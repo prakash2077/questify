@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scope: Solo Leveling-Style Life App</title>
+<style>
+  :root{--bg:#05060d;--panel:#0d1020;--line:#252a4a;--text:#e8eaf6;--dim:#9aa0c3;--glow:#6c8cff;--fire:#ff7a3d;--bad:#ff4d6d;--ok:#4be0a0}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,Segoe UI,sans-serif}
+  main{max-width:860px;margin:0 auto;padding:32px 16px 64px}
+  h1{font-size:2rem;margin:0 0 4px;text-shadow:0 0 18px rgba(108,140,255,.5)}
+  h2{font-size:1.15rem;color:var(--glow);margin:36px 0 10px;letter-spacing:.04em;text-transform:uppercase}
+  .tag{color:var(--dim);margin:0 0 8px}
+  .status{display:inline-block;border:1px solid var(--fire);color:var(--fire);border-radius:999px;padding:2px 12px;font-size:.8rem}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .kernel{border-color:var(--fire);box-shadow:0 0 24px rgba(255,122,61,.18)}
+  blockquote{margin:10px 0 0;color:var(--dim);border-left:3px solid var(--fire);padding-left:12px;font-style:italic}
+  svg{width:100%;height:auto;display:block}
+  svg text{fill:var(--text);font:13px system-ui,sans-serif}
+  svg .box{fill:var(--panel);stroke:var(--glow);stroke-width:1.5}
+  svg .pen{fill:#1a0b14;stroke:var(--bad);stroke-width:1.5}
+  svg .arrow{stroke:var(--dim);stroke-width:1.5;fill:none}
+  details{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:10px 0;padding:0}
+  summary{cursor:pointer;padding:12px 18px;font-weight:600;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";color:var(--glow)}
+  details[open] summary::before{content:"▾ "}
+  details ul{margin:0;padding:0 18px 14px 40px;color:var(--text)}
+  details li{margin:4px 0}
+  .now summary{color:var(--ok)} .later summary{color:var(--glow)} .cut summary{color:var(--bad)}
+  .why{color:var(--dim)}
+  .grid{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <span class="status">approved</span>
+  <h1>Solo Leveling-Style Life App <span class="why">(working title)</span></h1>
+  <p class="tag">A daily-quest app that gamifies your real life: finish tasks and grow your shadow army; miss them and the app locks into a Penalty Zone.</p>
+
+  <h2>The Unique Kernel</h2>
+  <div class="card kernel">
+    <strong>The Penalty Zone.</strong> Miss a task and the rest of the app shuts until you clear a hard penalty you chose in advance. The screen also gently shows the full picture: your goal, the weeks you have left in your life, and a real, influential quote. It motivates without being harsh, so people don't just uninstall.
+    <blockquote>"It should be somewhat harder... but gentle, something that feels awesome and heartwarming."</blockquote>
+  </div>
+
+  <h2>The Core Loop</h2>
+  <div class="card">
+    <svg viewBox="0 0 800 300" role="img" aria-label="Core loop: morning quests, focus screen, check off, coins, army; a missed task goes to the Penalty Zone then back to quests">
+      <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#9aa0c3"/></marker></defs>
+      <rect class="box" x="10" y="30" width="130" height="56" rx="10"/><text x="75" y="55" text-anchor="middle">Morning</text><text x="75" y="73" text-anchor="middle">quest list</text>
+      <rect class="box" x="175" y="30" width="130" height="56" rx="10"/><text x="240" y="55" text-anchor="middle">Black focus</text><text x="240" y="73" text-anchor="middle">screen + fire</text>
+      <rect class="box" x="340" y="30" width="130" height="56" rx="10"/><text x="405" y="55" text-anchor="middle">Check off</text><text x="405" y="73" text-anchor="middle">task</text>
+      <rect class="box" x="505" y="30" width="130" height="56" rx="10"/><text x="570" y="55" text-anchor="middle">Earn</text><text x="570" y="73" text-anchor="middle">coins</text>
+      <rect class="box" x="670" y="30" width="120" height="56" rx="10"/><text x="730" y="55" text-anchor="middle">Grow your</text><text x="730" y="73" text-anchor="middle">army</text>
+      <path class="arrow" marker-end="url(#a)" d="M140 58H175"/><path class="arrow" marker-end="url(#a)" d="M305 58H340"/><path class="arrow" marker-end="url(#a)" d="M470 58H505"/><path class="arrow" marker-end="url(#a)" d="M635 58H670"/>
+      <path class="arrow" marker-end="url(#a)" d="M75 86V180" stroke-dasharray="5 4"/>
+      <text x="85" y="140" style="fill:#ff4d6d">task missed</text>
+      <rect class="pen" x="10" y="180" width="360" height="100" rx="12"/>
+      <text x="190" y="208" text-anchor="middle" style="fill:#ff4d6d;font-weight:700">PENALTY ZONE (app locked)</text>
+      <text x="190" y="232" text-anchor="middle">Hard penalty you chose in advance</text>
+      <text x="190" y="252" text-anchor="middle">Your goal · weeks left · a real quote</text>
+      <path class="arrow" marker-end="url(#a)" d="M370 230H430"/>
+      <text x="440" y="235">Penalty cleared → back to quests</text>
+    </svg>
+    <p class="why">You come back because the army grows, and the penalty is unavoidable.</p>
+  </div>
+
+  <h2>Who It's For &amp; Why</h2>
+  <div class="grid">
+    <div class="card"><strong>Who</strong><br>A student like you who wants to improve and reach goals, probably a <em>Solo Leveling</em> fan. Today there's no good plan, and apps that rely on willpower get skipped or uninstalled.</div>
+    <div class="card"><strong>Why it matters</strong><br>You're on a dopamine detox, working on self-improvement, and want to be stable enough to take care of family. You want a level-up system for your own life.</div>
+  </div>
+
+  <h2>Look &amp; Feel</h2>
+  <div class="card">
+    <em>Solo Leveling</em> and <em>Demon Slayer</em> energy. A true-black AMOLED look with a grinding fire symbol. Cinematic and cute at once, so just using it gives a dopamine hit and a sense of progress. <strong>Sound effects matter</strong>: check-offs, coins, new soldiers and the Penalty Zone should sound good, like a game. Fonts and styling close to the anime's System UI, with a "fire plus cool" Pinterest vibe. Heartwarming, not harsh.
+  </div>
+
+  <h2>What "Working" Looks Like</h2>
+  <div class="card">
+    Open the app and see today's quests with deadlines and priority. Start a task and get the black focus screen with the task name and fire. Check it off, earn coins, buy and name a soldier, and watch the army grow.<br><br>
+    <strong>The "oh, that's cool" beat:</strong> a missed task locks the app into the Penalty Zone, with your goal, weeks left, and a quote.
+  </div>
+
+  <h2>Boundary</h2>
+  <details class="now" open><summary>Now: in the proof of concept</summary>
+    <ul>
+      <li>Quest list with deadlines and user-set priority</li>
+      <li>Check off a task; focused black screen with task name and fire symbol</li>
+      <li>Coins for finished tasks</li>
+      <li><strong>The empire, made concrete:</strong> a shop where coins buy a weapon or a soldier, you name each soldier, and one army screen shows everything you own so it visibly grows. Easy to understand at a glance. <em>(Proposed from your description; confirm in review.)</em></li>
+      <li>Sound effects on key moments; cinematic, cute look and feel</li>
+      <li>Missed task opens the Penalty Zone: app locked, pre-chosen hard penalty, goal, weeks left, quote</li>
+      <li>Phone-sized web app</li>
+    </ul>
+  </details>
+  <details class="later"><summary>Later: worth doing, not now</summary>
+    <ul>
+      <li>Mini-games</li>
+      <li>AI-assigned priority</li>
+      <li>Phone home-screen widget</li>
+      <li>Clash of Clans-style attacks with your army</li>
+      <li>Online challenges, winning other people's soldiers</li>
+    </ul>
+  </details>
+  <details class="cut"><summary>Cut: and why</summary>
+    <ul>
+      <li><strong>Real-life offers and rewards:</strong> depends on outside partners and isn't needed to prove the kernel.</li>
+      <li><strong>Losing rank or level on a skip:</strong> you said you'd rather use the Penalty Zone than build something to lose.</li>
+    </ul>
+  </details>
+</main>
+</body>
+</html>

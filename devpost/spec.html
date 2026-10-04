@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical Spec — Solo Leveling-Style Life App</title>
+<style>
+:root{--bg:#000;--panel:#0b0f1a;--line:#1d2a4a;--text:#e6ecff;--dim:#8d9ac0;--accent:#2f7bff;--danger:#ff3b3b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,Segoe UI,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:1.6rem;letter-spacing:.08em;text-transform:uppercase;margin:.2em 0}
+h2{font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:6px;margin-top:40px}
+.badge{display:inline-block;border:1px solid var(--accent);color:var(--accent);padding:2px 10px;border-radius:99px;font-size:.75rem;letter-spacing:.1em}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}
+code{background:#10182c;padding:1px 6px;border-radius:4px;font-size:.88em}
+pre{background:#060912;border:1px solid var(--line);border-radius:8px;padding:12px;overflow:auto;font-size:.82rem}
+.dim{color:var(--dim)}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--text);font:13px system-ui}
+svg .box{fill:var(--panel);stroke:var(--accent);stroke-width:1.5}
+svg .red{stroke:var(--danger)}
+svg .arrow{stroke:var(--dim);stroke-width:1.5;fill:none;marker-end:url(#a)}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.steps button,.tabs button{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-height:40px;cursor:pointer}
+.steps button[aria-pressed=true]{border-color:var(--accent);background:#0f1c3a}
+.step-body{min-height:90px}
+details{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:8px 0;padding:10px 14px}
+summary{cursor:pointer;font-weight:600}
+summary span{color:var(--dim);font-weight:400;font-size:.85rem;margin-left:8px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.tree{white-space:pre;font-size:.8rem}
+.tree b{color:var(--accent);font-weight:400}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+<span class="badge">APPROVED · spec.md is the canonical text</span>
+<h1>Solo Leveling-Style Life App<br><span class="dim" style="font-size:.8em">Technical Spec</span></h1>
+
+<h2>How it works, in plain language</h2>
+<div class="card">
+<p>A <b>website that acts like a phone app</b> (a Progressive Web App). You open a link on your phone, tap <b>Add to Home Screen</b>, and it opens full-screen with its own icon.</p>
+<p>It is plain <b>HTML/CSS/JavaScript</b> for the screens, a <b>canvas</b> for the fire and army, and the <b>phone's own storage</b> as memory. No server, no accounts. <b>Vercel</b> just keeps the files at a web link, updated each time you push to GitHub.</p>
+<p class="dim">Later, <b>Capacitor</b> can wrap the same files into a real Android app in Android Studio.</p>
+</div>
+
+<h2>The big picture</h2>
+<svg viewBox="0 0 800 270" role="img" aria-label="Architecture: phone browser holds screens, canvas, audio and storage; GitHub feeds Vercel which serves files">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8d9ac0"/></marker></defs>
+<rect class="box" x="10" y="20" width="150" height="60" rx="8"/><text x="85" y="46" text-anchor="middle">Your code</text><text x="85" y="64" text-anchor="middle" class="dim">GitHub (public)</text>
+<rect class="box" x="10" y="150" width="150" height="60" rx="8"/><text x="85" y="176" text-anchor="middle">Vercel</text><text x="85" y="194" text-anchor="middle">free hosting</text>
+<path class="arrow" d="M85,80 L85,150"/>
+<rect class="box" x="230" y="10" width="560" height="250" rx="12"/>
+<text x="250" y="34" style="font-weight:700">Your phone (browser / installed app)</text>
+<rect class="box" x="250" y="50" width="150" height="55" rx="8"/><text x="325" y="74" text-anchor="middle">Screens</text><text x="325" y="92" text-anchor="middle">HTML + JS</text>
+<rect class="box" x="420" y="50" width="170" height="55" rx="8"/><text x="505" y="74" text-anchor="middle">Canvas</text><text x="505" y="92" text-anchor="middle">fire · soldiers · demons</text>
+<rect class="box" x="610" y="50" width="160" height="55" rx="8"/><text x="690" y="74" text-anchor="middle">Audio</text><text x="690" y="92" text-anchor="middle">synthesized sounds</text>
+<rect class="box" x="250" y="150" width="200" height="85" rx="8"/><text x="350" y="176" text-anchor="middle">localStorage</text><text x="350" y="194" text-anchor="middle">quests · coins · XP</text><text x="350" y="212" text-anchor="middle">level · army · settings</text>
+<rect class="box red" x="480" y="150" width="190" height="85" rx="8"/><text x="575" y="176" text-anchor="middle">IndexedDB</text><text x="575" y="194" text-anchor="middle">penalty photos</text><text x="575" y="212" text-anchor="middle">(camera input)</text>
+<path class="arrow" d="M160,180 L230,180"/>
+<path class="arrow" d="M325,105 L325,150"/><path class="arrow" d="M575,150 L575,110" style="display:none"/>
+</svg>
+<p class="dim">Files travel from GitHub, to Vercel, to your phone. After that everything happens on the phone.</p>
+
+<h2>The core journey through the system</h2>
+<p class="dim">Tap a step. Source: <code>prd.md &gt; The Core Journey</code></p>
+<div class="steps" id="steps" role="group" aria-label="Journey steps"></div>
+<div class="card step-body" id="stepBody" aria-live="polite"></div>
+
+<h2>Penalty Zone flow</h2>
+<svg viewBox="0 0 800 130" role="img" aria-label="Penalty flow: deadline passes, saved lock, red screen, photo or fallback, unlock">
+<rect class="box" x="5" y="35" width="130" height="60" rx="8"/><text x="70" y="62" text-anchor="middle">Deadline passes</text><text x="70" y="80" text-anchor="middle">no check-off</text>
+<rect class="box red" x="165" y="35" width="130" height="60" rx="8"/><text x="230" y="62" text-anchor="middle">Save lock</text><text x="230" y="80" text-anchor="middle">penalty note</text>
+<rect class="box red" x="325" y="35" width="140" height="60" rx="8"/><text x="395" y="62" text-anchor="middle">Red screen</text><text x="395" y="80" text-anchor="middle">task · goal · weeks · quote</text>
+<rect class="box" x="495" y="10" width="140" height="48" rx="8"/><text x="565" y="40" text-anchor="middle">Photo proof</text>
+<rect class="box" x="495" y="72" width="140" height="48" rx="8"/><text x="565" y="94" text-anchor="middle">No camera?</text><text x="565" y="110" text-anchor="middle">type + hold 5s</text>
+<rect class="box" x="665" y="35" width="130" height="60" rx="8"/><text x="730" y="70" text-anchor="middle">App unlocks</text>
+<path class="arrow" d="M135,65 L165,65"/><path class="arrow" d="M295,65 L325,65"/><path class="arrow" d="M465,55 L495,38"/><path class="arrow" d="M465,75 L495,96"/><path class="arrow" d="M635,34 L665,55"/><path class="arrow" d="M635,96 L665,75"/>
+</svg>
+
+<h2>Stack</h2>
+<table>
+<tr><th>Piece</th><th>Choice</th><th>Who decided</th></tr>
+<tr><td>App type</td><td>Progressive Web App</td><td>You</td></tr>
+<tr><td>Code</td><td>Plain JavaScript, HTML, CSS (no framework)</td><td>Derived</td></tr>
+<tr><td>Animation</td><td>Canvas 2D + SVG sprites</td><td>Derived</td></tr>
+<tr><td>Sound</td><td>Web Audio, synthesized</td><td>Derived</td></tr>
+<tr><td>Data</td><td>localStorage + IndexedDB, on device only</td><td>You</td></tr>
+<tr><td>Camera</td><td><code>&lt;input capture&gt;</code></td><td>Derived</td></tr>
+<tr><td>Hosting</td><td>Vercel (free) from public GitHub repo</td><td>You</td></tr>
+</table>
+<p class="dim">To verify early: camera opens on your phone, sound plays after the first tap, Add to Home Screen is full-screen.</p>
+
+<h2>Components</h2>
+<p class="dim">Click to open. Each ties to a PRD heading and files.</p>
+<div id="comps"></div>
+
+<h2>Data model</h2>
+<pre>{
+  profile:  { dob, lifespanYears, setupDone },
+  goal:     { id, name },
+  quests:   [ { id, name, deadline:"21:00", priority:1-3, penalty, createdOn } ],
+  days:     { "YYYY-MM-DD": { done:[questId], checkedIn } },
+  coins, xp, level,
+  army:     [ { id, catalogId, name } ],
+  settings: { accent, muted },
+  penalty:  null | { questId, date },     // kept so reloading can't escape the lock
+  proofs:   [ { id, date, questId, hasPhoto } ]
+}</pre>
+<p class="dim">Saved in <code>localStorage</code> key <code>lifeApp.v1</code>. Photos are blobs in IndexedDB. On reopen everything is restored.</p>
+
+<h2>Rewards at a glance</h2>
+<table>
+<tr><th>Priority</th><th>XP</th><th>Coins</th></tr>
+<tr><td>1</td><td>10</td><td>5</td></tr><tr><td>2</td><td>20</td><td>10</td></tr><tr><td>3</td><td>30</td><td>15</td></tr>
+<tr><td>Daily check-in</td><td>5</td><td>0</td></tr>
+</table>
+<p class="dim">Level n to n+1 needs <code>round(50 × 1.33^(n−1))</code> XP: level 1 to 2 is 50; level 10 to 11 is about 650 (~10 days). Tunable in <code>config.js</code>.</p>
+
+<h2>File structure</h2>
+<pre class="tree"><b>life-app/</b>
+├── index.html            all screens as sections
+├── manifest.webmanifest  makes it installable
+├── sw.js                 offline cache
+├── css/  base.css · screens.css
+├── js/
+│   ├── main.js · store.js · config.js
+│   ├── quests.js · rewards.js · penalty.js
+│   ├── fire.js · battleground.js · sprites.js
+│   ├── audio.js · intro.js · weeks-grid.js
+│   └── screens/  setup · today · focus · shop · settings · gallery
+├── data/  catalog.js · quotes.js
+├── assets/  sprites/ · icons/ · sounds/
+├── devpost/
+└── README.md</pre>
+
+<h2>If something breaks</h2>
+<table>
+<tr><td>Sound blocked</td><td>"Tap to begin" screen unlocks it; mute toggle in Settings</td></tr>
+<tr><td>Camera won't open</td><td>Type "I did it" and hold 5 seconds</td></tr>
+<tr><td>Storage cleared</td><td>First-use flow again; reset in Demo tools</td></tr>
+<tr><td>Deadline passes while closed</td><td>Locks on next open (a web app can't run in the background)</td></tr>
+</table>
+
+<h2>Where it runs and how to try it</h2>
+<div class="card">
+<p><b>Computer:</b> <code>npx serve .</code>, open localhost in phone-size mode.<br>
+<b>Phone:</b> open the Vercel link, Add to Home Screen.<br>
+<b>Demo video:</b> screen-record the phone. <i>Demo tools</i> in Settings makes a deadline due in 1 minute.<br>
+<b>Submission:</b> demo video + public GitHub repo. The Vercel link is a bonus.</p>
+</div>
+
+<h2>Simplified on purpose</h2>
+<ul>
+<li>Device-only storage, no accounts</li>
+<li>Synthesized sounds, no audio files</li>
+<li>Ambient Battleground, no combat</li>
+<li>Three active quests in total (enforces max 3 a day)</li>
+<li>No background notifications (Capacitor adds them later)</li>
+</ul>
+</main>
+
+<script>
+const steps=[
+["First open","A black “Tap to begin” (unlocks sound), then the intro and Level 0 demo with sample data, then Setup.","intro.js · main.js"],
+["Set a goal","You enter birth date, lifespan, goal and quests (name, deadline, priority, penalty). Saved to localStorage.","setup.js · store.js · quests.js"],
+["Today","Recurring quests for today (max 3), by priority, with deadlines.","today.js · quests.js"],
+["Focus","Black screen, quest name, canvas bonfire, check-off.","focus.js · fire.js"],
+["Finish","Quest marked done; coins and XP added; sound and animation; level recalculated.","rewards.js · audio.js"],
+["Grow the army","Shop spends coins, you name the soldier, it is saved and drawn around the fire.","shop.js · battleground.js · sprites.js"],
+["Level up","XP crosses the threshold; Battleground draws bigger and more demons.","config.js · battleground.js"],
+["Miss a quest","Timer checks every 15 s and on open. A saved lock note shows the red Penalty Zone and blocks all other screens.","penalty.js · weeks-grid.js · quotes.js"],
+["Clear it","Photo goes to IndexedDB (or the type-and-hold fallback). Lock note cleared; app unlocks.","penalty.js · gallery.js"]
+];
+const comps=[
+["App Shell and Router","One screen at a time; enforces the lock; registers the service worker.","Screens and Layout","index.html · main.js · sw.js"],
+["Intro and Level 0 Demo","Tap gate, animated intro with sound, 4–5 explainer cards using labelled sample data.","The Core Journey","intro.js"],
+["Setup","Birth date, lifespan, first goal and quests; shown once.","The Core Journey","setup.js"],
+["Goals and Quests","Recurring daily quests; 3 active in total; fourth is blocked with a message.","Goals and Quests","quests.js"],
+["Today Screen","Quests, coins/XP/level header, Focus buttons, daily check-in.","Screens and Layout &gt; Today","today.js"],
+["Focus Mode","True black, quest name, bonfire, check-off.","Focus Mode","focus.js · fire.js"],
+["Rewards","Coins, XP, levels, check-in (5 XP). Misses never remove XP.","Coins, XP and Levels","rewards.js · config.js"],
+["Shop and Army","Catalog; blocks if too few coins; name soldiers; Sung Jinwoo first; weapons stand in the ground.","Shop and Army","shop.js · catalog.js"],
+["Battleground","Fire at the bottom, soldiers around it, demons grow with level; ambient loop; sound layers.","Battleground","battleground.js · sprites.js"],
+["Penalty Zone","Red lock: task, goal, weeks-left grid, quote, photo proof, fallback.","Penalty Zone","penalty.js · weeks-grid.js · quotes.js"],
+["Proof Gallery","Past penalty photos with dates, under Settings.","Penalty Zone","gallery.js"],
+["Settings","Accent colour, gallery, mute, labelled Demo tools.","Screens and Layout &gt; Settings","settings.js"]
+];
+const sb=document.getElementById('steps'),body=document.getElementById('stepBody');
+function show(i){[...sb.children].forEach((b,j)=>b.setAttribute('aria-pressed',i===j));
+ const s=steps[i];body.innerHTML='<b>'+(i+1)+'. '+s[0]+'</b><p>'+s[1]+'</p><p class="dim">Files: '+s[2]+'</p>';}
+steps.forEach((s,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+s[0];b.onclick=()=>show(i);sb.appendChild(b)});
+show(0);
+document.getElementById('comps').innerHTML=comps.map(c=>`<details><summary>${c[0]}<span>${c[3]}</span></summary><p>${c[1]}</p><p class="dim">PRD: <code>prd.md &gt; ${c[2]}</code></p></details>`).join('');
+</script>
+</body>
+</html>

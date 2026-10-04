@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PRD — Solo Leveling-Style Life App</title>
+<style>
+:root{--bg:#05070d;--card:#0c1220;--line:#1c2a4a;--fg:#e6eefc;--mut:#8fa0c4;--blue:#3aa0ff;--red:#ff3b4a;--fire:#ff9a3a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,Segoe UI,sans-serif;padding:24px 16px 64px}
+main{max-width:860px;margin:auto}h1{font-size:1.9rem;margin:.2em 0;letter-spacing:.5px}h1 span{color:var(--blue)}
+h2{margin-top:2.2em;color:var(--blue);font-size:1.15rem;text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.tag{display:inline-block;font-size:.75rem;padding:2px 8px;border:1px solid var(--line);border-radius:99px;color:var(--mut);margin-right:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.mut{color:var(--mut)}.draft{color:var(--fire)}
+svg{width:100%;height:auto}svg text{fill:var(--fg);font-size:13px;font-family:system-ui}
+.node{fill:var(--card);stroke:var(--blue);stroke-width:1.5}.node.red{stroke:var(--red)}.edge{stroke:var(--mut);stroke-width:1.5;fill:none}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.steps button,.tabs button{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;font:inherit}
+.steps button[aria-pressed=true],.tabs button[aria-pressed=true]{border-color:var(--blue);background:#10203d}
+.tabs.red button[aria-pressed=true]{border-color:var(--red);background:#2a0d12}
+.panel{display:none}.panel.on{display:block}
+ul{padding-left:1.2em}li{margin:4px 0}.ok::marker{content:"☐ "}
+.red-t{color:var(--red)}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0}summary{cursor:pointer;font-weight:600}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:640px){.cmp{grid-template-columns:1fr}}
+</style></head><body><main>
+<span class="tag">PRD</span><span class="tag">status: approved</span>
+<h1>Solo Leveling-Style <span>Life App</span></h1>
+<p class="mut">Working title. A phone-sized web app: finish daily quests, grow your shadow army; miss one and the Penalty Zone locks everything. Canonical text lives in <code>prd.md</code>.</p>
+
+<h2>Scope said → Now we know</h2>
+<div class="cmp">
+<div class="card"><b>Scope said</b><ul><li>“Quest list with deadlines and priority”</li><li>“Missed task leads to the Penalty Zone”</li><li>“A simple empire/army”</li></ul></div>
+<div class="card"><b>Now</b><ul><li>Goals hold daily quests entered once; max 3 a day; each has a pre-chosen penalty</li><li>Missed = deadline passes; photo proof clears it; weeks-left grid + goal + quote</li><li>Full-screen 2D battleground: fire, named soldiers, demons that grow with level</li></ul></div>
+</div>
+
+<h2>The Core Journey</h2>
+<svg viewBox="0 0 820 250" role="img" aria-label="Journey: intro, setup, today, focus, check-off, shop, battleground; deadline missed leads to penalty zone and back">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8fa0c4"/></marker></defs>
+<rect class="node" x="10" y="20" width="100" height="44" rx="10"/><text x="60" y="47" text-anchor="middle">Intro</text>
+<rect class="node" x="140" y="20" width="110" height="44" rx="10"/><text x="195" y="47" text-anchor="middle">Setup + goal</text>
+<rect class="node" x="280" y="20" width="100" height="44" rx="10"/><text x="330" y="47" text-anchor="middle">Today</text>
+<rect class="node" x="410" y="20" width="100" height="44" rx="10"/><text x="460" y="47" text-anchor="middle">Focus</text>
+<rect class="node" x="540" y="20" width="120" height="44" rx="10"/><text x="600" y="47" text-anchor="middle">Check off</text>
+<rect class="node" x="690" y="20" width="120" height="44" rx="10"/><text x="750" y="40" text-anchor="middle">Coins + XP</text><text x="750" y="56" text-anchor="middle" class="mut">+ level</text>
+<rect class="node" x="540" y="120" width="100" height="44" rx="10"/><text x="590" y="147" text-anchor="middle">Shop</text>
+<rect class="node" x="690" y="120" width="120" height="44" rx="10"/><text x="750" y="147" text-anchor="middle">Battleground</text>
+<rect class="node red" x="280" y="190" width="170" height="44" rx="10"/><text x="365" y="217" text-anchor="middle">Penalty Zone (red)</text>
+<path class="edge" d="M110 42H138" marker-end="url(#a)"/><path class="edge" d="M250 42H278" marker-end="url(#a)"/><path class="edge" d="M380 42H408" marker-end="url(#a)"/><path class="edge" d="M510 42H538" marker-end="url(#a)"/><path class="edge" d="M660 42H688" marker-end="url(#a)"/>
+<path class="edge" d="M750 64V120" marker-end="url(#a)" style="display:none"/><path class="edge" d="M750 64C750 90 600 90 590 118" marker-end="url(#a)"/>
+<path class="edge" d="M640 142H688" marker-end="url(#a)"/>
+<path class="edge" d="M330 64V188" stroke="#ff3b4a" marker-end="url(#a)"/><text x="338" y="130" class="red-t" style="fill:#ff3b4a">deadline missed</text>
+<path class="edge" d="M450 212H500C520 212 520 100 330 66" stroke="#3aa0ff" marker-end="url(#a)"/><text x="468" y="200" style="fill:#3aa0ff">photo proof</text>
+</svg>
+<p class="mut">Step through the journey:</p>
+<div class="steps" id="jsteps"></div>
+<div class="card" id="jtext"></div>
+
+<h2>Screens: behavior, states, criteria</h2>
+<div class="tabs" id="tabs"></div>
+<div id="panels"></div>
+
+<h2>Look and Feel</h2>
+<div class="card"><ul>
+<li>True-black AMOLED, <i>Solo Leveling</i> System-style type; blue by default, red in the Penalty Zone; accent colour switchable in Settings.</li>
+<li>Sleek short 3D-feeling intro; a real burning bonfire (building something, cooking something); thick clean Duolingo-style 2D sprites drawn from scratch.</li>
+<li>Sound at key moments; the battleground gets richer in sound as the army grows. Heartwarming, not harsh.</li></ul></div>
+
+<h2>Building now vs deferred</h2>
+<div class="cmp">
+<div class="card"><b>Building</b><ul><li>Intro, Level 0 demo, sign-up</li><li>Goals + recurring quests (max 3/day)</li><li>Focus mode, coins, XP, levels</li><li>Shop, naming, battleground</li><li>Penalty Zone with photo proof</li><li>Accent colour setting</li></ul></div>
+<div class="card"><b>Deferred</b><ul><li>AI plan interviewer</li><li>Cheat prevention</li><li>Playable soldier-vs-demon fighting</li><li>Accounts / sync</li></ul></div>
+</div>
+
+<h2>Open questions & assumptions</h2>
+<details open><summary>Please confirm</summary><ul>
+<li>Soldiers and demons animate in a loop; no playable combat.</li>
+<li>Data stays on your device; no accounts.</li>
+<li>Can wait: what counts as a daily check-in and other small XP sources.</li><li>Can wait: the exact form of the no-camera fallback.</li>
+<li>Can wait: Level 0 demo contents, final app name, where the quotes come from.</li></ul></details>
+
+<script>
+const J=[["1. Intro & setup","Sleek intro from black with a sound. Level 0 demo teaches the app. Enter date of birth and expected lifespan; create a goal and its daily quests, each with a pre-chosen penalty."],
+["2. Today","Level 1: up to three quests appear each morning, ordered by priority, with deadlines."],
+["3. Focus","Tap Focus: a true-black screen with only the quest name and a burning bonfire."],
+["4. Finish","Check off: coins and XP with sound and animation. XP fills, levels rise (fast early, slower later)."],
+["5. Grow","Spend coins in the Shop, name your soldier (the first is Sung Jinwoo), watch the army appear around your fire. Demons grow with your level."],
+["6. Miss","Deadline passes: the app locks into the red Penalty Zone with your penalty, goal, weeks-left grid and a quote. Do it, submit a photo, and it unlocks."]];
+const js=document.getElementById('jsteps'),jt=document.getElementById('jtext');
+J.forEach((s,i)=>{const b=document.createElement('button');b.textContent=i+1;b.setAttribute('aria-pressed',i==0);b.onclick=()=>{[...js.children].forEach(c=>c.setAttribute('aria-pressed',false));b.setAttribute('aria-pressed',true);jt.innerHTML='<b>'+s[0]+'</b><p>'+s[1]+'</p>'};js.appendChild(b)});
+jt.innerHTML='<b>'+J[0][0]+'</b><p>'+J[0][1]+'</p>';
+const P={
+"Quests":["Goals and daily quests","Enter once, appear every day. Name, deadline, priority, pre-chosen penalty. Max three per day.",["Quests appear next day without re-entering","Each shows name, deadline, priority","A fourth quest is refused with a reason"],"Empty: Today prompts to set up quests."],
+"Focus":["Focus mode","Full-screen true black, quest name, burning bonfire, check-off control.",["Only name and moving fire are shown","Quest can be checked off from here"],""],
+"Rewards":["Coins, XP, levels","More XP for higher priority; a small amount also comes from things like a daily check-in. A miss never removes XP or coins. Steeper levels over time; Level 0 is the demo.",["Check-off raises coins and XP with sound","Daily check-in gives a small XP bonus","Level increases when XP fills","Later levels need more XP than early ones"],""],
+"Shop & Army":["Shop and Battleground","Buy soldiers/weapons, name them, see them on the full-screen scene with your fire at the bottom; demons grow with level.",["Purchase blocked with a message when coins are short","Bought soldier appears with its name","More purchases show more soldiers","Demons bigger at higher levels","Only the fire at the start"],"Empty: new users see only the fire."],
+"Penalty Zone":["Penalty Zone","Triggers when a deadline passes without check-off. Locks everything. Shows penalty, goal, weeks-left grid, quote.",["Missing a deadline locks every other screen","Shows penalty, goal, weeks-left grid, quote in red","Unlocks after photo submitted (or the no-camera fallback)","Photo is kept and viewable"],"If the camera is unavailable, the penalty can still be cleared by a fallback (rare); its form is decided in spec."]};
+const tb=document.getElementById('tabs'),pn=document.getElementById('panels');
+Object.keys(P).forEach((k,i)=>{const b=document.createElement('button');b.textContent=k;b.setAttribute('aria-pressed',i==0);
+const d=document.createElement('div');d.className='panel card'+(i==0?' on':'');const v=P[k];
+d.innerHTML='<b>'+v[0]+'</b><p>'+v[1]+'</p><b class="mut">How we’ll know it works</b><ul class="ok">'+v[2].map(x=>'<li>'+x+'</li>').join('')+'</ul>'+(v[3]?'<p class="mut">'+v[3]+'</p>':'');
+b.onclick=()=>{[...tb.children].forEach(c=>c.setAttribute('aria-pressed',false));[...pn.children].forEach(c=>c.classList.remove('on'));b.setAttribute('aria-pressed',true);d.classList.add('on')};
+tb.appendChild(b);pn.appendChild(d)});
+</script></main></body></html>
