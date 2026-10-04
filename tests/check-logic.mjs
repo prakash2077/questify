@@ -7,8 +7,12 @@ import {
   addQuest,
   canAddQuest,
   dateStr,
+  deadlineTime,
+  findMissed,
   isDone,
   markDone,
+  nextDeadline,
+  penaltyServed,
   questsFor,
   removeQuest,
   upcomingQuests,
@@ -110,6 +114,88 @@ check('ticking a quest is done for that day only', () => {
   assert.equal(isDone(state, saved.id, '2026-10-04'), true);
   assert.deepEqual(state.days['2026-10-04'].done, [saved.id]);
   assert.equal(isDone(state, saved.id, '2026-10-05'), false);
+});
+
+// ---------- Missed quests (the Penalty Zone trigger) ----------
+
+// A state with one 21:00 quest that started on 4 October.
+function withQuest(over = {}) {
+  const state = { quests: [], days: {}, proofs: [] };
+  const { quest: saved } = addQuest(state, quest(over), noon);
+  return { state, id: saved.id };
+}
+const at = (day, hh, mm = 0) => new Date(2026, 9, day, hh, mm);
+
+check('before the deadline nothing is missed', () => {
+  const { state } = withQuest();
+  assert.deepEqual(findMissed(state, at(4, 20, 59)), []);
+});
+
+check('deadline passed without a tick is a miss', () => {
+  const { state, id } = withQuest();
+  assert.deepEqual(findMissed(state, at(4, 21, 0)), [{ questId: id, date: '2026-10-04' }]);
+});
+
+check('a ticked quest is never missed', () => {
+  const { state, id } = withQuest();
+  markDone(state, id, '2026-10-04');
+  assert.deepEqual(findMissed(state, at(4, 23, 0)), []);
+});
+
+check('a miss on an earlier day is found when the app opens the next morning', () => {
+  const { state, id } = withQuest();
+  assert.deepEqual(findMissed(state, at(5, 8)), [{ questId: id, date: '2026-10-04' }]);
+});
+
+check('a quest made after its deadline is not missed that day', () => {
+  const { state, id } = withQuest({ deadline: '07:00' });
+  assert.deepEqual(findMissed(state, at(4, 23)), []);
+  assert.deepEqual(findMissed(state, at(5, 7, 1)), [{ questId: id, date: '2026-10-05' }]);
+});
+
+check('a week away costs one penalty per quest, for the most recent miss', () => {
+  const { state, id } = withQuest();
+  assert.deepEqual(findMissed(state, at(11, 9)), [{ questId: id, date: '2026-10-10' }]);
+});
+
+check('a cleared penalty is not asked for again, and answers for earlier days', () => {
+  const { state, id } = withQuest();
+  state.proofs.push({ id: 'p1', questId: id, date: '2026-10-10', hasPhoto: true });
+  assert.deepEqual(findMissed(state, at(11, 9)), []);
+  assert.equal(penaltyServed(state, id, '2026-10-10'), true);
+  assert.equal(penaltyServed(state, id, '2026-10-11'), false);
+  assert.deepEqual(findMissed(state, at(11, 21)), [{ questId: id, date: '2026-10-11' }]);
+});
+
+check('several missed quests come back oldest deadline first', () => {
+  const state = { quests: [], days: {}, proofs: [] };
+  const late = addQuest(state, quest({ name: 'late', deadline: '20:00' }), noon).quest;
+  const early = addQuest(state, quest({ name: 'early', deadline: '15:00' }), noon).quest;
+  assert.deepEqual(findMissed(state, at(4, 22)), [
+    { questId: early.id, date: '2026-10-04' },
+    { questId: late.id, date: '2026-10-04' },
+  ]);
+});
+
+check('a Demo tool deadline applies to its one day only', () => {
+  const { state, id } = withQuest();
+  state.quests[0].demo = { date: '2026-10-04', time: '12:01:00' };
+  assert.equal(deadlineTime(state.quests[0], '2026-10-04'), '12:01:00');
+  assert.equal(deadlineTime(state.quests[0], '2026-10-05'), '21:00');
+  assert.deepEqual(findMissed(state, at(4, 12, 0)), []);
+  assert.deepEqual(findMissed(state, at(4, 12, 1)), [{ questId: id, date: '2026-10-04' }]);
+  markDone(state, id, '2026-10-04');
+  assert.deepEqual(findMissed(state, at(5, 20, 59)), []);
+});
+
+check('the next deadline skips finished quests and passed deadlines', () => {
+  const state = { quests: [], days: {}, proofs: [] };
+  const a = addQuest(state, quest({ deadline: '15:00' }), noon).quest;
+  addQuest(state, quest({ deadline: '20:00' }), noon);
+  assert.equal(nextDeadline(state, noon).getHours(), 15);
+  markDone(state, a.id, '2026-10-04');
+  assert.equal(nextDeadline(state, noon).getHours(), 20);
+  assert.equal(nextDeadline(state, at(4, 20, 30)), null);
 });
 
 // ---------- Weeks left ----------

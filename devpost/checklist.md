@@ -5,7 +5,7 @@ status: approved
 
 # Build Checklist
 
-Build mode: not chosen yet (slice 1 is built, verified and committed; the learner has not tried it yet)
+Build mode: fast. The learner also asked for learning notes to study later: add a section to `devpost/learning-notes.md` for every slice as it is built.
 
 ## Slices
 
@@ -19,7 +19,7 @@ Build mode: not chosen yet (slice 1 is built, verified and committed; the learne
   Learner check: Run `npx serve .` in the project folder, open `http://localhost:3000` in your browser's phone-size mode, tap to begin, fill in Setup with a goal and two or three quests, then close the tab and open it again. Your quests should still be on Today in priority order. Say how the look and the font feel to you.
   Commit: `Add setup, quests and Today screen`
 
-- [ ] **2. Missing a quest locks the app into the Penalty Zone**
+- [x] **2. Missing a quest locks the app into the Penalty Zone**
   Becomes usable: When a quest's deadline passes without a tick, the red Penalty Zone takes over the whole app and shows your penalty task, your goal, the weeks-left grid and a real quote. Reloading does not escape it. Submitting a photo (or the no-camera fallback) unlocks the app, and the photo can be found afterwards in Settings under Proof Gallery.
   Why now: This is the unique kernel, so it comes second, not last. It also carries the riskiest machinery (the deadline timer, a lock that survives a reload, the camera input, photo storage), and bad news about any of those should arrive now.
   PRD ref: `prd.md > The Core Journey` (step 8), `prd.md > Features and Behavior > Penalty Zone`, `prd.md > States and Boundaries` (Camera unavailable or permission denied)
@@ -97,4 +97,6 @@ Activity mode: not started
 - Each quest now also stores `startsOn` (`spec.md > Data Model`) — the rule "a quest created after its deadline begins tomorrow" cannot be worked out from `createdOn` alone, because that holds only the date, not the time of day.
 - Added `tests/check-logic.mjs` (`spec.md > File Structure`) — every slice's "Node check" needs somewhere to live, and keeping it in the repo lets it be rerun after later slices change the same rules. It uses Node's built-in `assert`; no packages.
 - The app shows the name "Questify" on the opening screen and browser tab — taken from the repo name the learner chose; the PRD and spec titles still say "working title" until the learner confirms it.
-
+- A quest missed several days in a row while the app was closed gives one penalty per quest (the most recent missed day), not one per day — the spec did not say what happens after a long absence, and a queue of penalties on return would work against the kernel's "motivate without being harsh". Recorded in `spec.md > Components > Penalty Zone` as derived; the learner still needs to confirm it.
+- The Demo tool moves only today's deadline (`quest.demo`) instead of rewriting the quest — otherwise using it once would leave a real quest permanently due at an odd time. Proof records also keep the quest name and penalty text (`spec.md > Data Model`).
+- The app also checks at the exact moment the next deadline passes, on top of the 15-second check — the lock otherwise lagged the deadline by up to 15 seconds, which reads as a bug in a demo.

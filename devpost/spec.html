@@ -108,7 +108,7 @@ a{color:var(--accent)}
   army:     [ { id, catalogId, name } ],
   settings: { accent, muted },
   penalty:  null | { questId, date },     // kept so reloading can't escape the lock
-  proofs:   [ { id, date, questId, hasPhoto } ]
+  proofs:   [ { id, date, questId, questName, penalty, clearedOn, hasPhoto } ]
 }</pre>
 <p class="dim">Saved in <code>localStorage</code> key <code>lifeApp.v1</code>. Photos are blobs in IndexedDB. On reopen everything is restored.</p>
 

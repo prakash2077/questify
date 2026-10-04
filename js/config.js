@@ -16,6 +16,11 @@ export const PENALTY_IDEAS = [
   'Stare at a wall for an hour',
 ];
 
+// Penalty Zone
+export const PENALTY_CHECK_MS = 15 * 1000; // how often an open app looks for missed deadlines
+export const FALLBACK_PHRASE = 'I did it';
+export const FALLBACK_HOLD_MS = 5 * 1000;
+
 export const DEFAULT_ACCENT = '#2f7bff';
 export const DEFAULT_LIFESPAN_YEARS = 80;
 export const MAX_LIFESPAN_YEARS = 120;

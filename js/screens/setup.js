@@ -9,7 +9,7 @@ import {
   PRIORITIES,
   QUEST_LIMIT_MESSAGE,
 } from '../config.js';
-import { addQuest, canAddQuest, dateStr, removeQuest } from '../quests.js';
+import { addQuest, canAddQuest, dateStr, deadlineTime, removeQuest } from '../quests.js';
 import { weeksLeft, weeksTotal } from '../weeks-grid.js';
 
 const $ = (id) => document.getElementById(id);
@@ -42,7 +42,8 @@ function formatTime(deadline) {
 }
 
 // The text half of a quest row: name, priority, then the deadline with any extras after it.
-export function questSummary(quest, ...extras) {
+// Pass a date to show the deadline that applies on that day.
+export function questSummary(quest, { date = null, extras = [] } = {}) {
   const body = document.createElement('div');
   body.className = 'quest__body';
 
@@ -56,7 +57,7 @@ export function questSummary(quest, ...extras) {
 
   const due = document.createElement('span');
   due.className = 'quest__meta';
-  due.append(`Due ${formatTime(quest.deadline)}`, ...extras);
+  due.append(`Due ${formatTime(date ? deadlineTime(quest, date) : quest.deadline)}`, ...extras);
 
   body.append(name, priority, due);
   return body;

@@ -76,7 +76,10 @@
     <!-- Today: home. -->
     <section class="screen" data-screen="today">
       <header class="today-head">
-        <p class="eyebrow" id="today-date"></p>
+        <div class="head-row">
+          <p class="eyebrow" id="today-date"></p>
+          <button class="btn btn--small" id="today-settings" type="button">Settings</button>
+        </div>
         <p class="today-goal"><span class="today-goal__label">Goal</span><span id="today-goal"></span></p>
       </header>
 
@@ -95,7 +98,91 @@
       <button class="btn btn--dashed" id="today-add-quest" type="button">+ Add quest</button>
     </section>
 
+    <!-- Penalty Zone: takes over the whole app until the penalty is cleared. -->
+    <section class="screen zone-danger" data-screen="penalty">
+      <div class="panel">
+        <h1 class="panel__title"><span class="notice__icon" aria-hidden="true">!</span>Penalty zone</h1>
+        <p class="system-line system-line--center">You missed a quest. Everything else is locked until you clear the penalty you chose. One miss does not undo you.</p>
+        <div class="fact">
+          <p class="field__label">Quest missed</p>
+          <p class="fact__value" id="penalty-quest"></p>
+          <p class="fact__note" id="penalty-when"></p>
+        </div>
+        <div class="fact fact--main">
+          <p class="field__label">Your penalty</p>
+          <p class="fact__value" id="penalty-task"></p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel__title">The full picture</h2>
+        <div class="fact">
+          <p class="field__label">Your goal</p>
+          <p class="fact__value" id="penalty-goal"></p>
+        </div>
+        <div class="fact">
+          <p class="field__label">Your weeks</p>
+          <canvas class="weeks-grid" id="penalty-weeks" role="img" aria-label="Grid of the weeks of your life: lived weeks dim, remaining weeks lit"></canvas>
+          <p class="fact__note" id="penalty-weeks-caption"></p>
+        </div>
+        <figure class="quote">
+          <blockquote id="penalty-quote"></blockquote>
+          <figcaption id="penalty-quote-author"></figcaption>
+        </figure>
+      </div>
+
+      <div class="panel" id="penalty-fallback" hidden>
+        <h2 class="panel__title">No camera</h2>
+        <p class="system-line">Do the penalty first. Then type <strong>I did it</strong> and hold the button for 5 seconds.</p>
+        <input class="input" id="penalty-fallback-text" type="text" autocomplete="off" autocapitalize="off" placeholder="I did it" aria-label="Type: I did it">
+        <button class="btn btn--hold" id="penalty-fallback-hold" type="button" disabled>
+          <span class="btn--hold__fill" aria-hidden="true"></span>
+          <span class="btn--hold__label">Hold for 5 seconds</span>
+        </button>
+      </div>
+
+      <div class="penalty-actions">
+        <label class="btn btn--primary btn--file">
+          Submit photo proof
+          <input class="visually-hidden" id="penalty-photo" type="file" accept="image/*" capture="environment">
+        </label>
+        <button class="link-btn" id="penalty-no-camera" type="button">Can't use the camera?</button>
+      </div>
+    </section>
+
+    <!-- Settings: Proof Gallery and Demo tools. -->
+    <section class="screen" data-screen="settings">
+      <header class="head-row">
+        <h1 class="eyebrow">Settings</h1>
+        <button class="btn btn--small" id="settings-back" type="button">Back</button>
+      </header>
+
+      <div class="panel">
+        <h2 class="panel__title">Proof gallery</h2>
+        <p class="system-line system-line--center" id="gallery-empty">No penalties yet. Keep it that way, Player.</p>
+        <ul class="gallery" id="gallery"></ul>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel__title">Demo tools</h2>
+        <p class="system-line">Shortcuts for showing the app in a demo. They are not part of normal use.</p>
+        <button class="btn btn--wrap" id="demo-due-soon" type="button">Make my next quest due in 1 minute</button>
+        <button class="btn btn--wrap" id="demo-reset" type="button">Reset all data</button>
+      </div>
+    </section>
+
   </main>
+
+  <!-- A penalty photo, opened large from the Proof Gallery. -->
+  <dialog class="modal" id="photo-view">
+    <div class="panel">
+      <img class="photo-view__img" id="photo-view-img" alt="">
+      <p class="system-line system-line--center" id="photo-view-caption"></p>
+      <div class="actions">
+        <button class="btn btn--primary" id="photo-view-close" type="button">Close</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- New quest form, used by Setup and by Today. -->
   <dialog class="modal" id="quest-sheet">

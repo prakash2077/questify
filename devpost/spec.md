@@ -132,6 +132,9 @@ Triggered by `penalty.js` when a quest's deadline time passes without a check-of
 - **Submit photo proof**, which opens the camera input; on a photo the image is stored in `IndexedDB`, the penalty clears, and the app unlocks.
 - **Fallback (no camera)** **[accepted]**: a small link, "Can't use the camera?", asks the user to type "I did it" and hold a button for 5 seconds, which also clears the penalty (recorded as "no photo").
 - If several quests were missed, they are handled one after another.
+- A quest missed on several days in a row while the app was closed gives **one** penalty, for the most recent missed day. Clearing it also answers for the days before it. **[derived, learner to confirm]**
+- A tick only counts before the deadline. Tapping the tick after the deadline has passed locks the app instead.
+- While the app is open it checks every 15 seconds, and also at the exact moment the next deadline passes and whenever the app comes back to the foreground.
 PRD ref: `prd.md > Features and Behavior > Penalty Zone`, `prd.md > States and Boundaries > Camera unavailable or permission denied`.
 
 ### Proof Gallery
@@ -163,9 +166,11 @@ All state is one object saved in `localStorage` under the key `lifeApp.v1`. It i
   army:     [ { id, catalogId, name } ],
   settings: { accent: "#2f7bff", muted: false },
   penalty:  null | { questId, date },
-  proofs:   [ { id, date, questId, hasPhoto: true } ]
+  proofs:   [ { id, date, questId, questName, penalty, clearedOn, hasPhoto: true } ]
 }
 ```
+- **`proofs`** also keep the quest's name and penalty text as they were at the time, so the Proof Gallery can still caption a photo after the quest is removed.
+- **`quest.demo`** (`{ date, time }`) exists only after the Demo tool "make my next quest due in 1 minute" is used. It moves the deadline for that one day and leaves the real daily deadline alone.
 - **Where it lives / how it updates / when you return:** state is in `localStorage`, updated by `store.js` on every action, and fully restored on reopen. This includes a pending `penalty`, which keeps the lock. Level is recomputed from XP.
 - **Photos:** `IndexedDB` database `lifeAppProofs`, store `photos`, one record per proof `{ id, blob }`, linked by `id` from `state.proofs`.
 - **Dates** are the device's local date as `YYYY-MM-DD`. Deadlines are local times.

@@ -1,7 +1,17 @@
 // Today: home. Lists today's quests by priority, each with its deadline and a done tick.
 
 import { getState, update } from '../store.js';
-import { dateStr, deadlineAt, isDone, markDone, questsFor, removeQuest, upcomingQuests } from '../quests.js';
+import {
+  dateStr,
+  deadlineAt,
+  isDone,
+  markDone,
+  penaltyServed,
+  questsFor,
+  removeQuest,
+  upcomingQuests,
+} from '../quests.js';
+import { enforcePenalty } from '../penalty.js';
 import { openQuestSheet, questSummary } from './setup.js';
 
 const $ = (id) => document.getElementById(id);
@@ -37,9 +47,9 @@ function questRow(quest, { today, now, upcoming }) {
     status.textContent = left;
   } else {
     status.classList.add('quest__late');
-    status.textContent = 'Deadline passed';
+    status.textContent = penaltyServed(getState(), quest.id, today) ? 'Missed · penalty cleared' : 'Deadline passed';
   }
-  const body = questSummary(quest, status);
+  const body = questSummary(quest, { date: today, extras: [status] });
 
   const remove = document.createElement('button');
   remove.className = 'icon-btn';
@@ -61,9 +71,14 @@ function questRow(quest, { today, now, upcoming }) {
   const tick = document.createElement('button');
   tick.className = 'quest__tick';
   tick.type = 'button';
-  tick.disabled = done;
+  tick.disabled = done || !left;
   tick.setAttribute('aria-label', done ? `Done: ${quest.name}` : `Mark done: ${quest.name}`);
   tick.addEventListener('click', () => {
+    // A tick only counts before the deadline. If it has just passed, lock instead.
+    if (enforcePenalty()) {
+      app.lock();
+      return;
+    }
     update((state) => markDone(state, quest.id, today));
     render();
   });
@@ -104,4 +119,5 @@ export function initToday(theApp) {
   });
 
   $('today-add-quest').addEventListener('click', () => openQuestSheet(render));
+  $('today-settings').addEventListener('click', () => app.go('settings'));
 }

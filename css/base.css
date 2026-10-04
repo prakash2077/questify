@@ -396,3 +396,99 @@ input {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- Danger zone ----------
+   Anything inside .zone-danger is drawn in red instead of the accent colour.
+   The colours built from --accent are listed again so they follow the change. */
+.zone-danger {
+  --accent: var(--danger);
+  --text-dim: #b89da2;
+  --line: color-mix(in srgb, var(--accent) 65%, transparent);
+  --line-soft: color-mix(in srgb, var(--accent) 30%, transparent);
+  --glow: color-mix(in srgb, var(--accent) 45%, transparent);
+  --fill: color-mix(in srgb, var(--accent) 9%, #000);
+  --fill-strong: color-mix(in srgb, var(--accent) 24%, #000);
+}
+
+/* ---------- Small extras ---------- */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.btn--small {
+  flex: none;
+  min-height: 40px;
+  padding: 4px 14px;
+  font-size: 13px;
+}
+
+/* Buttons with a long label may wrap onto two lines. */
+.btn--wrap {
+  flex: none;
+  letter-spacing: 0.12em;
+  white-space: normal;
+}
+
+/* A label styled as a button, wrapping a hidden file input (the camera). */
+.btn--file {
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.btn--file:focus-within {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.link-btn {
+  min-height: 40px;
+  padding: 4px 8px;
+  background: none;
+  border: 0;
+  color: var(--text-dim);
+  font-size: 16px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+/* Press-and-hold button: the fill sweeps across while it is held. */
+.btn--hold {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn--hold__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--fill-strong);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.btn--hold.is-holding .btn--hold__fill {
+  transform: scaleX(1);
+  transition: transform var(--hold-ms) linear;
+}
+
+.btn--hold__label {
+  position: relative;
+}
