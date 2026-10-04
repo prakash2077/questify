@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>Questify</title>
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/screens.css">
+</head>
+<body>
+  <!-- Every screen is one section. JavaScript shows exactly one at a time. -->
+  <main id="app">
+
+    <!-- Tap to begin: phones only allow sound after a tap. -->
+    <section class="screen is-active" data-screen="gate">
+      <button class="gate" id="gate" type="button">
+        <span class="gate__mark" aria-hidden="true"></span>
+        <span class="gate__title">Questify</span>
+        <span class="gate__prompt">Tap to begin</span>
+      </button>
+    </section>
+
+    <!-- Setup: shown once, on first use. -->
+    <section class="screen" data-screen="setup">
+      <p class="eyebrow" id="setup-progress">Step 1 of 3</p>
+
+      <form class="panel setup-step" data-step="1" novalidate>
+        <h1 class="panel__title">Player registration</h1>
+        <p class="system-line">Welcome, Player. The System needs two numbers to count the weeks ahead of you.</p>
+        <label class="field">
+          <span class="field__label">Date of birth</span>
+          <input class="input" id="setup-dob" type="date" required>
+        </label>
+        <label class="field">
+          <span class="field__label">Expected lifespan, in years</span>
+          <input class="input" id="setup-lifespan" type="number" inputmode="numeric" min="1" max="120" required>
+        </label>
+        <p class="weeks-readout" id="setup-weeks" hidden></p>
+        <p class="field-error" id="setup-error-1" role="alert" hidden></p>
+        <div class="actions">
+          <button class="btn btn--primary" type="submit">Next</button>
+        </div>
+      </form>
+
+      <form class="panel setup-step" data-step="2" novalidate hidden>
+        <h1 class="panel__title">Your goal</h1>
+        <p class="system-line">Name the one big thing you are working toward.</p>
+        <label class="field">
+          <span class="field__label">Goal</span>
+          <input class="input" id="setup-goal" type="text" maxlength="80" autocomplete="off" placeholder="Get into Google or Microsoft" required>
+        </label>
+        <p class="field-error" id="setup-error-2" role="alert" hidden></p>
+        <div class="actions">
+          <button class="btn" type="button" data-back>Back</button>
+          <button class="btn btn--primary" type="submit">Next</button>
+        </div>
+      </form>
+
+      <div class="panel setup-step" data-step="3" hidden>
+        <h1 class="panel__title">Daily quests</h1>
+        <p class="system-line">Add up to three quests you will do every day for this goal. You choose each penalty now, while you are calm.</p>
+        <ul class="quest-list" id="setup-quests"></ul>
+        <button class="btn btn--dashed" id="setup-add-quest" type="button">+ Add quest</button>
+        <div class="actions">
+          <button class="btn" type="button" data-back>Back</button>
+          <button class="btn btn--primary" id="setup-finish" type="button" disabled>Begin Level 1</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Today: home. -->
+    <section class="screen" data-screen="today">
+      <header class="today-head">
+        <p class="eyebrow" id="today-date"></p>
+        <p class="today-goal"><span class="today-goal__label">Goal</span><span id="today-goal"></span></p>
+      </header>
+
+      <div class="panel">
+        <h1 class="panel__title">Daily quests</h1>
+        <ul class="quest-list" id="today-quests"></ul>
+        <p class="system-line system-line--center" id="today-empty" hidden>No quests for today yet. Add one to begin.</p>
+        <p class="system-line system-line--center all-clear" id="today-clear" hidden>All quests cleared. Well done, Player.</p>
+      </div>
+
+      <div id="today-upcoming-wrap" hidden>
+        <p class="eyebrow">Starts tomorrow</p>
+        <ul class="quest-list" id="today-upcoming"></ul>
+      </div>
+
+      <button class="btn btn--dashed" id="today-add-quest" type="button">+ Add quest</button>
+    </section>
+
+  </main>
+
+  <!-- New quest form, used by Setup and by Today. -->
+  <dialog class="modal" id="quest-sheet">
+    <form class="panel" id="quest-form" novalidate>
+      <h2 class="panel__title">New quest</h2>
+      <label class="field">
+        <span class="field__label">Quest</span>
+        <input class="input" id="quest-name" type="text" maxlength="60" autocomplete="off" placeholder="Solve two coding problems" required>
+      </label>
+      <label class="field">
+        <span class="field__label">Deadline, every day</span>
+        <input class="input" id="quest-deadline" type="time" value="21:00" required>
+      </label>
+      <fieldset class="field">
+        <legend class="field__label">Priority</legend>
+        <div class="segmented" id="quest-priority"></div>
+      </fieldset>
+      <label class="field">
+        <span class="field__label">Penalty if you miss it</span>
+        <input class="input" id="quest-penalty" type="text" maxlength="80" autocomplete="off" placeholder="Something hard that you will really do" required>
+      </label>
+      <div class="chips" id="quest-penalty-ideas"></div>
+      <p class="field-error" id="quest-error" role="alert" hidden></p>
+      <div class="actions">
+        <button class="btn" id="quest-cancel" type="button">Cancel</button>
+        <button class="btn btn--primary" type="submit">Add quest</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- System message window. -->
+  <dialog class="modal" id="notice">
+    <div class="panel">
+      <h2 class="panel__title"><span class="notice__icon" aria-hidden="true">!</span><span id="notice-title">Notification</span></h2>
+      <p class="system-line system-line--center" id="notice-text"></p>
+      <div class="actions">
+        <button class="btn" id="notice-no" type="button" hidden>No</button>
+        <button class="btn btn--primary" id="notice-yes" type="button">OK</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

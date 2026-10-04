@@ -157,7 +157,7 @@ All state is one object saved in `localStorage` under the key `lifeApp.v1`. It i
 {
   profile:  { dob: "2005-03-14", lifespanYears: 80, setupDone: true },
   goal:     { id, name },
-  quests:   [ { id, name, deadline: "21:00", priority: 2, penalty: "Write 100 lines", createdOn: "2026-10-04" } ],
+  quests:   [ { id, name, deadline: "21:00", priority: 2, penalty: "Write 100 lines", createdOn: "2026-10-04", startsOn: "2026-10-04" } ],
   days:     { "2026-10-04": { done: [questId], checkedIn: true } },
   coins: 0, xp: 0, level: 1,
   army:     [ { id, catalogId, name } ],
@@ -169,6 +169,7 @@ All state is one object saved in `localStorage` under the key `lifeApp.v1`. It i
 - **Where it lives / how it updates / when you return:** state is in `localStorage`, updated by `store.js` on every action, and fully restored on reopen. This includes a pending `penalty`, which keeps the lock. Level is recomputed from XP.
 - **Photos:** `IndexedDB` database `lifeAppProofs`, store `photos`, one record per proof `{ id, blob }`, linked by `id` from `state.proofs`.
 - **Dates** are the device's local date as `YYYY-MM-DD`. Deadlines are local times.
+- **`startsOn`** is the first day a quest counts. It is today, or tomorrow when the quest was created after its deadline had already passed.
 - **Data flow:** your input, to `store.js`, to `localStorage` (or `IndexedDB`), to the screens that read it. Nothing is sent to a server.
 
 ## File Structure
@@ -207,6 +208,8 @@ life-app/                        # repo root; also the Vercel output directory
 │   ├── sprites/                 # SVG soldiers, demons, weapons (drawn by the AI, you direct)
 │   ├── icons/                   # app icons (192px, 512px) for Add to Home Screen
 │   └── sounds/                  # optional real audio files later (empty at first)
+├── tests/
+│   └── check-logic.mjs          # checks the app's rules without a browser: node tests/check-logic.mjs
 ├── devpost/                     # Devpost learning workspace
 ├── README.md                    # what it is + how to run (needed for the public repo)
 └── .gitignore

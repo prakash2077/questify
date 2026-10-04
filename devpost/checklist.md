@@ -1,15 +1,15 @@
 ---
 doc: checklist
-status: draft
+status: approved
 ---
 
 # Build Checklist
 
-Build mode: not chosen yet
+Build mode: not chosen yet (slice 1 is built, verified and committed; the learner has not tried it yet)
 
 ## Slices
 
-- [ ] **1. You can set up your goal and quests and see them on Today**
+- [x] **1. You can set up your goal and quests and see them on Today**
   Becomes usable: Open the app, tap to begin, enter your date of birth, expected lifespan, a goal and up to three quests (name, deadline, priority, penalty). Today lists them highest priority first with their deadlines, you can tick one done, and it is all still there after closing and reopening.
   Why now: Everything else hangs off real quests. The Penalty Zone cannot be proven without a quest that has a deadline and a penalty, a goal, and a date of birth. This step also sets the black System look once, so every later screen inherits it.
   PRD ref: `prd.md > The Core Journey` (steps 1-3), `prd.md > Features and Behavior > Goals and Quests`, `prd.md > States and Boundaries`
@@ -34,7 +34,7 @@ Build mode: not chosen yet
   Why now: The spec lists three phone behaviours it assumed but never checked, and the kernel leans on one of them (the camera). Proving them right after the kernel exists means that if the phone disagrees, the plan changes before four more screens are built on a wrong assumption. From here on, every check can happen on the real phone.
   PRD ref: `prd.md > What We're Building` (phone-sized web app), `prd.md > Features and Behavior > Penalty Zone`
   Spec ref: `spec.md > Stack`, `spec.md > Where It Runs and How Someone Tries It`, `spec.md > External Services and Dependencies`, `spec.md > Decisions and Open Issues`
-  Build: Add `manifest.webmanifest`, the app icons in `assets/icons/`, `sw.js` (network first, falling back to the saved copy when offline, so new versions always show up), service worker registration in `js/main.js`, `README.md`, and a `.vercelignore` so the planning workspace is not served on the live site. Then, with the learner's go-ahead and on their own accounts, put the repo on GitHub and import it into Vercel as described in the spec.
+  Build: Add `manifest.webmanifest`, the app icons in `assets/icons/`, `sw.js` (network first, falling back to the saved copy when offline, so new versions always show up), service worker registration in `js/main.js`, `README.md`, and a `.vercelignore` so the planning workspace is not served on the live site. The repo is already on GitHub (`prakash2077/questify`); the learner imports it into Vercel on their own account as described in the spec.
   Verify (mechanical): Fetch the live link and confirm `index.html`, `manifest.webmanifest`, `sw.js` and both icons return successfully with the right content types; confirm the manifest declares standalone display, the black theme and both icons; in headless Chrome on the live link confirm the service worker registers and the app still loads with the network switched off.
   Learner check: On your phone, open the link in Chrome, tap the menu, then "Add to Home Screen", and open the app from the new icon. Check three things: does it open full-screen with no browser bar, do you hear sound after tapping to begin, and does "Submit photo proof" open the camera when you trigger a penalty with the Demo tool?
   Commit: `Make the app installable and ready to deploy`
@@ -92,4 +92,9 @@ Reflection: not started
 Activity mode: not started
 
 ## Revisions
+
+- Slice 3 no longer creates the GitHub repo, and the Vercel import is the learner's own step — the learner created the public repo `prakash2077/questify` and pushed a first commit before the build began, and chose to do the Vercel hosting themselves.
+- Each quest now also stores `startsOn` (`spec.md > Data Model`) — the rule "a quest created after its deadline begins tomorrow" cannot be worked out from `createdOn` alone, because that holds only the date, not the time of day.
+- Added `tests/check-logic.mjs` (`spec.md > File Structure`) — every slice's "Node check" needs somewhere to live, and keeping it in the repo lets it be rerun after later slices change the same rules. It uses Node's built-in `assert`; no packages.
+- The app shows the name "Questify" on the opening screen and browser tab — taken from the repo name the learner chose; the PRD and spec titles still say "working title" until the learner confirms it.
 

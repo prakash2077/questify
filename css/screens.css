@@ -1,0 +1,236 @@
+/* Layout for each screen. Colours and shared pieces live in base.css. */
+
+.screen {
+  display: none;
+}
+
+.screen.is-active {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 100dvh;
+  padding: calc(22px + env(safe-area-inset-top)) 14px calc(26px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Tap to begin ---------- */
+
+.screen[data-screen='gate'].is-active {
+  padding: 0;
+}
+
+.gate {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.gate__mark {
+  width: 64px;
+  height: 64px;
+  border: 2px solid var(--accent);
+  transform: rotate(45deg);
+  box-shadow: 0 0 26px var(--glow), inset 0 0 18px var(--glow);
+  animation: gate-pulse 2.2s ease-in-out infinite;
+}
+
+.gate__title {
+  margin-right: -0.34em; /* balances the trailing letter-spacing so it sits centred */
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px var(--glow);
+}
+
+.gate__prompt {
+  margin-right: -0.36em;
+  color: var(--text-dim);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  animation: gate-blink 1.8s ease-in-out infinite;
+}
+
+@keyframes gate-pulse {
+  50% {
+    box-shadow: 0 0 44px var(--glow), inset 0 0 26px var(--glow);
+  }
+}
+
+@keyframes gate-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ---------- Setup ---------- */
+
+.weeks-readout {
+  padding: 10px 12px;
+  border-left: 2px solid var(--accent);
+  background: var(--fill);
+}
+
+.weeks-readout strong {
+  font-size: 24px;
+  font-weight: 700;
+  text-shadow: 0 0 12px var(--glow);
+}
+
+/* ---------- Today ---------- */
+
+.today-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.today-goal {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.today-goal__label {
+  flex: none;
+  padding: 1px 8px;
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.all-clear {
+  font-weight: 600;
+}
+
+/* ---------- Quest rows (Setup and Today) ---------- */
+
+.quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quest-list:empty {
+  display: none;
+}
+
+.quest {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 12px 6px 12px 14px;
+  background: var(--fill);
+  border: 1px solid var(--line-soft);
+}
+
+.quest--tickable {
+  grid-template-columns: auto 1fr auto;
+  gap: 4px 6px;
+  padding: 12px 2px 12px 4px;
+}
+
+.quest__body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.quest__name {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.quest__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Time left, "Cleared" or "Deadline passed", sitting after the deadline. */
+.quest__status {
+  color: color-mix(in srgb, var(--text) 55%, var(--accent));
+}
+
+.quest__penalty {
+  color: var(--text-dim);
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.quest__late {
+  color: var(--danger);
+}
+
+/* The done tick: a diamond that fills in. */
+.quest__tick {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.quest__tick::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--accent);
+  transform: rotate(45deg);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.quest.is-done .quest__tick {
+  cursor: default;
+}
+
+.quest.is-done .quest__tick::before {
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent);
+}
+
+.quest.is-done {
+  border-color: var(--line);
+}
+
+.quest.is-done .quest__name {
+  color: var(--text-dim);
+  text-decoration: line-through;
+  text-decoration-color: var(--line);
+}
+
+.quest.is-done .quest__cleared {
+  color: var(--text);
+  text-shadow: 0 0 10px var(--glow);
+}
+
+.quest--upcoming {
+  opacity: 0.55;
+}

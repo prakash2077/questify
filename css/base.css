@@ -1,0 +1,398 @@
+/* The black System theme. Every colour comes from these variables, so changing
+   --accent restyles the whole app at once. */
+:root {
+  --bg: #000000;
+  --accent: #2f7bff;
+  --danger: #ff3344;
+  --text: #eaf2ff;
+  --text-dim: #8493ad;
+
+  --line: color-mix(in srgb, var(--accent) 65%, transparent);
+  --line-soft: color-mix(in srgb, var(--accent) 30%, transparent);
+  --glow: color-mix(in srgb, var(--accent) 45%, transparent);
+  --fill: color-mix(in srgb, var(--accent) 9%, #000);
+  --fill-strong: color-mix(in srgb, var(--accent) 24%, #000);
+
+  --font: 'Rajdhani', 'Segoe UI', Roboto, system-ui, sans-serif;
+  --tap: 48px;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+body {
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+p,
+ul,
+fieldset,
+legend {
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+fieldset {
+  border: 0;
+  min-width: 0;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+/* A phone-sized column, even on a wide desktop window. */
+#app {
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+/* ---------- Text ---------- */
+
+.eyebrow {
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.system-line {
+  text-shadow: 0 0 10px var(--glow);
+}
+
+.system-line--center {
+  text-align: center;
+}
+
+/* ---------- System window ---------- */
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 16px 18px;
+  background: linear-gradient(180deg, var(--fill), #000 130%);
+  border: 1px solid var(--line-soft);
+  border-top: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 0 22px var(--glow);
+  animation: panel-open 0.22s ease-out;
+}
+
+/* Bright corner ticks. */
+.panel::before,
+.panel::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--text);
+  pointer-events: none;
+}
+
+.panel::before {
+  top: -2px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.panel::after {
+  right: -1px;
+  bottom: -2px;
+  border-top: 0;
+  border-left: 0;
+}
+
+.panel__title {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  border: 1px solid var(--line);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px var(--glow);
+  box-shadow: inset 0 0 12px var(--line-soft);
+}
+
+@keyframes panel-open {
+  from {
+    opacity: 0;
+    transform: scaleY(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  flex: 1;
+  min-height: var(--tap);
+  padding: 10px 16px;
+  background: #000;
+  border: 1px solid var(--line-soft);
+  border-radius: 2px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.15s, background 0.15s;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn--primary {
+  background: var(--fill-strong);
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--glow);
+  text-shadow: 0 0 10px var(--glow);
+}
+
+.btn--dashed {
+  flex: none;
+  width: 100%;
+  border-style: dashed;
+  border-color: var(--line);
+  color: var(--text-dim);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+  cursor: default;
+}
+
+.btn:focus-visible,
+.input:focus-visible,
+.gate:focus-visible,
+.icon-btn:focus-visible,
+.quest__tick:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* The main action gets the room; Back, Cancel and No stay compact. */
+.actions .btn:not(.btn--primary) {
+  flex: 0 1 34%;
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--text-dim);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ---------- Form fields ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 10px 12px;
+  background: #000;
+  border: 1px solid var(--line-soft);
+  border-radius: 2px;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.input::placeholder {
+  color: color-mix(in srgb, var(--text-dim) 60%, transparent);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--glow);
+  outline: none;
+}
+
+.field-error {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* Three-way choice (priority). */
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 56px;
+  border: 1px solid var(--line-soft);
+  border-radius: 2px;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.segmented input:checked + label {
+  background: var(--fill-strong);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--glow);
+  color: var(--text);
+}
+
+.segmented input:focus-visible + label {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+/* Small suggestion buttons. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: -6px;
+}
+
+.chip {
+  padding: 6px 10px;
+  background: none;
+  border: 1px solid var(--line-soft);
+  border-radius: 2px;
+  color: var(--text-dim);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* Priority shown as one to three small diamonds. */
+.pips {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.pip {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--accent);
+  transform: rotate(45deg);
+}
+
+.pip.is-on {
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--glow);
+}
+
+/* ---------- Pop-up windows ---------- */
+
+.modal {
+  width: min(100vw - 24px, 436px);
+  max-width: none;
+  max-height: calc(100dvh - 24px);
+  padding: 0;
+  overflow: visible auto;
+  background: none;
+  border: 0;
+  color: inherit;
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.86);
+}
+
+.notice__icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--line);
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
