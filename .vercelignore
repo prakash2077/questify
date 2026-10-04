@@ -1,0 +1,8 @@
+# Kept in the repo, but not part of the app, so not served on the live site.
+devpost
+tests
+.claude
+.agents
+agent
+skills-lock.json
+README.md

@@ -147,3 +147,61 @@ Two things the checking caught, both worth remembering:
 2. In `js/config.js`, change `FALLBACK_HOLD_MS` to `2000` and try the no-camera fallback. Change it back afterwards.
 3. Add a quote of your own to `data/quotes.js`. Each one is `{ text, author }`.
 4. In `css/screens.css`, find `--week-left` and change its colour. That is the colour of every week you still have.
+
+---
+
+## Step 3: the app on your phone
+
+### What you can do now
+
+Open the live link on your phone, choose "Add to Home Screen" (Chrome may call it "Install app"), and Questify gets its own icon and opens full-screen with no browser bar. It also opens with no internet.
+
+### How it works
+
+Three small files turn a website into something a phone treats as an app. Together this is called a Progressive Web App (PWA).
+
+- **`manifest.webmanifest`** is the app's ID card: its name, its icons, the black colours, and `"display": "standalone"`, which means "no browser bar".
+- **`sw.js`** is the service worker: a script the browser keeps running beside the app. It sits between the app and the internet and can answer requests from its own saved copies.
+- **`assets/icons/`** holds the icons. They are drawn in `icon.svg` and rendered to PNG at 192 and 512 pixels. The "maskable" one has extra black margin, because Android crops icons into circles and rounded squares.
+
+`js/main.js` switches the service worker on with one line: `navigator.serviceWorker.register('sw.js')`.
+
+A service worker has three moments, and each is one block in `sw.js`:
+
+1. **install**: it saves every file named in `APP_FILES`.
+2. **activate**: it deletes saved copies left by older versions.
+3. **fetch**: every time the app asks for a file, it decides where the answer comes from.
+
+### Ideas worth learning
+
+**Network first, saved copy second.** On each request `sw.js` tries the internet, and only if that fails does it use the saved copy. The other common choice is the reverse (saved copy first), which is faster but has a well-known trap: people keep seeing the old version after you publish a new one. While an app is changing every day, network first is the safer choice.
+
+**Getting to your phone is a chain.** Commit (saved on your computer), push (sent to GitHub), deploy (Vercel sees the push and updates the link). If the phone shows an old version, ask which link in the chain did not happen.
+
+**`https` is what unlocks phone features.** Service workers and installing only work on secure pages. Vercel gives you `https` for free, and `localhost` on your own computer counts as secure too. That is why testing locally worked at all.
+
+**Not everything in the repo belongs on the site.** `.vercelignore` tells Vercel to skip the planning documents, the tests and the course skills. They stay in the repo for people reading the code, but the live link serves only the app.
+
+**A list that must stay in step with the code should be checked by a machine.** `APP_FILES` in `sw.js` has to name every file the app loads, or that file is missing offline. Forgetting to add a new file is an easy mistake to make, so `tests/check-logic.mjs` compares the list with the real folders and fails if they differ.
+
+### How it was checked
+
+- Chrome has a built-in report of reasons a page cannot be installed. The check asked for that report and got an empty list.
+- The script loaded the app, switched the network off, reloaded, and confirmed the app still opened and still ran.
+- The same checks are run again against the live link after a push.
+
+### What only a real phone can prove
+
+The spec assumed three things without testing them, and a computer cannot settle any of them:
+
+1. The installed app opens full-screen.
+2. Sound plays after the first tap.
+3. "Submit photo proof" opens the camera.
+
+These are the three things to try on your phone.
+
+### Try it yourself
+
+1. On your computer, open the app, then developer tools, Application, Service workers. Tick "Offline" and reload. The app still opens.
+2. In the same panel, open Cache storage and look inside `questify-v1`. Those are the saved copies.
+3. In `manifest.webmanifest`, the `short_name` is the label under the icon on your home screen. Change it, push, and reinstall the app to see it.

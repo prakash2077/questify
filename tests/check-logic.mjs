@@ -1,6 +1,7 @@
 // Checks the app's rules without a browser. Run with: node tests/check-logic.mjs
 
 import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
 import { MAX_QUESTS } from '../js/config.js';
 import {
   addDays,
@@ -205,6 +206,28 @@ check('weeks left = lifespan x 52 - weeks lived', () => {
   assert.equal(weeksLived('2026-09-20', noon), 2);
   assert.equal(weeksLeft({ dob: '2026-09-20', lifespanYears: 80 }, noon), 4158);
   assert.equal(weeksLeft({ dob: '1900-01-01', lifespanYears: 80 }, noon), 0);
+});
+
+// ---------- Offline file list ----------
+
+check('every file the app loads is in the service worker\'s offline list', () => {
+  const root = new URL('../', import.meta.url);
+  const listed = readFileSync(new URL('sw.js', root), 'utf8')
+    .match(/const APP_FILES = \[([^\]]*)\]/)[1]
+    .match(/'[^']+'/g)
+    .map((entry) => entry.slice(1, -1));
+
+  const onDisk = ['index.html', 'manifest.webmanifest'];
+  for (const folder of ['css', 'js', 'data', 'assets']) {
+    for (const file of readdirSync(new URL(folder, root), { recursive: true, withFileTypes: true })) {
+      if (!file.isFile()) continue;
+      const path = `${file.parentPath}/${file.name}`.replaceAll('\\', '/');
+      onDisk.push(path.slice(path.lastIndexOf(`/${folder}/`) + 1));
+    }
+  }
+
+  assert.deepEqual(onDisk.filter((file) => !listed.includes(file)), [], 'files missing from APP_FILES in sw.js');
+  assert.deepEqual(listed.filter((file) => file !== './' && !onDisk.includes(file)), [], 'APP_FILES names files that do not exist');
 });
 
 console.log(`\n${passed} checks passed`);

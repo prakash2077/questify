@@ -79,6 +79,11 @@ initToday(app);
 initSettings(app);
 initPenalty(app);
 
+// Offline support and "Add to Home Screen" both need the service worker (sw.js).
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
 // The first tap: it lets the phone play sound, then the app opens.
 document.getElementById('gate').addEventListener('click', () => {
   unlockAudio();

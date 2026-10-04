@@ -7,6 +7,8 @@ status: approved
 
 Build mode: fast. The learner also asked for learning notes to study later: add a section to `devpost/learning-notes.md` for every slice as it is built.
 
+Resume note: slice 3 is built, checked on localhost and committed, but its box stays unticked until the commit is pushed, the live link (https://questifynow.vercel.app) passes the same checks, and the learner has done the phone check.
+
 ## Slices
 
 - [x] **1. You can set up your goal and quests and see them on Today**
@@ -100,3 +102,4 @@ Activity mode: not started
 - A quest missed several days in a row while the app was closed gives one penalty per quest (the most recent missed day), not one per day — the spec did not say what happens after a long absence, and a queue of penalties on return would work against the kernel's "motivate without being harsh". Recorded in `spec.md > Components > Penalty Zone` as derived; the learner still needs to confirm it.
 - The Demo tool moves only today's deadline (`quest.demo`) instead of rewriting the quest — otherwise using it once would leave a real quest permanently due at an odd time. Proof records also keep the quest name and penalty text (`spec.md > Data Model`).
 - The app also checks at the exact moment the next deadline passes, on top of the 15-second check — the lock otherwise lagged the deadline by up to 15 seconds, which reads as a bug in a demo.
+- Slice 3 was verified on localhost first and committed before its live-link check — the live link only updates after a push, and pushing is the learner's step, so the live check and the phone check happen together at the hands-on checkpoint.

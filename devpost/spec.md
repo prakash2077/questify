@@ -217,6 +217,7 @@ life-app/                        # repo root; also the Vercel output directory
 │   └── check-logic.mjs          # checks the app's rules without a browser: node tests/check-logic.mjs
 ├── devpost/                     # Devpost learning workspace
 ├── README.md                    # what it is + how to run (needed for the public repo)
+├── .vercelignore                # keeps devpost/, tests/ and the course skills off the live site
 └── .gitignore
 ```
 
