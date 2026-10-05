@@ -950,3 +950,101 @@
   outline: 2px solid var(--text);
   outline-offset: 3px;
 }
+
+/* ---------- Today: a quest feeling its deadline ---------- */
+
+/* The bar along the bottom of an open quest, draining toward the deadline. */
+.quest__timebar {
+  grid-column: 1 / -1;
+  height: 2px;
+  margin: 4px 8px 0 8px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.quest__timebar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  transition: width 1s linear;
+}
+
+/* The last hour: amber. */
+.quest[data-urgency='soon'] {
+  border-left-color: var(--ember);
+}
+
+.quest[data-urgency='soon'] .quest__status,
+.quest[data-urgency='near'] .quest__status,
+.quest[data-urgency='critical'] .quest__status {
+  color: var(--ember);
+}
+
+.quest[data-urgency='soon'] .quest__timebar span {
+  background: var(--ember);
+  box-shadow: 0 0 8px var(--ember);
+}
+
+/* The last ten minutes: red, and breathing. */
+.quest[data-urgency='near'],
+.quest[data-urgency='critical'] {
+  border-color: color-mix(in srgb, var(--danger) 60%, transparent);
+  border-left-color: var(--danger);
+  animation: quest-heat 1.8s ease-in-out infinite;
+}
+
+.quest[data-urgency='near'] .quest__status,
+.quest[data-urgency='critical'] .quest__status {
+  color: var(--danger);
+  font-size: 17px;
+  text-shadow: 0 0 12px var(--danger);
+}
+
+.quest[data-urgency='near'] .quest__timebar span,
+.quest[data-urgency='critical'] .quest__timebar span {
+  background: var(--danger);
+  box-shadow: 0 0 10px var(--danger);
+}
+
+/* The last minute: the same, twice as fast. */
+.quest[data-urgency='critical'] {
+  animation-duration: 0.7s;
+}
+
+@keyframes quest-heat {
+  50% {
+    background-color: color-mix(in srgb, var(--danger) 16%, transparent);
+    box-shadow: 0 0 22px -4px var(--danger);
+  }
+}
+
+/* A number in the header kicking when it changes. */
+.is-bumped {
+  animation: bump 0.5s cubic-bezier(0.2, 1.8, 0.4, 1);
+}
+
+@keyframes bump {
+  30% {
+    transform: scale(1.5);
+    filter: brightness(1.8);
+  }
+}
+
+/* ---------- Penalty Zone: it arrives with a flash ---------- */
+
+.screen[data-screen='penalty'].is-active::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: var(--danger);
+  pointer-events: none;
+  animation: penalty-flash 1s ease-out both;
+}
+
+@keyframes penalty-flash {
+  0% { opacity: 0.85; }
+  18% { opacity: 0.2; }
+  30% { opacity: 0.6; }
+  100% { opacity: 0; }
+}

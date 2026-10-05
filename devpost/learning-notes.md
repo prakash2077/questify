@@ -452,3 +452,51 @@ Then each app sound is a short score: the intro is a rush, a boom, two braams, a
 1. In `tools/make-sprites.cjs`, find `const eyes = (y, colour = '#cfe2ff', halo = '#5b8cff')` and change the halo to `'#ff5b5b'`. Run `node tools/make-sprites.cjs`, reload, and open the Shop.
 2. In `js/audio.js`, find `soften.frequency.value = 3800;` in `buildOutput` and change it to `900`. The hall becomes dark and muffled. Then find `** 2.6` a few lines above and change it to `** 1.2` for a much longer echo.
 3. In `js/battleground.js`, find `drawMoon` and change the three reds in `disc.addColorStop` to blues. A different night entirely.
+
+---
+
+## Final review, round 2: intensity
+
+### What happened
+
+You liked the new look and asked for the app to be "even more gamified and intense". Those are two different requests, and they were handled differently on purpose.
+
+- **Intense** is about feel. The same rules, staged harder. That was built straight away.
+- **Gamified** means new rules: ranks, streaks, bosses. Each one changes the PRD and is one more thing to build, test and show in a short demo. That is a scope decision, so it went back to you as a question instead of being guessed at.
+
+The practice to reuse: when a request is vague, split it into the part that is safe to act on and the part that needs a decision, do the first, and ask about the second.
+
+### What changed
+
+- **Finishing a quest** now plays a sequence: a flash of light, a shockwave ring, sparks, a jolt of the screen, a vibration, and the bell. A level-up, or the last quest of the day, gets a bigger gold version.
+- **Deadlines are felt before they hit.** In the last hour a quest's row turns amber. In the last ten minutes it turns red, counts down in seconds, and the edges of every screen glow red. In the last minute a clock ticks, faster for the final ten seconds.
+- **The bonfire in Focus burns harder** as the deadline closes in: taller flames and five times the sparks.
+- **A soldier joining** rises out of a pool of shadow under the word ARISE.
+- **The Penalty Zone arrives** with a red flash and a hard jolt.
+- **Lightning** cracks over the demons, with thunder.
+
+### Ideas worth learning
+
+**"Juice" is the word game makers use for this.** None of it changes what the app does. All of it changes how doing it feels. A reward that is a number going up is information; the same number with a flash, a sound and a jolt is a reward. Each effect on its own is small (`shake` in `js/main.js` is ten lines); the feeling comes from several firing in the same instant.
+
+**One mood, set in one place, read by everything.** `feelTension` in `js/penalty.js` runs once a second and writes a single word onto the page: `<body data-tension="near">`. It does not know about any screen. The CSS then says "when the body has that word, glow the edges" (`body[data-tension='near']::after` in `css/base.css`). That is why the tension shows on every screen, including ones written before it existed, without touching any of them.
+
+**Change the text, not the list.** Today's countdown ticks every second. Rebuilding the whole quest list each second would restart every animation and could swallow a tap. So `render` builds the rows once and remembers the pieces that change (`live` in `js/screens/today.js`), and `tickCountdowns` only rewrites those.
+
+**Pass a question, not an answer.** `lightFire(canvas, heat)` takes `heat` as a function. The fire asks it "how hot now?" on every frame, and Focus answers from the clock. If it took a number, the fire would be stuck at whatever the heat was when the screen opened.
+
+**Sparks are the fire, thrown outward.** `sparks` in `js/main.js` is the same particle idea as the bonfire: many dots, each with a speed, gravity pulling them down, air slowing them, fading out. Three places in this app now use that one idea.
+
+**Respecting "reduce motion" was already paid for.** `shake`, `sparks` and `arise` each begin by asking `calm()`. People who get dizzy from motion get the reward without the jolt.
+
+### How it was checked
+
+- A new walkthrough runs with animation switched on. It moves the clock to five minutes, then 45 seconds, before a deadline and checks the mood words, the seconds countdown and the ticking; finishes quests and checks the jolt, the sparks and the vibration; buys a soldier and checks the Arise sequence; lets a deadline pass and checks the flash; and waits for lightning.
+- The four new sounds were rendered and measured like the others. That caught one: the ticking clock measured about a third as loud as it needed to be, because a very short low note fades before it has finished one wave. It was made longer.
+- Two of the new checks failed for the same reason as before: they looked for a half-second effect a moment too late. Checks on short-lived effects have to look immediately.
+
+### Try it yourself
+
+1. In `js/config.js`, change `TENSION_NEAR_MS` to `60 * 60 * 1000`. Now the last *hour* glows red and counts in seconds. Notice you changed one number and three places reacted.
+2. In `js/main.js`, find `count: grand ? 110 : 46` and try `400`.
+3. In `css/base.css`, find `@keyframes quake` and double every number.
