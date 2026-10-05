@@ -2,7 +2,7 @@
 // Level 0 demo, a few cards that explain the app using sample data.
 // Nothing in the demo is ever saved: this file never touches the app's memory.
 
-import { INTRO_MS } from './config.js';
+import { INTRO_MS, INTRO_QUICK_MS } from './config.js';
 import { play } from './audio.js';
 import { lightFire } from './fire.js';
 
@@ -55,10 +55,12 @@ export function initIntro(theApp) {
 
   app.register('intro', {
     // `next` is the screen to open once the intro has played.
-    enter({ next }) {
+    // `quick` plays the short version: the emblem, a bell, and straight in.
+    enter({ next, quick = false }) {
       afterIntro = next;
-      play('intro');
-      introTimer = setTimeout(endIntro, INTRO_MS);
+      $('intro').classList.toggle('is-quick', quick);
+      play(quick ? 'begin' : 'intro');
+      introTimer = setTimeout(endIntro, quick ? INTRO_QUICK_MS : INTRO_MS);
     },
     leave() {
       clearTimeout(introTimer);

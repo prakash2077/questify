@@ -3,7 +3,8 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { CHECK_IN_XP, MAX_QUESTS, XP_BY_PRIORITY, demonsForLevel, soundLayersFor, xpToNext } from '../js/config.js';
-import { armyOf, buyItem, canCheckIn, checkIn, completeQuest, levelInfo } from '../js/rewards.js';
+import { armyOf, buyItem, canCheckIn, checkIn, completeQuest, levelInfo, totalCleared } from '../js/rewards.js';
+import { QUOTES, quoteOfTheDay } from '../data/quotes.js';
 import { CATALOG, FIRST_SOLDIER_NAME } from '../data/catalog.js';
 import {
   addDays,
@@ -273,6 +274,28 @@ check('missing a quest never removes coins, XP or levels', () => {
   addQuest(state, quest(), noon);
   assert.equal(findMissed(state, at(6, 9)).length, 1);
   assert.deepEqual([state.coins, state.xp, state.level], [40, 70, 2]);
+});
+
+// ---------- Motivation ----------
+
+check('the count of quests cleared adds up every day and never goes down', () => {
+  const state = player();
+  assert.equal(totalCleared(state), 0);
+  const a = addQuest(state, quest({ priority: 1 }), noon).quest;
+  const b = addQuest(state, quest({ priority: 2 }), noon).quest;
+  completeQuest(state, a, '2026-10-04');
+  completeQuest(state, b, '2026-10-04');
+  completeQuest(state, a, '2026-10-05');
+  assert.equal(totalCleared(state), 3);
+  assert.equal(findMissed(state, at(6, 23)).length, 2);
+  assert.equal(totalCleared(state), 3, 'a missed day takes nothing away');
+});
+
+check('the quote of the day is the same all day and changes over time', () => {
+  assert.deepEqual(quoteOfTheDay('2026-10-05'), quoteOfTheDay('2026-10-05'));
+  const week = ['01', '02', '03', '04', '05', '06', '07'].map((day) => quoteOfTheDay(`2026-10-${day}`).text);
+  assert.equal(new Set(week).size, 7, 'a week of days gives seven different quotes');
+  for (const q of QUOTES) assert.ok(q.text.length > 10 && q.author.length > 2);
 });
 
 // ---------- Shop and army ----------

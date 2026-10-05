@@ -60,7 +60,7 @@ function startPurchase(item) {
   const { coins } = getState();
   if (coins < item.price) {
     const short = item.price - coins;
-    app.notify(`Not enough coins. ${item.label} costs ${item.price} and you have ${coins}. Finish a quest to earn ${short} more.`, 'Shop');
+    app.deny(`Not enough coins. ${item.label} costs ${item.price} and you have ${coins}. Finish a quest to earn ${short} more.`, 'Shop');
     return;
   }
   if (item.kind === 'weapon') {
@@ -74,7 +74,7 @@ function startPurchase(item) {
   $('name-prompt').textContent = `Name your ${item.label}.`;
   $('name-input').value = armyOf(getState()).soldiers.length === 0 ? FIRST_SOLDIER_NAME : '';
   $('name-error').hidden = true;
-  $('name-sheet').showModal();
+  app.openSheet($('name-sheet'));
   $('name-input').select();
 }
 
@@ -98,15 +98,15 @@ export function initShop(theApp) {
   app = theApp;
   app.register('shop', { enter: render });
 
-  $('shop-back').addEventListener('click', () => app.go('today'));
-  $('shop-battleground').addEventListener('click', () => app.go('battleground'));
-
   $('name-cancel').addEventListener('click', () => $('name-sheet').close());
   $('name-form').addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = $('name-input').value.trim();
     $('name-error').hidden = Boolean(name);
-    if (!name) return;
+    if (!name) {
+      play('deny');
+      return;
+    }
     $('name-sheet').close();
     finishPurchase(naming, name);
   });

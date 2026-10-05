@@ -261,6 +261,40 @@ const sounds = {
     pad([293.7, 370, 440, 587.3], 0.5, 3, 0.05);
     [587.3, 740, 880, 1174.7, 1480].forEach((freq, i) => bell(freq, 0.56 + i * 0.1, 0.09, 2.4));
   },
+  // ---- The small sounds: one for every touch ----
+  // Any button pressed: a soft, short click.
+  tap() {
+    tone({ from: 720, to: 520, dur: 0.09, vol: 0.34, attack: 0.004, wet: 0.2 });
+  },
+  // Moving between screens: a breath of air.
+  nav() {
+    rush({ from: 700, to: 2600, dur: 0.22, vol: 0.5, swell: 0.4, wet: 0.4 });
+  },
+  // A window or sheet opening: two quick rising notes.
+  open() {
+    tone({ from: 520, dur: 0.1, vol: 0.22, attack: 0.005, wet: 0.4 });
+    tone({ from: 780, dur: 0.16, at: 0.06, vol: 0.22, attack: 0.005, wet: 0.5 });
+  },
+  // Something refused: two low, flat buzzes.
+  deny() {
+    tone({ type: 'square', from: 150, dur: 0.1, vol: 0.14, attack: 0.004, cutoff: [600, 400], wet: 0.2 });
+    tone({ type: 'square', from: 140, dur: 0.14, at: 0.12, vol: 0.14, attack: 0.004, cutoff: [600, 400], wet: 0.2 });
+  },
+  // Something added or saved: a small bright chime.
+  add() {
+    bell(880, 0, 0.09, 1);
+    bell(1318.5, 0.07, 0.06, 0.9);
+  },
+  // Something removed: a note falling away.
+  remove() {
+    tone({ from: 520, to: 170, dur: 0.26, vol: 0.3, wet: 0.4 });
+    rush({ from: 2400, to: 500, dur: 0.2, vol: 0.2, swell: 0.05, wet: 0.4 });
+  },
+  // A switch or a choice changed: one clean high tick.
+  toggle() {
+    tone({ from: 1040, dur: 0.09, vol: 0.26, attack: 0.004, wet: 0.4 });
+    tone({ from: 1560, dur: 0.14, at: 0.05, vol: 0.16, attack: 0.004, wet: 0.5 });
+  },
   // Daily check-in: a single soft bell.
   checkIn() {
     bell(784, 0, 0.17, 1.4);

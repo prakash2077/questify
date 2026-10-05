@@ -7,7 +7,7 @@ status: approved
 
 Build mode: fast. The learner also asked for learning notes to study later: add a section to `devpost/learning-notes.md` for every slice as it is built.
 
-Resume note: all six slices are built. Final review: round 1 (dark look, cinematic sound) is accepted. Round 2: the "more intense" pass is implemented and committed and needs the learner to push, retry and react; "more gamified" is waiting on the learner naming the mechanic they want. The three phone questions (full-screen, sound after first tap, camera) are still unanswered. The learner pushes to GitHub themselves; the live link is https://questifynow.vercel.app.
+Resume note: all six slices are built. Final review is in its fourth round. Accepted and live: the dark look, cinematic sound, and the intensity pass. Round 4 (native feel, smoothness, sound on every interaction, motivation) is implemented and committed and needs the learner to push, retry and react. The agent misread round 3 and reverted work the learner wanted; if feedback is ambiguous, ask what they mean before removing anything. The three phone questions (full-screen, sound after first tap, camera) are still unanswered. The learner pushes to GitHub themselves; the live link is https://questifynow.vercel.app.
 
 ## Slices
 
@@ -92,8 +92,20 @@ Round 1 feedback from the learner: "the app looks like some small kids game"; ma
 
 Round 2 feedback from the learner: "GREAT WORK! NOW CAN WE MAKE THIS EVEN MORE GAMIFIED AND INTENSE!!"
 
-- [ ] More intense, with no rule changes — full-screen reward sequence (flash, shockwave, sparks, screen jolt, vibration) with a gold version for a level-up or a cleared day; deadline tension (amber in the last hour, red with a seconds countdown and glowing screen edges in the last ten minutes, a ticking clock in the last minute); a hotter bonfire near a deadline; the Arise sequence when a soldier joins; a red flash and hard jolt on entering the Penalty Zone; lightning and thunder over the demons. Implemented, 298 browser checks pass, committed. Waiting for the learner to retry and react.
-- [ ] More gamified — this means new game rules, which is a scope decision for the learner. Asked which mechanic they want most; nothing added yet.
+- [x] More intense, with no rule changes — full-screen reward sequence (flash, shockwave, sparks, screen jolt, vibration) with a gold version for a level-up or a cleared day; deadline tension (amber in the last hour, red with a seconds countdown and glowing screen edges in the last ten minutes, a ticking clock in the last minute); a hotter bonfire near a deadline; the Arise sequence when a soldier joins; a red flash and hard jolt on entering the Penalty Zone; lightning and thunder over the demons. Implemented, committed and pushed. Kept: in round 4 the learner said plainly that it is not annoying.
+- [x] More gamified — asked which new mechanic they wanted; the learner did not name one and instead asked for overall quality (round 4). No new game rules were added, and none are pending.
+
+Round 3 feedback from the learner: "the things feel vague and annoying now, do something cool".
+
+- [x] Misread by the agent as "remove the effects". The intensity pass was reverted locally (`500431b`), never pushed, and the learner was asked what "cool" meant.
+
+Round 4 feedback from the learner: "noooo it's not annoying, the overall app should be more good! ... like some native app and so smooth and sound effects everywhere and motivating".
+
+- [x] The intensity pass was restored (`0603f2f`); the live app never lost it.
+- [ ] Like a native app — bottom tab bar replaces the Back / Shop / Settings buttons; screens slide in from the side; the quest and naming forms rise from the bottom as sheets; no text selection, long-press menus or page bounce; every button sinks and brightens when pressed; a returning player gets a one-second intro instead of the full one. Waiting for the learner to retry.
+- [ ] Smooth — the Battleground was measured (processor slowed four times): about 40 frames a second with a full army, about 53 after the changes, and about 59 with a normal-sized army. Waiting for the learner to say how it feels on their phone, which is the only measurement that counts.
+- [ ] Sound effects everywhere — a sound for every tap, screen change, window, refusal, add, remove and switch. Waiting for the learner to listen.
+- [ ] Motivating — a greeting, the day's progress in words, a quote of the day, a lifetime count of quests cleared, and the player's goal named in every reward. Waiting for the learner to react.
 
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
@@ -134,3 +146,7 @@ Activity mode: not started
 - Added staging and tension without changing any rule (`prd.md > Look and Feel`, `spec.md > Components > Tension and Big Moments`) — the learner asked for the app to be more intense. The countdown inside the last ten minutes now reads in minutes and seconds.
 - Finishing the last quest of the day is celebrated as "All quests cleared" — it is the PRD's own definition of a successful day, and it had no moment of its own. No extra reward is paid for it.
 - New game mechanics (ranks, streaks and the like) were not added on the strength of "more gamified" — each is a new rule that changes the PRD, and the scope document already parks mini-games, attacks and online challenges under Later. The learner was asked to name the one they want.
+- The intensity pass was reverted and then restored (`500431b`, `0603f2f`) — the agent read "the things feel vague and annoying now" as a request to remove the effects; the learner meant the whole app should feel better. The revert was never pushed. Both commits stay in the history as the record.
+- Navigation moved to a bottom tab bar (`prd.md > Screens and Layout`, `spec.md > Components > App Shell and Screen Router`) — the learner asked for the app to feel native, and a tab bar is how phone apps move between their main screens. The Back buttons, the Shop and Battleground buttons on Today, and the Settings button were removed.
+- A streak counter was considered for "motivating" and not added — a streak that resets on a missed day is a loss of progress, and `scope.md > Explicitly Cut` rules out progress-as-stake losses. A lifetime count of quests cleared, which only ever goes up, was added instead.
+- A returning player now gets a one-second intro; the full one plays on a first visit and after a reset — a native app opens quickly, and the learner asked for native.

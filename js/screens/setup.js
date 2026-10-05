@@ -11,6 +11,7 @@ import {
 } from '../config.js';
 import { addQuest, canAddQuest, dateStr, deadlineTime, removeQuest } from '../quests.js';
 import { weeksLeft, weeksTotal } from '../weeks-grid.js';
+import { play } from '../audio.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -125,6 +126,7 @@ function renderQuests() {
     remove.setAttribute('aria-label', `Remove quest: ${quest.name}`);
     remove.addEventListener('click', () => {
       update((state) => removeQuest(state, quest.id));
+      play('remove');
       renderQuests();
     });
 
@@ -143,13 +145,13 @@ let afterAdd = null;
 // Opens the form, or explains the three-quest limit. Calls onAdded once a quest is saved.
 export async function openQuestSheet(onAdded) {
   if (!canAddQuest(getState())) {
-    await app.notify(QUEST_LIMIT_MESSAGE);
+    await app.deny(QUEST_LIMIT_MESSAGE);
     return;
   }
   afterAdd = onAdded;
   $('quest-form').reset();
   showError($('quest-error'), '');
-  $('quest-sheet').showModal();
+  app.openSheet($('quest-sheet'));
 }
 
 async function submitQuest(event) {
@@ -166,13 +168,15 @@ async function submitQuest(event) {
 
   if (!result.ok && result.reason === 'invalid') {
     showError($('quest-error'), 'Give the quest a name, a deadline and a penalty.');
+    play('deny');
     return;
   }
   $('quest-sheet').close();
   if (!result.ok) {
-    await app.notify(QUEST_LIMIT_MESSAGE);
+    await app.deny(QUEST_LIMIT_MESSAGE);
     return;
   }
+  play('add');
   if (result.quest.startsOn > dateStr()) {
     await app.notify('That deadline has already passed today, so this quest starts tomorrow.');
   }
@@ -244,7 +248,11 @@ export function initSetup(theApp) {
     event.preventDefault();
     const profile = readProfile();
     showError($('setup-error-1'), profile.error ?? '');
-    if (profile.error) return;
+    if (profile.error) {
+      play('deny');
+      return;
+    }
+    play('add');
     update((state) => Object.assign(state.profile, profile));
     showStep(2);
   });
@@ -253,7 +261,11 @@ export function initSetup(theApp) {
     event.preventDefault();
     const name = $('setup-goal').value.trim();
     showError($('setup-error-2'), name ? '' : 'Give your goal a name.');
-    if (!name) return;
+    if (!name) {
+      play('deny');
+      return;
+    }
+    play('add');
     update((state) => {
       state.goal = { id: state.goal?.id ?? 'goal-1', name };
     });

@@ -26,8 +26,8 @@ const MAX_SOLDIERS = RINGS.reduce((sum, ring) => sum + ring.slots, 0);
 // Weapons are planted between the soldiers of the first ring, front first.
 const WEAPON_ANGLES = [90, 30, 150, 210, 330, 270, 55, 125];
 const HORIZON = 0.5; // how far down the screen the ground begins
-const AURA_BUDGET = 110; // wisps of shadow per second, shared by the whole army
-const MOTES = 26; // specks of dust drifting in the firelight
+const AURA_BUDGET = 30; // wisps of shadow per second, shared by the whole army
+const MOTES = 18; // specks of dust drifting in the firelight
 
 let app;
 let stopScene = null;
@@ -96,6 +96,8 @@ function arrange(width, height, state) {
     groundY,
     fireSize: Math.min(width * 0.42, height * 0.24),
     figures,
+    behind: figures.filter((figure) => figure.y < groundY),
+    inFront: figures.filter((figure) => figure.y >= groundY),
     soldiers: figures.filter((figure) => figure.name),
     demons,
     soldierCount: soldiers.length,
@@ -142,13 +144,13 @@ function getAuraStamps() {
 function stepAir(air, scene, width, height, dt) {
   // Each soldier sheds a few wisps a second; a large army shares one budget.
   if (scene.soldiers.length) {
-    for (air.debt += dt * Math.min(AURA_BUDGET, scene.soldiers.length * 12); air.debt >= 1; air.debt -= 1) {
+    for (air.debt += dt * Math.min(AURA_BUDGET, scene.soldiers.length * 6); air.debt >= 1; air.debt -= 1) {
       const from = scene.soldiers[Math.floor(Math.random() * scene.soldiers.length)];
       air.wisps.push({
         x: from.x + rand(-0.22, 0.22) * from.height,
         y: from.y - rand(0.05, 0.75) * from.height,
         rise: rand(10, 26),
-        size: from.height * rand(0.22, 0.42),
+        size: from.height * rand(0.3, 0.52),
         stamp: Math.random() < 0.6 ? 0 : 1,
         phase: rand(0, TAU),
         age: 0,
@@ -192,29 +194,98 @@ function stepAir(air, scene, width, height, dt) {
   }
 }
 
-// ---------- Drawing ----------
+// ---------- Painted once ----------
+// Building a gradient or drawing glowing text is slow. None of these change from
+// frame to frame, so each is made once when the screen opens and reused.
 
-// The blood moon the demons stand against. It only rises once they are here.
-function drawMoon(ctx, scene, width, height, time) {
-  const x = scene.cx;
-  const y = height * 0.25;
-  const r = Math.min(width * 0.36, height * 0.2);
-  const pulse = 0.9 + 0.1 * Math.sin(time * 0.6);
+// A ready-made picture, `width` by `height`, painted by `paint`.
+function picture(width, height, paint) {
+  const scale = Math.min(window.devicePixelRatio || 1, 1.5);
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.ceil(width * scale);
+  canvas.height = Math.ceil(height * scale);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+  paint(ctx);
+  return canvas;
+}
 
-  const halo = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 2.6);
-  halo.addColorStop(0, `rgba(190, 22, 34, ${0.5 * pulse})`);
+function makePaints(ctx, scene, width, height) {
+  const horizonY = height * HORIZON;
+  const moon = { x: scene.cx, y: height * 0.25, r: Math.min(width * 0.36, height * 0.2) };
+
+  const halo = ctx.createRadialGradient(moon.x, moon.y, moon.r * 0.6, moon.x, moon.y, moon.r * 2.6);
+  halo.addColorStop(0, 'rgba(190, 22, 34, 0.5)');
   halo.addColorStop(0.45, 'rgba(120, 10, 22, 0.16)');
   halo.addColorStop(1, 'rgba(120, 10, 22, 0)');
-  ctx.fillStyle = halo;
-  ctx.fillRect(0, 0, width, height * 0.75);
 
-  const disc = ctx.createRadialGradient(x - r * 0.25, y - r * 0.3, r * 0.1, x, y, r);
+  const disc = ctx.createRadialGradient(moon.x - moon.r * 0.25, moon.y - moon.r * 0.3, moon.r * 0.1, moon.x, moon.y, moon.r);
   disc.addColorStop(0, '#8f1420');
   disc.addColorStop(0.7, '#4a070f');
   disc.addColorStop(1, '#2a0409');
-  ctx.fillStyle = disc;
+
+  const ground = ctx.createLinearGradient(0, horizonY - height * 0.04, 0, horizonY + height * 0.1);
+  ground.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  ground.addColorStop(0.45, 'rgba(0, 0, 0, 0.96)');
+  ground.addColorStop(1, '#000');
+
+  // One soft cloud, stamped wide and flat to make each bank of mist.
+  const mist = picture(128, 128, (p) => {
+    const cloud = p.createRadialGradient(64, 64, 0, 64, 64, 64);
+    cloud.addColorStop(0, scene.demons.length ? 'rgba(70, 14, 24, 0.2)' : 'rgba(30, 40, 80, 0.2)');
+    cloud.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    p.fillStyle = cloud;
+    p.fillRect(0, 0, 128, 128);
+  });
+
+  // Each soldier's name, with its glow, as a small picture of its own.
+  for (const figure of scene.soldiers) {
+    const size = Math.max(10, figure.height * 0.105);
+    const label = figure.name.toUpperCase();
+    const font = `600 ${size}px Rajdhani, 'Segoe UI', sans-serif`;
+    ctx.font = font;
+    if ('letterSpacing' in ctx) ctx.letterSpacing = '1.5px';
+    const w = ctx.measureText(label).width + 24;
+    const h = size + 20;
+    figure.label = {
+      width: w,
+      height: h,
+      image: picture(w, h, (p) => {
+        p.font = font;
+        if ('letterSpacing' in p) p.letterSpacing = '1.5px';
+        p.textAlign = 'center';
+        p.textBaseline = 'top';
+        p.lineJoin = 'round';
+        p.lineWidth = 3;
+        p.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+        p.strokeText(label, w / 2, 8);
+        p.shadowColor = '#5b8cff';
+        p.shadowBlur = 8;
+        p.fillStyle = '#cfe0ff';
+        p.fillText(label, w / 2, 8);
+      }),
+    };
+  }
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+
+  return { horizonY, moon, halo, disc, ground, mist };
+}
+
+// ---------- Drawing ----------
+
+// The blood moon the demons stand against. It only rises once they are here.
+function drawMoon(ctx, paints, width, height, time) {
+  const { moon } = paints;
+  const pulse = 0.9 + 0.1 * Math.sin(time * 0.6);
+
+  ctx.globalAlpha = pulse;
+  ctx.fillStyle = paints.halo;
+  ctx.fillRect(0, 0, width, height * 0.75);
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = paints.disc;
   ctx.beginPath();
-  ctx.arc(x, y, r, 0, TAU);
+  ctx.arc(moon.x, moon.y, moon.r, 0, TAU);
   ctx.fill();
   ctx.lineWidth = 1.5;
   ctx.strokeStyle = `rgba(255, 96, 80, ${0.75 * pulse})`;
@@ -222,11 +293,11 @@ function drawMoon(ctx, scene, width, height, time) {
 }
 
 function drawScene(ctx, width, height, scene, sprites, fire, air, time) {
+  const { paints } = scene;
   ctx.clearRect(0, 0, width, height);
-  const horizonY = height * HORIZON;
 
   if (scene.demons.length) {
-    drawMoon(ctx, scene, width, height, time);
+    drawMoon(ctx, paints, width, height, time);
     for (const demon of scene.demons) {
       const breathe = Math.sin(time * 0.7 + demon.phase);
       drawSprite(ctx, demon.sprite, sprites[demon.sprite], demon.x + breathe * 2, demon.y + Math.cos(time * 0.5 + demon.phase) * 3, demon.height);
@@ -238,33 +309,16 @@ function drawScene(ctx, width, height, scene, sprites, fire, air, time) {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.fillStyle = `rgba(255, 150, 140, ${air.flash * 0.34})`;
-    ctx.fillRect(0, 0, width, horizonY + height * 0.04);
+    ctx.fillRect(0, 0, width, paints.horizonY + height * 0.04);
     ctx.restore();
   }
 
   // The ground: black, with the sky fading into it at the horizon.
-  const ground = ctx.createLinearGradient(0, horizonY - height * 0.04, 0, horizonY + height * 0.1);
-  ground.addColorStop(0, 'rgba(0, 0, 0, 0)');
-  ground.addColorStop(0.45, 'rgba(0, 0, 0, 0.96)');
-  ground.addColorStop(1, '#000');
-  ctx.fillStyle = ground;
-  ctx.fillRect(0, horizonY - height * 0.04, width, height);
+  ctx.fillStyle = paints.ground;
+  ctx.fillRect(0, paints.horizonY - height * 0.04, width, height);
 
-  // Fog lying along the horizon, drifting.
-  for (const f of air.fog) {
-    const mist = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r);
-    mist.addColorStop(0, scene.demons.length ? 'rgba(70, 14, 24, 0.2)' : 'rgba(30, 40, 80, 0.2)');
-    mist.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.save();
-    ctx.translate(f.x, f.y);
-    ctx.scale(1, 0.16); // squash each round cloud into a low bank of mist
-    ctx.translate(-f.x, -f.y);
-    ctx.fillStyle = mist;
-    ctx.beginPath();
-    ctx.arc(f.x, f.y, f.r, 0, TAU);
-    ctx.fill();
-    ctx.restore();
-  }
+  // Fog lying along the horizon, drifting: the one cloud, stretched wide and flat.
+  for (const f of air.fog) ctx.drawImage(paints.mist, f.x - f.r, f.y - f.r * 0.16, f.r * 2, f.r * 0.32);
 
   // Shadow rising off the soldiers, drawn behind all of them.
   ctx.save();
@@ -285,48 +339,26 @@ function drawScene(ctx, width, height, scene, sprites, fire, air, time) {
   };
 
   // Everything behind the fire, then the fire, then everything in front of it.
-  scene.figures.filter((figure) => figure.y < scene.groundY).forEach(drawFigure);
+  for (const figure of scene.behind) drawFigure(figure);
   fire.draw(ctx, scene.cx, scene.groundY, scene.fireSize);
-  scene.figures.filter((figure) => figure.y >= scene.groundY).forEach(drawFigure);
+  for (const figure of scene.inFront) drawFigure(figure);
 
   // Dust catching the firelight.
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
+  ctx.fillStyle = '#ffb46b';
   for (const m of air.motes) {
     const near = 1 - Math.min(1, Math.hypot(m.x - scene.cx, m.y - scene.groundY) / (width * 0.75));
     ctx.globalAlpha = (0.15 + 0.55 * near) * (0.6 + 0.4 * Math.sin(time * 2 + m.phase));
-    ctx.fillStyle = '#ffb46b';
-    ctx.beginPath();
-    ctx.arc(m.x, m.y, m.size, 0, TAU);
-    ctx.fill();
+    ctx.fillRect(m.x, m.y, m.size * 1.6, m.size * 1.6);
   }
   ctx.restore();
 
-  // Darkness closing in at the edges.
-  const vignette = ctx.createRadialGradient(scene.cx, height * 0.55, height * 0.3, scene.cx, height * 0.55, height * 0.75);
-  vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
-  vignette.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
-  ctx.fillStyle = vignette;
-  ctx.fillRect(0, 0, width, height);
-
   // Names go on last, over everything, so no soldier hides another's name.
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.lineJoin = 'round';
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
-  ctx.fillStyle = '#cfe0ff';
-  ctx.shadowColor = '#5b8cff';
+  // (The darkness at the edges of the screen is a CSS layer over the canvas.)
   for (const figure of scene.soldiers) {
-    ctx.font = `600 ${Math.max(10, figure.height * 0.105)}px Rajdhani, 'Segoe UI', sans-serif`;
-    if ('letterSpacing' in ctx) ctx.letterSpacing = '1.5px';
-    const label = figure.name.toUpperCase();
-    ctx.shadowBlur = 0;
-    ctx.strokeText(label, figure.x, figure.y + 4);
-    ctx.shadowBlur = 8;
-    ctx.fillText(label, figure.x, figure.y + 4);
+    ctx.drawImage(figure.label.image, figure.x - figure.label.width / 2, figure.y - 4, figure.label.width, figure.label.height);
   }
-  ctx.shadowBlur = 0;
 }
 
 // In words, what the scene shows: for screen readers, and for the captions.
@@ -339,7 +371,8 @@ async function enter() {
   const state = getState();
   const canvas = $('battle-scene');
   const ctx = canvas.getContext('2d');
-  const fire = createFire();
+  // The fire is drawn small here, so it needs fewer particles than on the Focus screen.
+  const fire = createFire(0.5);
   for (let i = 0; i < 60; i++) fire.step(1 / 60);
 
   const thisVisit = ++visit;
@@ -352,13 +385,16 @@ async function enter() {
   let scene = null;
   let air = null;
   function fit() {
-    const scale = Math.min(window.devicePixelRatio || 1, 2);
+    // A full-screen scene at a phone's full sharpness is a lot of pixels to repaint
+    // sixty times a second. One and a half is sharp enough and far lighter.
+    const scale = Math.min(window.devicePixelRatio || 1, 1.5);
     width = canvas.clientWidth;
     height = canvas.clientHeight;
     canvas.width = Math.round(width * scale);
     canvas.height = Math.round(height * scale);
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     scene = arrange(width, height, state);
+    scene.paints = makePaints(ctx, scene, width, height);
     air = makeAir(width, height);
   }
   fit();
@@ -408,6 +444,4 @@ export function initBattleground(theApp) {
     },
   });
 
-  $('battle-back').addEventListener('click', () => app.go('today'));
-  $('battle-shop').addEventListener('click', () => app.go('shop'));
 }

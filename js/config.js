@@ -72,6 +72,7 @@ export const ACCENTS = [
 
 // How long the opening animation plays before the app moves on (a tap skips it).
 export const INTRO_MS = 2600;
+export const INTRO_QUICK_MS = 950; // for a returning player
 
 // Setup
 export const DEFAULT_LIFESPAN_YEARS = 80;

@@ -49,7 +49,8 @@ const TONGUES = [
   { x: 0.12, power: 0.72 },
 ];
 
-export function createFire() {
+// `density` thins the fire out where it is drawn small: 1 is full, 0.5 is half the particles.
+export function createFire(density = 1) {
   const flames = [];
   const sparks = [];
   let time = 0;
@@ -89,7 +90,7 @@ export function createFire() {
 
     // The fire breathes: it burns a little harder and softer over time.
     const breath = 0.82 + 0.18 * Math.sin(time * 2.6) * Math.sin(time * 1.1 + 1);
-    for (flameDebt += dt * FLAMES_PER_SECOND * breath * (1 + heat * 0.7); flameDebt >= 1; flameDebt -= 1) addFlame(heat);
+    for (flameDebt += dt * FLAMES_PER_SECOND * density * breath * (1 + heat * 0.7); flameDebt >= 1; flameDebt -= 1) addFlame(heat);
     for (sparkDebt += dt * SPARKS_PER_SECOND * (1 + heat * 5); sparkDebt >= 1; sparkDebt -= 1) addSpark();
 
     for (const f of flames) {
@@ -113,9 +114,9 @@ export function createFire() {
     const px = (x) => cx + x * size;
     const py = (y) => groundY - y * size;
 
+    const base = baseFor(size);
     drawGroundGlow(ctx, cx, groundY, size, flicker);
-    drawStones(ctx, px, py, size, false);
-    drawLogs(ctx, cx, groundY, size);
+    ctx.drawImage(base.back, cx - base.x, groundY - base.y, base.width, base.height);
 
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
@@ -132,7 +133,8 @@ export function createFire() {
     for (const f of flames) {
       const t = f.age / f.life;
       const stamp = t < 0.22 ? hot : t < 0.5 ? warm : t < 0.78 ? cool : dying;
-      const width = f.size * size * (1 - t * 0.78);
+      // A thinner fire uses slightly larger blobs, so it still looks full.
+      const width = f.size * size * (1 - t * 0.78) * (1.3 - 0.3 * density);
       ctx.globalAlpha = (t < 0.12 ? t / 0.12 : 1 - (t - 0.12) / 0.88) * 0.9;
       // Taller than wide, so the blobs read as licks of flame.
       ctx.drawImage(stamp, px(f.x) - width / 2, py(f.y) - width * 0.75, width, width * 1.5);
@@ -148,7 +150,7 @@ export function createFire() {
     }
     ctx.restore();
 
-    drawStones(ctx, px, py, size, true);
+    ctx.drawImage(base.front, cx - base.x, groundY - base.y, base.width, base.height);
   }
 
   return { step, draw };
@@ -156,16 +158,30 @@ export function createFire() {
 
 // ---------- The parts that do not move ----------
 
+// The warm haze in the air round the fire: one soft picture, stretched to fit.
+let airGlow = null;
+function getAirGlow() {
+  if (!airGlow) {
+    airGlow = document.createElement('canvas');
+    airGlow.width = airGlow.height = 128;
+    const ctx = airGlow.getContext('2d');
+    const haze = ctx.createRadialGradient(64, 64, 0, 64, 64, 61);
+    haze.addColorStop(0, 'rgba(255, 120, 30, 0.16)');
+    haze.addColorStop(1, 'rgba(255, 80, 0, 0)');
+    ctx.fillStyle = haze;
+    ctx.fillRect(0, 0, 128, 128);
+  }
+  return airGlow;
+}
+
 // Warm light spilling onto the ground and into the air around the fire.
 function drawGroundGlow(ctx, cx, groundY, size, flicker) {
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
 
-  const air = ctx.createRadialGradient(cx, groundY - size * 0.45, 0, cx, groundY - size * 0.45, size * 1.25);
-  air.addColorStop(0, `rgba(255, 120, 30, ${0.16 * flicker})`);
-  air.addColorStop(1, 'rgba(255, 80, 0, 0)');
-  ctx.fillStyle = air;
-  ctx.fillRect(cx - size * 1.3, groundY - size * 1.75, size * 2.6, size * 2.6);
+  ctx.globalAlpha = flicker;
+  ctx.drawImage(getAirGlow(), cx - size * 1.3, groundY - size * 1.75, size * 2.6, size * 2.6);
+  ctx.globalAlpha = 1;
 
   ctx.translate(cx, groundY + size * 0.02);
   ctx.scale(1, 0.22); // squash a circle into a pool of light lying on the ground
@@ -242,6 +258,43 @@ function drawStones(ctx, px, py, size, front) {
     ctx.ellipse(x, y, r, r * 0.7, 0, 0, TAU);
     ctx.fill();
   }
+}
+
+// The logs and stones never move. Painting them (especially the glow in the
+// logs' cracks) is slow, so it is done once for each size of fire and the two
+// finished pictures are stamped on every frame: one behind the flames, one in front.
+const bases = new Map();
+
+function baseFor(size) {
+  const key = Math.round(size);
+  if (!bases.has(key)) {
+    const scale = Math.min(window.devicePixelRatio || 1, 2);
+    const width = size * 1.5;
+    const height = size * 0.72;
+    const x = width / 2; // where the centre of the fire sits inside the picture
+    const y = size * 0.44;
+    const picture = (paint) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.ceil(width * scale);
+      canvas.height = Math.ceil(height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.scale(scale, scale);
+      paint(ctx, (ux) => x + ux * size, (uy) => y - uy * size);
+      return canvas;
+    };
+    bases.set(key, {
+      width,
+      height,
+      x,
+      y,
+      back: picture((ctx, px, py) => {
+        drawStones(ctx, px, py, size, false);
+        drawLogs(ctx, x, y, size);
+      }),
+      front: picture((ctx, px, py) => drawStones(ctx, px, py, size, true)),
+    });
+  }
+  return bases.get(key);
 }
 
 // ---------- Running a fire on its own canvas ----------

@@ -51,3 +51,10 @@ export const QUOTES = [
     author: 'Walter Elliot',
   },
 ];
+
+// The quote shown on Today. The same date always gives the same quote, so it
+// stays put all day and changes overnight.
+export function quoteOfTheDay(date) {
+  const sum = [...date].reduce((total, char) => total + char.charCodeAt(0), 0);
+  return QUOTES[sum % QUOTES.length];
+}

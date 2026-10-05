@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Questify</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
@@ -161,10 +161,8 @@
     <!-- Today: home. -->
     <section class="screen" data-screen="today">
       <header class="today-head">
-        <div class="head-row">
-          <p class="eyebrow" id="today-date"></p>
-          <button class="btn btn--small" id="today-settings" type="button">Settings</button>
-        </div>
+        <p class="eyebrow" id="today-date"></p>
+        <p class="today-greeting" id="today-greeting"></p>
         <p class="today-goal"><span class="today-goal__label">Goal</span><span id="today-goal"></span></p>
       </header>
 
@@ -186,12 +184,15 @@
           <span class="visually-hidden">coins</span>
         </div>
       </div>
-      <!-- Check in, and the ways to the Shop and the Battleground. -->
-      <nav class="today-nav">
+      <!-- How today is going, and the daily check-in. -->
+      <div class="today-day">
+        <div class="today-progress">
+          <span class="today-progress__pips" id="today-pips" aria-hidden="true"></span>
+          <span class="today-progress__text" id="today-progress"></span>
+          <span class="today-progress__next" id="today-next"></span>
+        </div>
         <button class="tile" id="today-checkin" type="button"><span class="tile__name">Check in</span><span class="tile__note" id="today-checkin-note"></span></button>
-        <button class="tile" id="today-shop" type="button"><span class="tile__name">Shop</span><span class="tile__note">Spend coins</span></button>
-        <button class="tile" id="today-battleground" type="button"><span class="tile__name">Battleground</span><span class="tile__note" id="today-army-note"></span></button>
-      </nav>
+      </div>
 
       <div class="panel">
         <h1 class="panel__title">Daily quests</h1>
@@ -206,6 +207,13 @@
       </div>
 
       <button class="btn btn--dashed" id="today-add-quest" type="button">+ Add quest</button>
+
+      <!-- One quote a day, and how far you have come. -->
+      <figure class="daily-quote">
+        <blockquote id="today-quote"></blockquote>
+        <figcaption id="today-quote-author"></figcaption>
+      </figure>
+      <p class="today-total" id="today-total"></p>
     </section>
 
     <!-- Focus: true black, the quest name and the bonfire. Nothing else. -->
@@ -221,7 +229,6 @@
       <header class="head-row">
         <h1 class="eyebrow">Shop</h1>
         <p class="shop-coins"><span class="coin" aria-hidden="true"></span><span id="shop-coins">0</span><span class="visually-hidden">coins</span></p>
-        <button class="btn btn--small" id="shop-back" type="button">Back</button>
       </header>
       <div class="panel">
         <h2 class="panel__title">Soldiers</h2>
@@ -231,19 +238,16 @@
         <h2 class="panel__title">Weapons</h2>
         <ul class="shop-list" id="shop-weapons"></ul>
       </div>
-      <button class="btn btn--wrap" id="shop-battleground" type="button">See the Battleground</button>
     </section>
 
     <!-- Battleground: the fire, your army around it, demons behind. One full-screen canvas. -->
     <section class="screen" data-screen="battleground">
       <canvas class="battle__scene" id="battle-scene" role="img"></canvas>
       <header class="battle__top">
-        <button class="btn btn--small" id="battle-back" type="button">Back</button>
         <p class="eyebrow" id="battle-caption"></p>
       </header>
       <footer class="battle__bottom">
         <p class="system-line system-line--center" id="battle-hint"></p>
-        <button class="btn btn--small" id="battle-shop" type="button">Shop</button>
       </footer>
     </section>
 
@@ -303,7 +307,6 @@
     <section class="screen" data-screen="settings">
       <header class="head-row">
         <h1 class="eyebrow">Settings</h1>
-        <button class="btn btn--small" id="settings-back" type="button">Back</button>
       </header>
 
       <div class="panel">
@@ -332,6 +335,14 @@
 
   </main>
 
+  <!-- The tab bar: always in reach on the four main screens. -->
+  <nav class="tabbar" id="tabbar" aria-label="Main" hidden>
+    <button class="tab" id="tab-today" type="button" data-go="today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 21 12 12 21 3 12Z"/><path d="m8.6 12 2.4 2.4 4.4-4.8"/></svg><span>Today</span></button>
+    <button class="tab" id="tab-shop" type="button" data-go="shop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l3 5-9 11L3 9Z"/><path d="M3 9h18M9.5 4 8 9l4 11 4-11-1.5-5"/></svg><span>Shop</span></button>
+    <button class="tab" id="tab-battleground" type="button" data-go="battleground"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 3-7 1 2 2 3 3 3-.5-2.5-.5-5 0-7Z"/></svg><span>Army</span><span class="tab__badge" id="tab-army-count" hidden></span></button>
+    <button class="tab" id="tab-settings" type="button" data-go="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.4"/><circle cx="8" cy="17" r="2.4"/></svg><span>Settings</span></button>
+  </nav>
+
   <!-- Reward pop-up: floats over whatever screen is showing, then fades. -->
   <div class="reward" id="reward" role="status" hidden>
     <span class="reward__flash" aria-hidden="true"></span>
@@ -344,6 +355,7 @@
         <span class="reward__coins" id="reward-coins"><span class="coin" aria-hidden="true"></span><span id="reward-coins-num"></span></span>
       </p>
       <p class="reward__level" id="reward-level" hidden></p>
+      <p class="reward__note" id="reward-note" hidden></p>
     </div>
   </div>
 
@@ -367,8 +379,9 @@
   </dialog>
 
   <!-- New quest form, used by Setup and by Today. -->
-  <dialog class="modal" id="quest-sheet">
+  <dialog class="modal sheet" id="quest-sheet">
     <form class="panel" id="quest-form" novalidate>
+      <span class="sheet__handle" aria-hidden="true"></span>
       <h2 class="panel__title">New quest</h2>
       <label class="field">
         <span class="field__label">Quest</span>
@@ -396,8 +409,9 @@
   </dialog>
 
   <!-- Naming a new soldier. -->
-  <dialog class="modal" id="name-sheet">
+  <dialog class="modal sheet" id="name-sheet">
     <form class="panel" id="name-form" novalidate>
+      <span class="sheet__handle" aria-hidden="true"></span>
       <h2 class="panel__title">Arise</h2>
       <img class="name-sheet__art" id="name-art" alt="">
       <p class="system-line system-line--center" id="name-prompt"></p>

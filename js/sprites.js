@@ -28,7 +28,8 @@ export async function loadSprites(names) {
 // An SVG is a recipe, and following it 60 times a second for every character is
 // slow. So each sprite is turned into a plain bitmap once per size and reused.
 function stampFor(name, img, height) {
-  const scale = Math.min(window.devicePixelRatio || 1, 2);
+  // The same sharpness as the Battleground canvas, so each stamp lands pixel for pixel.
+  const scale = Math.min(window.devicePixelRatio || 1, 1.5);
   const pixels = Math.round(height * scale);
   const key = `${name}@${pixels}`;
   if (!stamps.has(key)) {

@@ -5,7 +5,7 @@
 }
 
 .screen.is-active {
-  animation: screen-in 0.3s ease-out;
+  animation: screen-fade 0.28s ease-out both;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -13,9 +13,39 @@
   padding: calc(22px + env(safe-area-inset-top)) 14px calc(26px + env(safe-area-inset-bottom));
 }
 
-@keyframes screen-in {
+/* Going on to a later screen: it slides in from the right. Going back: from the left. */
+.screen.is-active[data-enter='forward'] {
+  animation: screen-forward 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.screen.is-active[data-enter='back'] {
+  animation: screen-back 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* The four tab-bar screens leave room for the bar at the bottom. */
+.screen[data-screen='today'].is-active,
+.screen[data-screen='shop'].is-active,
+.screen[data-screen='settings'].is-active {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+@keyframes screen-fade {
   from {
     opacity: 0;
+  }
+}
+
+@keyframes screen-forward {
+  from {
+    opacity: 0;
+    transform: translateX(36px);
+  }
+}
+
+@keyframes screen-back {
+  from {
+    opacity: 0;
+    transform: translateX(-36px);
   }
 }
 
@@ -559,13 +589,94 @@
   color: #b9b9b9;
 }
 
-/* ---------- Today: Check in, Shop, Battleground ---------- */
+/* ---------- Today: how the day is going, and the check-in ---------- */
 
-.today-nav {
+.today-greeting {
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-shadow: 0 0 18px var(--glow);
+}
+
+.today-day {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
   margin-top: -8px;
+}
+
+.today-progress {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 8px 12px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent);
+  border-left: 2px solid var(--accent);
+}
+
+.today-progress__pips {
+  display: flex;
+  gap: 7px;
+  padding: 2px 0 2px 2px;
+}
+
+.today-progress__pips:empty {
+  display: none;
+}
+
+.today-progress__text {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.today-progress__next {
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.today-day .tile {
+  min-width: 100px;
+}
+
+/* One quote a day, at the foot of Today. */
+.daily-quote {
+  margin: 4px 0 0;
+  padding: 4px 0 4px 14px;
+  border-left: 2px solid var(--line);
+}
+
+.daily-quote blockquote {
+  margin: 0;
+  color: color-mix(in srgb, var(--text) 86%, var(--accent));
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.daily-quote figcaption {
+  margin-top: 6px;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.daily-quote figcaption::before {
+  content: '— ';
+}
+
+.today-total {
+  color: var(--text-dim);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-align: center;
 }
 
 .tile {
@@ -727,7 +838,17 @@
 
 .battle__bottom {
   justify-content: flex-end;
-  padding: 12px 14px calc(16px + env(safe-area-inset-bottom));
+  padding: 12px 14px calc(84px + env(safe-area-inset-bottom));
+}
+
+/* Darkness closing in at the edges of the scene. A layer over the canvas, so the
+   canvas does not have to repaint it sixty times a second. */
+.screen[data-screen='battleground']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 62% at 50% 55%, transparent 48%, rgba(0, 0, 0, 0.8));
+  pointer-events: none;
 }
 
 .battle__bottom .system-line {
@@ -1047,4 +1168,23 @@
   18% { opacity: 0.2; }
   30% { opacity: 0.6; }
   100% { opacity: 0; }
+}
+
+/* ---------- The quick intro, for a returning player ---------- */
+
+.intro.is-quick .intro__mark {
+  animation-duration: 0.45s;
+}
+
+.intro.is-quick .intro__title span {
+  animation-duration: 0.35s;
+  animation-delay: calc(0.2s + var(--i) * 0.025s);
+}
+
+.intro.is-quick .intro__burst {
+  animation-delay: 0.3s;
+}
+
+.intro.is-quick .intro__tag {
+  display: none;
 }

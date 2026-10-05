@@ -85,7 +85,7 @@ Carried forward from `prd.md > Look and Feel` and `scope.md > Inspiration & Iden
 Each heading below is what `5-build` will point at.
 
 ### App Shell and Screen Router
-Loads `index.html`, shows exactly one screen at a time, handles the "Tap to begin" gate, and enforces the lock: if `state.penalty` exists, only the Penalty Zone can be shown. Registers the service worker.
+Loads `index.html`, shows exactly one screen at a time, handles the "Tap to begin" gate, and enforces the lock: if `state.penalty` exists, only the Penalty Zone can be shown. Registers the service worker. It also owns the **tab bar** (Today, Shop, Army, Settings; shown only on those four screens, with the soldier count as a badge), the direction each screen slides in from (`ORDER` in `main.js`), and the soft click every button makes.
 PRD ref: `prd.md > Screens and Layout`.
 
 ### Intro and Level 0 Demo
@@ -101,7 +101,7 @@ A goal holds recurring daily quests, each with name, deadline time (`HH:MM`), pr
 PRD ref: `prd.md > Features and Behavior > Goals and Quests`.
 
 ### Today Screen
-Lists today's quests ordered by priority with deadline, a Focus button, and a done tick. The header shows coins, XP bar and level. It has buttons to the Shop, Battleground and Settings, and a **Check in** button (see Rewards). If there are no quests, it shows a prompt to add one.
+Lists today's quests ordered by priority with deadline, a Focus button, and a done tick. The header greets the player and shows coins, XP bar and level. Below it: one diamond per quest with a line saying how the day is going, the XP still needed for the next level, and a **Check in** button (see Rewards). At the foot: the quote of the day (`quoteOfTheDay` in `data/quotes.js`, the same all day) and the count of every quest cleared (`totalCleared` in `rewards.js`). The Shop, Battleground and Settings are reached from the tab bar. If there are no quests, it shows a prompt to add one.
 PRD ref: `prd.md > Screens and Layout > Today`, `prd.md > States and Boundaries > No quests yet today`.
 
 ### Tension and Big Moments
@@ -111,6 +111,7 @@ Added in the final review. None of it changes a rule; it changes how the rules f
 - **The reward sequence** is `celebrate` in `main.js`: flash, ring, sparks on a canvas, a shake of `#app`, a vibration, and the sounds. `big` selects the gold version.
 - **Arise** is `arise` in `main.js`, shown for about two and a half seconds before the "joined your army" message.
 - **Reduced motion:** anyone whose device asks for less motion gets none of the shaking, sparks or Arise sequence.
+- **Kept light to draw:** anything on a canvas that does not change between frames (the fire's logs, stones and glow; the moon and ground gradients; the mist; each soldier's name) is painted once and reused. The Battleground canvas is capped at one and a half times screen sharpness. These came from measuring, not guessing: see the learning notes.
 PRD ref: `prd.md > Look and Feel`.
 
 ### Focus Mode
@@ -156,7 +157,7 @@ Accent colour picker with six colours (sets `--accent` and saves it), a sound on
 PRD ref: `prd.md > Screens and Layout > Settings`, `prd.md > Look and Feel`.
 
 ### Audio
-`audio.js` builds each effect from the Web Audio API (oscillators and noise), starts only after the first tap, and has a mute option in Settings.
+`audio.js` builds each effect from the Web Audio API (oscillators and noise), starts only after the first tap, and has a mute option in Settings. Besides the big moments there is a small sound for every interaction: `tap`, `nav`, `open`, `deny`, `add`, `remove`, `toggle`.
 PRD ref: `prd.md > Look and Feel` (sound effects).
 
 ### Fire and Sprite Rendering

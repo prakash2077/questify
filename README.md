@@ -10,13 +10,15 @@ It is a phone-sized web app. On a phone, open the link in Chrome, tap the menu, 
 
 - **Intro and Level 0**: a short animated open with sound, then a five-card demo for new players that uses sample data and saves nothing.
 - **Setup**: date of birth, expected lifespan, one goal, and up to three daily quests, each with a deadline, a priority and a penalty.
-- **Today**: your quests in priority order with the time left on each, plus your level, XP and coins. Quests come back every day on their own.
-- **Focus**: a true-black screen with only the quest name and a crackling bonfire.
-- **Rewards**: finishing a quest pays XP and coins. Levels get steeper as you climb. A daily check-in gives a small bonus.
-- **Shop and Battleground**: buy soldiers and weapons, name each soldier, and watch them gather round your fire while demons loom behind and grow with your level.
+- **Today**: your quests in priority order with the time left on each, plus your level, XP and coins. It greets you, says how the day is going, and shows a quote a day. Quests come back every day on their own.
+- **Deadlines you can feel**: a quest turns amber in its last hour and red in its last ten minutes, when the countdown switches to seconds and the edges of every screen glow. In the last minute a clock ticks.
+- **Focus**: a true-black screen with only the quest name and a crackling bonfire, which burns harder as the deadline nears.
+- **Rewards**: finishing a quest pays XP and coins, with a flash, sparks, a jolt and a bell. Levels get steeper as you climb. A daily check-in gives a small bonus.
+- **Shop and Battleground**: buy shadow soldiers and weapons, name each soldier, and watch them gather round your fire while demons rise against a blood moon and grow with your level.
 - **Penalty Zone**: a missed deadline locks every other screen. The red screen shows your penalty, your goal, your remaining weeks as a grid, and a quote. A photo unlocks it; reloading does not.
 - **Proof Gallery**: every penalty photo is kept, with its date, under Settings.
 - **Settings**: six accent colours, a sound switch, and demo tools.
+- **Feels like an app**: a tab bar, screens that slide, forms that rise from the bottom, and a sound for every touch.
 
 ## See everything in two minutes
 

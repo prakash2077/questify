@@ -13,8 +13,10 @@ import {
   upcomingQuests,
 } from '../quests.js';
 import { CHECK_IN_XP, TENSION_CRITICAL_MS, TENSION_NEAR_MS, TENSION_SOON_MS } from '../config.js';
-import { armyOf, canCheckIn, checkIn, completeQuest, levelInfo } from '../rewards.js';
+import { canCheckIn, checkIn, completeQuest, levelInfo, totalCleared } from '../rewards.js';
 import { enforcePenalty } from '../penalty.js';
+import { play } from '../audio.js';
+import { quoteOfTheDay } from '../../data/quotes.js';
 import { openQuestSheet, questSummary } from './setup.js';
 
 const $ = (id) => document.getElementById(id);
@@ -42,8 +44,15 @@ export function finishQuest(quest) {
     dayCleared = questsFor(state, today).every((q) => isDone(state, q.id, today));
   });
   if (!reward) return false;
-  // Finishing the last quest of the day is its own, bigger moment.
-  app.celebrate({ title: dayCleared ? 'All quests cleared' : 'Quest complete', sound: 'done', big: dayCleared, ...reward });
+  // Every reward names what it was for. Finishing the last quest of the day is its own, bigger moment.
+  const goal = getState().goal?.name;
+  app.celebrate({
+    title: dayCleared ? 'All quests cleared' : 'Quest complete',
+    note: goal ? `${dayCleared ? 'Day won. Closer to' : 'One step closer to'}: ${goal}` : '',
+    sound: 'done',
+    big: dayCleared,
+    ...reward,
+  });
   return true;
 }
 
@@ -112,6 +121,7 @@ function questRow(quest, { today, now, upcoming }) {
     const sure = await app.confirm(`Remove "${quest.name}"? It will stop appearing each day.`, 'Remove quest');
     if (!sure) return;
     update((state) => removeQuest(state, quest.id));
+    play('remove');
     render();
   });
   side.append(remove);
@@ -198,9 +208,43 @@ function renderHud(state, today) {
   const available = canCheckIn(state, today);
   $('today-checkin').disabled = !available;
   $('today-checkin-note').textContent = available ? `+${CHECK_IN_XP} XP` : 'Done today';
+  $('today-next').textContent = `${needed - into} XP to level ${level + 1}`;
+}
 
-  const soldiers = armyOf(state).soldiers.length;
-  $('today-army-note').textContent = soldiers === 0 ? 'Your fire' : soldiers === 1 ? '1 soldier' : `${soldiers} soldiers`;
+// "Good morning, Player." and so on, by the clock.
+function greeting(now) {
+  const hour = now.getHours();
+  if (hour < 5) return 'Still awake, Player.';
+  if (hour < 12) return 'Good morning, Player.';
+  if (hour < 17) return 'Good afternoon, Player.';
+  if (hour < 22) return 'Good evening, Player.';
+  return 'The day is almost over, Player.';
+}
+
+// How today is going: one diamond per quest, and a line that names what is left.
+function renderDay(state, quests, today) {
+  const cleared = quests.filter((q) => isDone(state, q.id, today)).length;
+  const left = quests.length - cleared;
+
+  const pips = quests.map((q) => {
+    const pip = document.createElement('span');
+    pip.className = isDone(state, q.id, today) ? 'pip is-on' : 'pip';
+    return pip;
+  });
+  $('today-pips').replaceChildren(...pips);
+
+  if (quests.length === 0) $('today-progress').textContent = 'No quests yet today.';
+  else if (left === 0) $('today-progress').textContent = 'Day won. Every quest cleared.';
+  else if (cleared === 0) $('today-progress').textContent = `${left} ${left === 1 ? 'quest stands' : 'quests stand'} between you and today.`;
+  else $('today-progress').textContent = `${cleared} down, ${left} to go. Keep the fire burning.`;
+
+  const quote = quoteOfTheDay(today);
+  $('today-quote').textContent = quote.text;
+  $('today-quote-author').textContent = quote.author;
+
+  const total = totalCleared(state);
+  $('today-total').hidden = total === 0;
+  $('today-total').textContent = `${total.toLocaleString()} ${total === 1 ? 'quest' : 'quests'} cleared since you began.`;
 }
 
 function render() {
@@ -211,8 +255,10 @@ function render() {
   const upcoming = upcomingQuests(state, today);
 
   $('today-date').textContent = now.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' });
+  $('today-greeting').textContent = greeting(now);
   $('today-goal').textContent = state.goal?.name ?? '';
   renderHud(state, today);
+  renderDay(state, quests, today);
 
   live = [];
   $('today-quests').dataset.day = today;
@@ -238,9 +284,6 @@ export function initToday(theApp) {
   });
 
   $('today-add-quest').addEventListener('click', () => openQuestSheet(render));
-  $('today-settings').addEventListener('click', () => app.go('settings'));
-  $('today-shop').addEventListener('click', () => app.go('shop'));
-  $('today-battleground').addEventListener('click', () => app.go('battleground'));
   $('today-checkin').addEventListener('click', () => {
     let reward;
     update((state) => {

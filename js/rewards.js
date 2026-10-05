@@ -36,6 +36,11 @@ export function completeQuest(state, quest, date) {
   return { xp, coins, levelsGained, level: state.level };
 }
 
+// Every quest ever finished, across all days. It only ever goes up.
+export function totalCleared(state) {
+  return Object.values(state.days).reduce((total, day) => total + day.done.length, 0);
+}
+
 // ---------- Spending coins ----------
 
 // Buys one Shop item. Soldiers need a name; weapons do not.

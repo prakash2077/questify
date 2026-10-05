@@ -29,7 +29,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`, `scope.md > 
 - **Penalty Zone** — full-screen red lock screen: the hard penalty task, the user's goal, the weeks-left grid, a real quote, and a button to submit photo proof.
 - **Settings** — accent colour choice (see Look and Feel).
 
-Navigation: Today is home. Shop and Battleground are reachable from Today. Focus opens from a quest and returns to Today. The Penalty Zone takes over everything until cleared.
+Navigation: Today is home. A tab bar at the bottom of the screen switches between Today, the Shop, the Battleground (Army) and Settings, as in a native phone app. Focus opens from a quest and returns to Today. The Penalty Zone takes over everything until cleared, and the tab bar disappears with it.
 
 ## Look and Feel
 - Black (AMOLED) background, close to the *Solo Leveling* System UI in typography and styling, with a "fire plus cool" feel; dark, cinematic, and not generic. Windows are panes of dark glass with cut corners in thin glowing frames.
@@ -40,6 +40,9 @@ Navigation: Today is home. Shop and Battleground are reachable from Today. Focus
 - Sound is cinematic: deep impacts, bells, low brass and a choir in a large reverberant space, not beeps. Sound effects are important at key moments: intro, check-off, coins, buying a soldier, the Battleground, the Penalty Zone. The Battleground gets richer in sound as the army grows.
 - Intensity: the key moments are staged, not just shown. Finishing a quest plays a flash, a shockwave, sparks, a jolt of the screen and a vibration; a level-up or the last quest of the day plays a bigger gold version. A soldier joining rises out of a pool of shadow under the word ARISE. The Penalty Zone arrives with a red flash and a hard jolt. Lightning cracks over the demons.
 - Tension: a deadline is felt before it hits. In its last hour a quest's row turns amber; in the last ten minutes it turns red, counts down in seconds, and the edges of every screen glow red; in the last minute a clock ticks. The bonfire in Focus burns harder as the deadline nears.
+- Native feel: it should behave like an app installed from a store, not like a web page. Screens slide in from the side, forms rise from the bottom edge as sheets, every button sinks and brightens under the finger, nothing can be accidentally selected or bounced, and a returning player gets in within a second.
+- Sound everywhere: every touch has a sound. A soft click for any button, a breath of air between screens, a rising pair of notes when a window opens, a low buzz when something is refused, a chime when something is added, a falling note when something is removed.
+- Motivating: Today greets the player, says how the day is going in words ("1 down, 2 to go. Keep the fire burning."), shows one real quote a day, and counts every quest ever cleared. Every reward names the player's own goal.
 - Tone: motivating and heartwarming, not harsh. The drama is in the staging; the words stay kind.
 
 ## Features and Behavior

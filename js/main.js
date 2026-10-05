@@ -10,6 +10,9 @@ import { initShop } from './screens/shop.js';
 import { initBattleground } from './battleground.js';
 import { applyAccent, initSettings } from './screens/settings.js';
 import { initIntro } from './intro.js';
+import { armyOf } from './rewards.js';
+import { loadSprites } from './sprites.js';
+import { CATALOG, DEMON_SPRITES } from '../data/catalog.js';
 
 const screens = {}; // name -> { enter, leave }
 let current = 'gate';
@@ -18,18 +21,63 @@ function register(name, handlers) {
   screens[name] = handlers;
 }
 
+// The order screens come in. Going to a later one slides in from the right,
+// going back to an earlier one slides in from the left.
+const ORDER = ['gate', 'intro', 'demo', 'setup', 'today', 'shop', 'battleground', 'settings', 'focus', 'penalty'];
+// The four screens that live on the tab bar.
+const TABS = ['today', 'shop', 'battleground', 'settings'];
+const tabbar = document.getElementById('tabbar');
+
 // Show exactly one screen at a time. While a penalty is waiting, that one screen
 // is always the Penalty Zone, whatever was asked for.
 function go(name, details = {}) {
   if (enforcePenalty()) name = 'penalty';
+  const from = current;
   screens[current]?.leave?.();
   current = name;
   for (const el of document.querySelectorAll('.screen')) {
     el.classList.toggle('is-active', el.dataset.screen === name);
+    if (el.dataset.screen === name) {
+      el.dataset.enter = name === 'penalty' || from === 'gate' ? 'fade' : ORDER.indexOf(name) > ORDER.indexOf(from) ? 'forward' : 'back';
+    }
   }
+  showTabs();
   window.scrollTo(0, 0);
+  // A breath of air between the app's own screens; the big entrances have their own sound.
+  if (from !== name && ORDER.indexOf(from) > 1 && name !== 'penalty') play('nav');
   screens[name]?.enter?.(details);
 }
+
+// Shows the tab bar on the four main screens, with the current one lit.
+function showTabs() {
+  tabbar.hidden = !TABS.includes(current);
+  for (const tab of tabbar.querySelectorAll('.tab')) {
+    if (tab.dataset.go === current) tab.setAttribute('aria-current', 'page');
+    else tab.removeAttribute('aria-current');
+  }
+  const soldiers = armyOf(getState()).soldiers.length;
+  const badge = document.getElementById('tab-army-count');
+  badge.hidden = soldiers === 0;
+  badge.textContent = soldiers;
+}
+
+for (const tab of tabbar.querySelectorAll('.tab')) {
+  tab.addEventListener('click', () => {
+    if (tab.dataset.go !== current) go(tab.dataset.go);
+  });
+}
+
+// Every button in the app answers a touch with a soft click and a tiny vibration.
+document.addEventListener(
+  'pointerdown',
+  (event) => {
+    if (event.target.closest?.('button, label.btn, .segmented label, .chip')) {
+      play('tap');
+      buzz(8);
+    }
+  },
+  { passive: true },
+);
 
 // Called when a deadline passes while the app is open: drop everything and lock.
 function lock() {
@@ -47,7 +95,9 @@ const noticeYes = document.getElementById('notice-yes');
 const noticeNo = document.getElementById('notice-no');
 
 // Shows a message and resolves with true (OK / Yes) or false (No / dismissed).
-function showNotice({ text, title = 'Notification', yes = 'OK', no = null }) {
+// `sound` is what it opens with: 'open' for news, 'deny' for a refusal.
+function showNotice({ text, title = 'Notification', yes = 'OK', no = null, sound = 'open' }) {
+  play(sound);
   return new Promise((resolve) => {
     noticeTitle.textContent = title;
     noticeText.textContent = text;
@@ -138,7 +188,7 @@ let rewardTimer = null;
 
 // Shows what was just earned over whatever screen is showing: a flash, a
 // shockwave, sparks, a jolt and a sound. `big` is for a level-up or a finished day.
-function celebrate({ title, sound, xp, coins, levelsGained, level, big = false }) {
+function celebrate({ title, sound, xp, coins, levelsGained, level, big = false, note = '' }) {
   const grand = big || levelsGained > 0;
   document.getElementById('reward-title').textContent = title;
   document.getElementById('reward-xp').textContent = `+${xp} XP`;
@@ -146,6 +196,8 @@ function celebrate({ title, sound, xp, coins, levelsGained, level, big = false }
   document.getElementById('reward-coins-num').textContent = `+${coins}`;
   document.getElementById('reward-level').hidden = !levelsGained;
   document.getElementById('reward-level').textContent = `Level up! You are now level ${level}`;
+  document.getElementById('reward-note').hidden = !note;
+  document.getElementById('reward-note').textContent = note;
   rewardEl.classList.toggle('is-big', grand);
 
   // Hiding and re-showing restarts the animations if a reward is already on screen.
@@ -203,6 +255,13 @@ const app = {
   arise,
   shake,
   notify: (text, title) => showNotice({ text, title }),
+  // Like notify, for when something is refused: it opens with a low buzz.
+  deny: (text, title) => showNotice({ text, title, sound: 'deny' }),
+  // Opens one of the bottom sheets.
+  openSheet(sheet) {
+    play('open');
+    sheet.showModal();
+  },
   confirm: (text, title, { yes = 'Yes', no = 'No' } = {}) => showNotice({ text, title, yes, no }),
 };
 
@@ -226,6 +285,8 @@ applyAccent(getState().settings.accent);
 document.getElementById('gate').addEventListener('click', () => {
   unlockAudio();
   startWatching();
+  // Fetch every drawing now, so the Shop and the Battleground open without a wait.
+  loadSprites([...CATALOG.map((item) => item.sprite), ...DEMON_SPRITES]).catch(() => {});
 
   // A brand-new player gets the Level 0 demo; everyone else goes home to Today.
   const next = getState().profile.setupDone ? 'today' : 'demo';
@@ -236,6 +297,7 @@ document.getElementById('gate').addEventListener('click', () => {
     go(next);
     play('begin');
   } else {
-    go('intro', { next });
+    // The full intro is for a first visit. After that the app opens with a quick flash of it.
+    go('intro', { next, quick: next === 'today' });
   }
 });

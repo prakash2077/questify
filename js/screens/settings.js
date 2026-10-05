@@ -66,6 +66,7 @@ function buildLook() {
       });
       applyAccent(value);
       renderLook();
+      play('toggle');
     });
     return swatch;
   });
@@ -76,7 +77,7 @@ function buildLook() {
       state.settings.muted = !state.settings.muted;
     });
     renderLook();
-    play('checkIn'); // heard only when sound has just been turned back on
+    play('toggle'); // heard only when sound has just been turned back on
   });
 }
 
@@ -99,12 +100,12 @@ export function initSettings(theApp) {
     leave: releaseGallery,
   });
 
-  $('settings-back').addEventListener('click', () => app.go('today'));
   $('demo-due-soon').addEventListener('click', dueInOneMinute);
   $('demo-coins').addEventListener('click', () => {
     update((state) => {
       state.coins += DEMO_COINS;
     });
+    play('coins');
     app.notify(`${DEMO_COINS} test coins added. You now have ${getState().coins}.`, 'Demo tools');
   });
   $('demo-reset').addEventListener('click', resetEverything);

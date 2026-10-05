@@ -500,3 +500,75 @@ The practice to reuse: when a request is vague, split it into the part that is s
 1. In `js/config.js`, change `TENSION_NEAR_MS` to `60 * 60 * 1000`. Now the last *hour* glows red and counts in seconds. Notice you changed one number and three places reacted.
 2. In `js/main.js`, find `count: grand ? 110 : 46` and try `400`.
 3. In `css/base.css`, find `@keyframes quake` and double every number.
+
+---
+
+## Final review, rounds 3 and 4: a misreading, then "make it feel native"
+
+### What happened
+
+1. After the intensity round you wrote: "the things feel vague and annoying now, do something cool".
+2. The agent read that as "take the effects out", reverted the whole round on your computer, and asked what "cool" meant.
+3. You answered: "noooo it's not annoying, the overall app should be more good". You wanted the effects kept and the *whole app* lifted: like a native app, smooth, sound effects everywhere, motivating.
+4. The effects were put back, and those four things were built.
+
+Two mistakes in a row, in opposite directions, and both came from the same place. In round 2 the agent built too much on one vague word. In round 3 it removed too much on another. Each time, one question first would have cost you ten seconds.
+
+What saved it both times: every change was its own commit, and the removal had not been pushed. Your live app never changed. Putting the work back was one command.
+
+**The practice to reuse:** when feedback could mean two opposite things, ask which before you add or remove anything. And push only when you are sure, because unpushed mistakes are free.
+
+Your round 4 message is also a good example of a request that works. "Like some native app", "so smooth", "sound effects everywhere" and "motivating" are four things that can each be turned into a list and checked.
+
+### What "like a native app" turned out to mean
+
+Nobody can build "native". But it breaks down into small, concrete habits that phone apps share and web pages do not:
+
+- **A tab bar at the bottom.** The main screens are always one tap away, and there are no Back buttons. `showTabs` in `js/main.js`, the `.tabbar` styles in `css/base.css`.
+- **Screens slide.** A later screen comes in from the right, an earlier one from the left. `ORDER` in `js/main.js` is the list that decides which is which; the `screen-forward` and `screen-back` animations in `css/screens.css` do the moving.
+- **Forms rise from the bottom** as sheets, attached to the edge of the screen. `.sheet` in `css/base.css`.
+- **Every press is answered.** Anything you can touch sinks and brightens under your finger, in under a tenth of a second.
+- **It does not behave like a document.** You cannot select the text, long-press an image, or drag the page until it bounces. Four lines of CSS near the top of `css/base.css` do this.
+- **It opens fast.** The full intro plays the first time; after that, a one-second flash of it.
+
+None of these is hard. Together they are most of the difference between "a website" and "an app".
+
+### Smooth: measure first
+
+The first attempt at "smooth" was a guess: the agent assumed the slow part of the Battleground was building colour gradients every frame, and moved those to be painted once. It then measured, and the screen was no faster.
+
+So it measured properly, by skipping one kind of drawing at a time and timing the rest:
+
+| Skipped | Frames per second |
+|---|---|
+| nothing | 45 |
+| the glowing particles (fire and aura) | 59 |
+| the big glow fills | 55 |
+| the sprites and name labels | 54 |
+
+The particles were the real cost, by a distance. With that known, the fix was obvious: fewer and larger aura wisps, a thinner fire where it is drawn small, the fire's glow painted once.
+
+Result with the processor slowed four times to stand in for a phone: about 40 frames a second before with a full army, about 53 after, and about 59 with a normal-sized army.
+
+**The practice to reuse:** do not optimise what you think is slow. Measure, change one thing, measure again. The first guess here was wrong, and only the measurement said so.
+
+One honest limit: these numbers come from a test browser on a computer, not from your phone. They show the direction. Your phone is the real test.
+
+### Sound everywhere, without it becoming noise
+
+There is one line of code behind most of it. `js/main.js` listens for a touch anywhere on the page and, if it landed on a button, plays `tap`. No button needed changing. Screens that move play `nav` from inside `go()`, for the same reason: one place, every screen.
+
+The sounds for small things are deliberately small: short, quiet, and high. The big sounds (a level-up, the Penalty Zone) stay rare. If everything is loud, nothing is.
+
+### Motivating without adding a rule that can hurt
+
+A streak counter is the usual way to motivate. It was left out on purpose: a streak that resets when you miss a day is a loss of progress, and your scope document rules that out ("the learner prefers the Penalty Zone approach"). So Today shows a count that can only go up, every quest you have ever cleared, plus how today is going, a quote a day, and your own goal named in every reward.
+
+Checking a new idea against what you already decided to leave out is what the "Explicitly Cut" list is for.
+
+### Try it yourself
+
+1. In `js/main.js`, change the order of two names in `ORDER` and watch which way those screens now slide.
+2. In `css/base.css`, find `.btn:active` and change `scale(0.95)` to `scale(0.8)`. Press any button.
+3. In `js/audio.js`, find `tap()` and change `720` to `220`. Every button in the app now sounds different, from one line.
+4. In `js/screens/today.js`, find `greeting` and write your own lines.
