@@ -731,3 +731,213 @@
 .battle__bottom .system-line:empty {
   visibility: hidden;
 }
+
+/* ---------- Intro ---------- */
+
+.screen[data-screen='intro'].is-active {
+  padding: 0;
+}
+
+/* perspective is what makes things seem to fly toward you out of the dark */
+.intro {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  background: none;
+  border: 0;
+  color: var(--text);
+  perspective: 700px;
+  cursor: pointer;
+}
+
+.intro__mark {
+  width: 150px;
+  height: 150px;
+  mix-blend-mode: screen; /* the drawing's black background lets the glow behind show through */
+  animation: intro-mark 0.8s cubic-bezier(0.16, 1, 0.3, 1.06) both;
+}
+
+/* The flash as the mark lands. */
+.intro__burst {
+  position: absolute;
+  top: calc(50% - 68px);
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 40px 10px var(--glow), inset 0 0 30px var(--glow);
+  opacity: 0;
+  animation: intro-burst 0.9s 0.7s ease-out both;
+}
+
+.intro__title {
+  display: flex;
+  margin-right: -0.3em;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  text-shadow: 0 0 22px var(--glow);
+  transform-style: preserve-3d;
+}
+
+.intro__title span {
+  display: inline-block;
+  animation: intro-letter 0.55s calc(0.78s + var(--i) * 0.055s) cubic-bezier(0.16, 1, 0.3, 1.1) both;
+}
+
+.intro__tag {
+  margin-right: -0.3em;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  animation: intro-tag 0.7s 1.55s ease-out both;
+}
+
+@keyframes intro-mark {
+  from {
+    opacity: 0;
+    filter: blur(14px) brightness(3);
+    transform: translateZ(-1500px) rotateX(75deg) rotateZ(-140deg);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@keyframes intro-burst {
+  from {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(22);
+  }
+}
+
+@keyframes intro-letter {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateZ(-500px) translateY(26px) rotateX(-80deg);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@keyframes intro-tag {
+  from {
+    opacity: 0;
+    letter-spacing: 0.9em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.3em;
+  }
+}
+
+/* ---------- Level 0 demo ---------- */
+
+.demo-card {
+  flex: 1;
+}
+
+.demo-card .system-line {
+  font-size: 19px;
+}
+
+/* A framed example with a "Sample" tag, so nobody mistakes it for their own data. */
+.demo-sample {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 26px 12px 14px;
+  border: 1px dashed var(--line);
+}
+
+.demo-sample--dark {
+  padding: 0;
+  background: #000;
+}
+
+.demo-sample__tag {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  z-index: 1;
+  padding: 1px 8px;
+  background: var(--accent);
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.demo-fire {
+  display: block;
+  width: 100%;
+  height: 250px;
+}
+
+.demo-gains {
+  justify-content: center;
+}
+
+.demo-army {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.demo-army img {
+  width: 84px;
+  height: 98px;
+}
+
+/* ---------- Settings: accent colour ---------- */
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px 2px;
+}
+
+.swatch {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: var(--swatch);
+  border: 2px solid #000;
+  border-radius: 2px;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--swatch) 60%, transparent);
+  cursor: pointer;
+}
+
+.swatch[aria-checked='true'] {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.swatch:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}

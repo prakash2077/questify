@@ -330,3 +330,74 @@ Nothing in what you get, but three choices were made that the plan had left open
 1. Add a soldier to the Shop without touching any screen: copy `assets/sprites/soldier-swordsman.svg` to `soldier-guard.svg`, change a colour in it, and add `{ id: 'guard', kind: 'soldier', label: 'Shadow Guard', price: 5, sprite: 'soldier-guard' }` to `data/catalog.js`. Then run `node tests/check-logic.mjs` and read why one check fails.
 2. In `js/config.js`, change `demonsForLevel` so level 1 already has two demons. Which check objects, and why does the plan care?
 3. In `js/battleground.js`, change the first ring's `ry` from `0.07` to `0.2`. The camp is now seen from above instead of from the side.
+
+---
+
+## Step 6: the intro, the Level 0 demo, and your accent colour
+
+### What you can do now
+
+The first tap plays a short intro: the emblem flies out of the dark with a sound and the name lands letter by letter. A brand-new player then gets Level 0, five cards that explain the app with clearly labelled sample data, and only then Setup. In Settings you can pick one of six accent colours for the whole app and switch the sound off.
+
+### How it works
+
+- **`js/intro.js`** runs the intro and the demo cards. It never imports `js/store.js`, which is how "the demo saves nothing" is guaranteed rather than promised.
+- The intro's movement is all CSS, in `css/screens.css` under "Intro". JavaScript only starts a timer.
+- **`applyAccent`** in `js/screens/settings.js` changes the colour.
+- The gate's click handler at the bottom of `js/main.js` decides what a tap leads to.
+
+That handler is worth reading. It is the whole "what happens when the app opens" decision in ten lines:
+
+1. Is a penalty waiting? Go to the Penalty Zone. No intro gets in the way.
+2. Has the person asked their device for less motion? Skip the intro.
+3. Otherwise play the intro, then go to the demo (new player) or Today (returning player).
+
+### Ideas worth learning
+
+**Animation without JavaScript.** The intro uses CSS `@keyframes`: you describe the start and the end, and the browser draws everything in between. The "3D" look comes from one property, `perspective`, on the container. With it, moving something along the Z axis (`translateZ(-1500px)`) makes it small and far away, so animating back to zero makes it fly toward you.
+
+**One animation, staggered.** All eight letters of the name share one animation. Each letter carries a number in a CSS variable (`--i: 0` to `--i: 7`) and starts a fraction later: `calc(0.78s + var(--i) * 0.055s)`. You do not write eight animations; you write one and a delay rule.
+
+**The payoff of colours-as-variables.** Step 1's notes said every border, glow and fill is built from `--accent`. That choice is why the accent picker is one line: `document.documentElement.style.setProperty('--accent', colour)`. No screen was edited to support it. A decision made at the start to make something easy later is the kind of thing a spec is for.
+
+**Sample data must look like sample data.** Each demo example sits in a dashed frame with a "Sample" tag, and is marked `inert` so it cannot be tapped. A demo that looks real makes people think their app already contains things it does not.
+
+**Respect "reduce motion".** Phones and computers have a setting for people who get dizzy or distracted by animation. `window.matchMedia('(prefers-reduced-motion: reduce)')` reads it, and the app skips the intro for them. It costs two lines.
+
+### How it was checked
+
+- The browser script timed the real intro (2.9 seconds, then it moves on by itself), tapped to skip it, walked all five demo cards forward and back, and confirmed nothing was saved.
+- It confirmed a locked player goes straight to the Penalty Zone with no intro.
+- It changed the accent to purple and read the colour back from Settings, Today, the XP bar, the Shop and the opening screen, and confirmed the Penalty Zone stayed red.
+- It muted the sound and confirmed that a reward, the fire and the Battleground all stayed silent.
+- Last, it ran **the whole core journey in one go**: intro, demo, Setup, Focus, reward, Shop, naming a soldier, the Battleground, a missed quest, the Penalty Zone, a photo, and the gallery, with no errors.
+
+Two things from the checking worth remembering:
+
+- **A check that failed once and passed the next time is a problem with the check.** The "title has landed" check assumed the animation would be finished after a fixed wait. On a busy run it was not. The fix was to wait for the thing itself, not for a guessed amount of time. Tests that sometimes fail teach people to ignore failures.
+- **A colour check failed for a reason that was not a bug.** Straight after changing the accent, the page still reported blue. The cause was the test's own "reduce motion" setting, under which every change takes one frame to settle. The colour was right a moment later. Before fixing code because a check failed, find out which of the two is wrong.
+
+### What changed from the plan
+
+- **The intro plays on every open, not only the first**, as the PRD's screen list says ("then onward to Today"). It is under three seconds and one tap skips it. Say so if you would rather returning players skip it.
+- **A locked player skips the intro**, so the Penalty Zone is the first thing they see.
+- **The six accent colours** were chosen in the build: System blue, Ice, Shadow purple, Emerald, Ember and Rose. They are a list in `js/config.js`.
+
+### Try it yourself
+
+1. In `js/config.js`, add `{ name: 'Blood', value: '#dc2626' }` to `ACCENTS`. A seventh swatch appears in Settings with no other change.
+2. In `css/screens.css`, find `@keyframes intro-mark` and change `translateZ(-1500px)` to `translateZ(600px)`. The emblem now arrives from behind you. Then change `perspective: 700px` on `.intro` to `200px` and watch the depth exaggerate.
+3. On your computer, turn on "reduce motion" in your system's accessibility settings, reload, and tap to begin. The intro is gone.
+
+---
+
+## What to take from all of this
+
+Six steps, and each one could be tried the moment it was finished. A few practices did most of the work, and none of them are specific to this app:
+
+1. **Say what "working" means before building.** Every step had a "this becomes usable" line and a way to check it, written before any code.
+2. **Build the risky, important part early.** The Penalty Zone was step 2, not step 6. If it had not worked, the plan would have changed while that was still cheap.
+3. **Check by running, and rerun old checks.** Twice, an earlier check caught something a later step changed.
+4. **Keep rules apart from screens.** It is why the rules can be checked in a second, and why the look could change without touching them.
+5. **Put numbers and lists in one place.** Rewards, the level curve, the Shop, the quotes and the accent colours are all data you can edit without reading screen code.
+6. **Write down what changed and why.** The plan was wrong in small ways about ten times. Each time it was corrected in the checklist under Revisions, which is why the documents still describe the app you have.

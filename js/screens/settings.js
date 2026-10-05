@@ -1,7 +1,8 @@
-// Settings: the Proof Gallery and the Demo tools.
+// Settings: accent colour and sound, the Proof Gallery, and the Demo tools.
 
 import { getState, resetAll, update } from '../store.js';
-import { DEMO_COINS } from '../config.js';
+import { ACCENTS, DEMO_COINS } from '../config.js';
+import { play } from '../audio.js';
 import { dateStr, deadlineAt, isDone, questsFor, upcomingQuests } from '../quests.js';
 import { initGallery, releaseGallery, renderGallery } from './gallery.js';
 
@@ -36,6 +37,49 @@ function dueInOneMinute() {
   app.go('today');
 }
 
+// Recolours the whole app: every border, glow and fill is built from --accent.
+export function applyAccent(colour) {
+  document.documentElement.style.setProperty('--accent', colour);
+}
+
+function renderLook() {
+  const { accent, muted } = getState().settings;
+  for (const swatch of $('settings-accents').children) {
+    swatch.setAttribute('aria-checked', String(swatch.dataset.colour === accent));
+  }
+  $('settings-mute').textContent = muted ? 'Sound: off' : 'Sound: on';
+  $('settings-mute').setAttribute('aria-pressed', String(muted));
+}
+
+function buildLook() {
+  const swatches = ACCENTS.map(({ name, value }) => {
+    const swatch = document.createElement('button');
+    swatch.className = 'swatch';
+    swatch.type = 'button';
+    swatch.dataset.colour = value;
+    swatch.style.setProperty('--swatch', value);
+    swatch.setAttribute('role', 'radio');
+    swatch.setAttribute('aria-label', name);
+    swatch.addEventListener('click', () => {
+      update((state) => {
+        state.settings.accent = value;
+      });
+      applyAccent(value);
+      renderLook();
+    });
+    return swatch;
+  });
+  $('settings-accents').append(...swatches);
+
+  $('settings-mute').addEventListener('click', () => {
+    update((state) => {
+      state.settings.muted = !state.settings.muted;
+    });
+    renderLook();
+    play('checkIn'); // heard only when sound has just been turned back on
+  });
+}
+
 async function resetEverything() {
   const sure = await app.confirm('Erase your goal, quests, progress and penalty photos from this device? This cannot be undone.', 'Reset all data');
   if (sure) resetAll();
@@ -45,8 +89,13 @@ export function initSettings(theApp) {
   app = theApp;
   initGallery();
 
+  buildLook();
+
   app.register('settings', {
-    enter: renderGallery,
+    enter() {
+      renderLook();
+      renderGallery();
+    },
     leave: releaseGallery,
   });
 

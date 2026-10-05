@@ -88,7 +88,7 @@ Loads `index.html`, shows exactly one screen at a time, handles the "Tap to begi
 PRD ref: `prd.md > Screens and Layout`.
 
 ### Intro and Level 0 Demo
-A short animated open with sound (after the tap), then a 4-5 card walkthrough (quests, Focus, army, Penalty Zone) using clearly labelled **sample data** that is never saved as real progress. Level 0 ends in Setup.
+A short animated open with sound (after the tap) on every open, skippable with a tap and skipped entirely for a locked player or when the device asks for reduced motion. On first use it is followed by a five-card walkthrough (quests, Focus, army, Penalty Zone) using clearly labelled **sample data** that is never saved as real progress. Level 0 ends in Setup.
 PRD ref: `prd.md > The Core Journey` (step 1), `prd.md > States and Boundaries > First use`.
 
 ### Setup (Sign-up and First Goal)
@@ -142,7 +142,7 @@ Under Settings, a simple grid of past penalty photos with their dates, so "the p
 PRD ref: `prd.md > Features and Behavior > Penalty Zone` (last criterion).
 
 ### Settings
-Accent colour picker (sets `--accent` and saves it), the Proof Gallery, and **Demo tools** (labelled): set the next quest due in 1 minute, add test coins, and reset all data.
+Accent colour picker with six colours (sets `--accent` and saves it), a sound on/off switch, the Proof Gallery, and **Demo tools** (labelled): set the next quest due in 1 minute, add test coins, and reset all data.
 PRD ref: `prd.md > Screens and Layout > Settings`, `prd.md > Look and Feel`.
 
 ### Audio

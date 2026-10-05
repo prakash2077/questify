@@ -55,6 +55,20 @@ export const FALLBACK_PHRASE = 'I did it';
 export const FALLBACK_HOLD_MS = 5 * 1000;
 
 export const DEFAULT_ACCENT = '#2f7bff';
+// The accent colours offered in Settings. The Penalty Zone is always red.
+export const ACCENTS = [
+  { name: 'System blue', value: '#2f7bff' },
+  { name: 'Ice', value: '#22d3ee' },
+  { name: 'Shadow purple', value: '#a855f7' },
+  { name: 'Emerald', value: '#22c55e' },
+  { name: 'Ember', value: '#f59e0b' },
+  { name: 'Rose', value: '#ff5fa2' },
+];
+
+// How long the opening animation plays before the app moves on (a tap skips it).
+export const INTRO_MS = 2600;
+
+// Setup
 export const DEFAULT_LIFESPAN_YEARS = 80;
 export const MAX_LIFESPAN_YEARS = 120;
 export const WEEKS_PER_YEAR = 52;

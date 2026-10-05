@@ -61,7 +61,7 @@ Resume note: the learner pushes to GitHub themselves (the live link is https://q
   Learner check: Use the Demo tool to add test coins, open the Shop, buy a soldier, name it, and open the Battleground. Buy one or two more and a weapon, and look again. Say how the soldiers and demons look and what you would change.
   Commit: `Add Shop, army and Battleground`
 
-- [ ] **6. First open feels like a game: intro, Level 0 demo and your accent colour**
+- [x] **6. First open feels like a game: intro, Level 0 demo and your accent colour**
   Becomes usable: A brand-new user taps to begin, sees the intro pop out of black with sound, swipes through a short Level 0 demo that uses sample data, and lands in Setup. In Settings you can change the accent colour for the whole app and mute the sound.
   Why now: The demo cards show the finished screens, so they can only be honest once those screens exist, and nothing earlier depends on them. This is the first impression for the demo video.
   PRD ref: `prd.md > The Core Journey` (step 1), `prd.md > Screens and Layout`, `prd.md > Look and Feel`, `prd.md > States and Boundaries` (First use)
@@ -110,3 +110,5 @@ Activity mode: not started
 - "The first soldier is Sung Jinwoo" is implemented as the suggested name for the first soldier bought, which the learner can overtype — the spec did not say whether it was a soldier type or a name, and naming every soldier is a PRD requirement.
 - Level 1 has no demons; one arrives per level up to six, then they keep growing — needed so the PRD criterion "at the start, only the fire is shown" and "demons are larger or more numerous at a higher level" both hold.
 - Check in, Shop and Battleground sit in one row of buttons under the coins and XP on Today — three separate buttons pushed the quest list below the fold on a phone.
+- The intro plays on every open (not only the first) and can be skipped with a tap; a locked player goes straight to the Penalty Zone; anyone who has set "reduce motion" on their device skips it — the PRD lists the intro as a screen that leads "onward to Today", and the spec did not say what a returning or locked player sees.
+- The accent picker offers six fixed colours rather than a free colour wheel — a free choice can pick colours that are unreadable on black; six tested ones cannot. They are a list in `js/config.js`.

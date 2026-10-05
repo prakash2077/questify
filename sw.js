@@ -25,6 +25,7 @@ const APP_FILES = [
   'js/sprites.js',
   'js/battleground.js',
   'js/audio.js',
+  'js/intro.js',
   'js/screens/setup.js',
   'js/screens/today.js',
   'js/screens/focus.js',

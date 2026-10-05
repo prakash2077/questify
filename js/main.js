@@ -8,7 +8,8 @@ import { initToday } from './screens/today.js';
 import { initFocus } from './screens/focus.js';
 import { initShop } from './screens/shop.js';
 import { initBattleground } from './battleground.js';
-import { initSettings } from './screens/settings.js';
+import { applyAccent, initSettings } from './screens/settings.js';
+import { initIntro } from './intro.js';
 
 const screens = {}; // name -> { enter, leave }
 let current = 'gate';
@@ -106,6 +107,7 @@ const app = {
   confirm: (text, title, { yes = 'Yes', no = 'No' } = {}) => showNotice({ text, title, yes, no }),
 };
 
+initIntro(app);
 initSetup(app);
 initToday(app);
 initFocus(app);
@@ -119,10 +121,23 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
 
+applyAccent(getState().settings.accent);
+
 // The first tap: it lets the phone play sound, then the app opens.
 document.getElementById('gate').addEventListener('click', () => {
   unlockAudio();
-  go(getState().profile.setupDone ? 'today' : 'setup');
-  if (current !== 'penalty') play('begin');
   startWatching();
+
+  // A brand-new player gets the Level 0 demo; everyone else goes home to Today.
+  const next = getState().profile.setupDone ? 'today' : 'demo';
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (enforcePenalty()) {
+    go('penalty');
+  } else if (calm) {
+    // Someone who has asked their device for less motion skips the intro.
+    go(next);
+    play('begin');
+  } else {
+    go('intro', { next });
+  }
 });

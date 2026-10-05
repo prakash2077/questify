@@ -30,6 +30,86 @@
       </button>
     </section>
 
+    <!-- Intro: the short animated open. A tap skips it. -->
+    <section class="screen" data-screen="intro">
+      <button class="intro" id="intro" type="button" aria-label="Questify. Tap to skip the intro.">
+        <span class="intro__burst" aria-hidden="true"></span>
+        <img class="intro__mark" src="assets/icons/icon.svg" alt="">
+        <span class="intro__title" aria-hidden="true"><span style="--i: 0">Q</span><span style="--i: 1">u</span><span style="--i: 2">e</span><span style="--i: 3">s</span><span style="--i: 4">t</span><span style="--i: 5">i</span><span style="--i: 6">f</span><span style="--i: 7">y</span></span>
+        <span class="intro__tag" aria-hidden="true">Level up your real life</span>
+      </button>
+    </section>
+
+    <!-- Level 0: a short demo for a brand-new player. Everything shown is sample data. -->
+    <section class="screen" data-screen="demo">
+      <header class="head-row">
+        <p class="eyebrow">Level 0 · Demo · <span id="demo-step"></span></p>
+        <button class="btn btn--small" id="demo-skip" type="button">Skip</button>
+      </header>
+
+      <div class="panel demo-card" data-card="1">
+        <h1 class="panel__title">Daily quests</h1>
+        <div class="demo-sample" inert>
+          <span class="demo-sample__tag">Sample</span>
+          <div class="quest quest--tickable">
+            <span class="quest__tick"></span>
+            <div class="quest__body">
+              <span class="quest__name">Solve two coding problems</span>
+              <span class="quest__meta"><span class="pips"><span class="pip is-on"></span><span class="pip is-on"></span><span class="pip is-on"></span></span>High</span>
+              <span class="quest__meta">Due 9:00 PM<span class="quest__status">3h 20m left</span></span>
+            </div>
+          </div>
+        </div>
+        <p class="system-line">Welcome, Player. You set up to three quests for each day. Every quest has a deadline, a priority, and a penalty you choose in advance.</p>
+      </div>
+
+      <div class="panel demo-card" data-card="2" hidden>
+        <h1 class="panel__title">Focus</h1>
+        <div class="demo-sample demo-sample--dark">
+          <span class="demo-sample__tag">Sample</span>
+          <canvas class="demo-fire" id="demo-fire" aria-hidden="true"></canvas>
+        </div>
+        <p class="system-line">Tap Focus on a quest and the screen goes black: only the quest's name and your fire. Keep the fire company until the work is done.</p>
+      </div>
+
+      <div class="panel demo-card" data-card="3" hidden>
+        <h1 class="panel__title">Rewards and army</h1>
+        <div class="demo-sample" inert>
+          <span class="demo-sample__tag">Sample</span>
+          <p class="reward__gains demo-gains"><span class="reward__xp">+30 XP</span><span class="reward__coins"><span class="coin" aria-hidden="true"></span>+15</span></p>
+          <div class="demo-army">
+            <img src="assets/sprites/soldier-archer.svg" alt="">
+            <img src="assets/sprites/soldier-swordsman.svg" alt="">
+            <img src="assets/sprites/soldier-mage.svg" alt="">
+          </div>
+        </div>
+        <p class="system-line">Finishing a quest earns XP and coins. XP raises your level. Coins buy shadow soldiers: you name each one, and they gather round your fire on the Battleground.</p>
+      </div>
+
+      <div class="panel demo-card" data-card="4" hidden>
+        <h1 class="panel__title">Penalty zone</h1>
+        <div class="demo-sample zone-danger" inert>
+          <span class="demo-sample__tag">Sample</span>
+          <div class="fact fact--main">
+            <p class="field__label">Your penalty</p>
+            <p class="fact__value">Write an essay</p>
+          </div>
+        </div>
+        <p class="system-line">Miss a deadline and the whole app locks. You do the penalty you chose and prove it with a photo. The screen also shows your goal and the weeks you have left, to remind you why you started.</p>
+      </div>
+
+      <div class="panel demo-card" data-card="5" hidden>
+        <h1 class="panel__title">Level 1 begins</h1>
+        <p class="system-line system-line--center">That was Level 0. Nothing you saw was saved.</p>
+        <p class="system-line system-line--center">Now it is your turn: your goal, your quests, your penalties.</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="demo-prev" type="button">Back</button>
+        <button class="btn btn--primary" id="demo-next" type="button">Next</button>
+      </div>
+    </section>
+
     <!-- Setup: shown once, on first use. -->
     <section class="screen" data-screen="setup">
       <p class="eyebrow" id="setup-progress">Step 1 of 3</p>
@@ -230,6 +310,15 @@
         <h2 class="panel__title">Proof gallery</h2>
         <p class="system-line system-line--center" id="gallery-empty">No penalties yet. Keep it that way, Player.</p>
         <ul class="gallery" id="gallery"></ul>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel__title">Look and sound</h2>
+        <div class="field">
+          <span class="field__label" id="settings-accent-label">Accent colour</span>
+          <div class="swatches" id="settings-accents" role="radiogroup" aria-labelledby="settings-accent-label"></div>
+        </div>
+        <button class="btn btn--wrap" id="settings-mute" type="button"></button>
       </div>
 
       <div class="panel">

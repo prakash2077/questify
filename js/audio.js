@@ -28,6 +28,16 @@ function tone({ type = 'sine', from, to = from, at = 0, dur, vol = 0.2 }) {
 }
 
 const sounds = {
+  // The intro: a rush out of the dark, an impact, then a bright chord left ringing.
+  intro() {
+    tone({ type: 'sawtooth', from: 48, to: 190, dur: 0.75, vol: 0.12 });
+    tone({ type: 'sine', from: 180, to: 720, dur: 0.75, vol: 0.07 });
+    tone({ type: 'sine', from: 120, to: 38, dur: 0.7, at: 0.72, vol: 0.4 });
+    for (const from of [523, 784, 1047, 1568]) tone({ type: 'triangle', from, dur: 1.5, at: 0.74, vol: 0.09 });
+    [2093, 2637, 3136].forEach((from, i) => {
+      tone({ type: 'sine', from, dur: 0.5, at: 1.25 + i * 0.09, vol: 0.05 });
+    });
+  },
   // The System waking up: two quick rising notes.
   begin() {
     tone({ type: 'triangle', from: 440, to: 660, dur: 0.14, vol: 0.18 });
