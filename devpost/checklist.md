@@ -7,7 +7,7 @@ status: approved
 
 Build mode: fast. The learner also asked for learning notes to study later: add a section to `devpost/learning-notes.md` for every slice as it is built.
 
-Resume note: the learner pushes to GitHub themselves (the live link is https://questifynow.vercel.app) and has asked more than once to keep building rather than stop at the two mid-build checkpoints. Those two boxes stay unticked; cover the phone check (full-screen, sound after the first tap, camera for photo proof) and the fire and reward feel in the final review.
+Resume note: all six slices are built, verified and committed. Next is the final review: the learner has not yet given hands-on feedback on anything, so the two mid-build checkpoint boxes and the final one are all still open. The learner pushes to GitHub themselves; the live link is https://questifynow.vercel.app.
 
 ## Slices
 
@@ -78,6 +78,12 @@ Resume note: the learner pushes to GitHub themselves (the live link is https://q
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
+
+Verification before the review: `node tests/check-logic.mjs` passes 39 rule checks, and the headless-Chrome walkthroughs pass 261 checks on localhost, including the whole core journey in one run. Slices 1 to 5 are live and the live link passes its install and offline checks; slice 6 is committed and waits for the learner to push.
+
+Still unproven, because only a real phone can show them: the installed app opening full-screen, sound after the first tap, and the camera opening for photo proof.
+
+Decisions made in the build that the learner has not confirmed yet: one penalty per quest after a long absence; the 21 quotes and their authors (written from memory, not looked up); the Shop catalog and prices; the intro playing on every open; the font (Rajdhani) and the name Questify.
 
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
