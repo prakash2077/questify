@@ -205,3 +205,60 @@ These are the three things to try on your phone.
 1. On your computer, open the app, then developer tools, Application, Service workers. Tick "Offline" and reload. The app still opens.
 2. In the same panel, open Cache storage and look inside `questify-v1`. Those are the saved copies.
 3. In `manifest.webmanifest`, the `short_name` is the label under the icon on your home screen. Change it, push, and reinstall the app to see it.
+
+---
+
+## Step 4: Focus by the fire, finish a quest, get rewarded
+
+### What you can do now
+
+Each open quest on Today has a Focus button. It opens a true-black screen with only the quest name and a crackling bonfire. Tap "Quest complete" and you get XP and coins with a sound, the XP bar fills, and when it is full you level up. A daily "Check in" gives a small XP bonus once a day.
+
+### How it works
+
+- **`js/rewards.js`** holds the reward rules: how much a quest pays, the check-in, and how XP becomes a level.
+- **`js/config.js`** holds the numbers those rules use.
+- **`js/fire.js`** draws the bonfire. **`js/screens/focus.js`** is the Focus screen.
+- **`js/screens/today.js`** shows the level, XP bar and coins (`renderHud`) and owns `finishQuest`.
+- **`celebrate`** in `js/main.js` shows the reward pop-up and plays the sounds.
+
+Follow finishing a quest through the code:
+
+1. You tap "Quest complete" in Focus (or the diamond on Today). Both call `finishQuest` in `js/screens/today.js`.
+2. `finishQuest` first asks `enforcePenalty()` whether a deadline was missed. If so, the app locks and nothing is paid.
+3. Otherwise `completeQuest` in `js/rewards.js` marks the quest done, adds coins and XP, and works out the new level.
+4. It returns a small report, such as `{ xp: 30, coins: 15, levelsGained: 0, level: 1 }`.
+5. `celebrate` turns that report into the pop-up and the sounds, and `renderHud` redraws the bar.
+
+### Ideas worth learning
+
+**Rules report, screens react.** `completeQuest` does not play a sound or show anything. It changes the numbers and returns a report of what happened. The screen decides what to do with the report. Because of that split, the reward rules can be checked without a browser, and you could restyle the whole celebration without touching a rule.
+
+**A level is not stored separately from XP; it is worked out.** `levelInfo(xp)` walks up from level 1, subtracting what each level costs, until the XP runs out. The cost of each level comes from one formula, `xpToNext` in `js/config.js`: 50 XP for the first level, and each level after costs 1.33 times the one before. Small multiplier, big effect: level 1 needs 50 XP and level 10 needs about 650.
+
+**The fire is hundreds of blurry dots.** `js/fire.js` never draws a flame shape. About 190 times a second it creates a soft glowing dot at the base of the fire. Each dot rises, sways, drifts toward the middle, shrinks, changes from yellow to orange to red, and fades out in about a second. Your eye joins them into flames. This is called a particle system.
+
+**Light that adds up.** The dots are drawn with `globalCompositeOperation = 'lighter'`, which adds colours together instead of painting over them. Where many dots overlap, at the heart of the fire, the sum reaches white. That is why the core looks hot without any code saying "make the middle white".
+
+**Animation is a loop that runs every frame.** `lightFire` uses `requestAnimationFrame`: the browser calls `tick` about 60 times a second, and each time the fire moves forward by the time that has passed (`dt`) and is redrawn. Using real elapsed time means the fire burns at the same speed on a fast phone and a slow one. Leaving the screen calls `putOut`, which stops the loop so it does not drain the battery.
+
+**A fire sound is mostly noise.** `startFireSound` in `js/audio.js` plays random static through a filter that keeps only the low rumble, then adds short sharp bursts of higher static at random moments for the crackles.
+
+### How it was checked
+
+- Eight new rule checks: the pay table, no double pay, the check-in, the level curve, and "missing a quest never removes coins, XP or levels".
+- The browser script opened Focus and confirmed the screen holds only four things (name, fire, back, check-off) on a true-black background. It compared two frames of the fire to prove it moves, finished a quest, crossed the 50 XP line to level 2, and let a deadline pass *during* Focus to confirm the Penalty Zone still takes over and progress is untouched.
+- The fire's look was tuned by eye from saved frames. The first version was short with a blown-out white base; the flames were made taller and each dot fainter so the colours could build up gradually.
+
+One check did its job in an unexpected place: the offline file list from step 3 failed straight away, because three new files were not yet named in `sw.js`.
+
+### What changed from the plan
+
+Nothing in what you get. One open question from the spec was settled: with the spec's numbers, a full first day (three quests and a check-in, 65 XP) reaches level 2, and level 3 comes on day two. The spec had also floated "levels 1 to 3 in about a day"; that would mean halving the first number, which also halves how long level 10 takes. Both numbers are in `js/config.js` if you want it faster.
+
+### Try it yourself
+
+1. In `js/config.js`, change `LEVEL_BASE_XP` to `20` and finish a quest. You will level up at once. Run `node tests/check-logic.mjs` and read which checks fail; they are telling you what the change affected. Change it back.
+2. In `js/fire.js`, change `FLAMES_PER_SECOND` to `40`, then `400`, and open Focus each time.
+3. In `js/fire.js`, find `ctx.globalCompositeOperation = 'lighter';` inside `draw` and comment that line out. The white-hot core disappears.
+4. In `js/audio.js`, find the `done()` sound and change `784` to `392`. Finish a quest and listen.

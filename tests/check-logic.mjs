@@ -2,7 +2,8 @@
 
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import { MAX_QUESTS } from '../js/config.js';
+import { CHECK_IN_XP, MAX_QUESTS, XP_BY_PRIORITY, xpToNext } from '../js/config.js';
+import { canCheckIn, checkIn, completeQuest, levelInfo } from '../js/rewards.js';
 import {
   addDays,
   addQuest,
@@ -197,6 +198,80 @@ check('the next deadline skips finished quests and passed deadlines', () => {
   markDone(state, a.id, '2026-10-04');
   assert.equal(nextDeadline(state, noon).getHours(), 20);
   assert.equal(nextDeadline(state, at(4, 20, 30)), null);
+});
+
+// ---------- Rewards: coins, XP and levels ----------
+
+function player(over = {}) {
+  return { quests: [], days: {}, proofs: [], coins: 0, xp: 0, level: 1, ...over };
+}
+
+check('finishing a quest pays XP 10/20/30 and coins 5/10/15 by priority', () => {
+  for (const [priority, xp, coins] of [[1, 10, 5], [2, 20, 10], [3, 30, 15]]) {
+    const state = player();
+    const { quest: saved } = addQuest(state, quest({ priority }), noon);
+    assert.deepEqual(completeQuest(state, saved, '2026-10-04'), { xp, coins, levelsGained: 0, level: 1 });
+    assert.equal(state.xp, xp);
+    assert.equal(state.coins, coins);
+    assert.equal(isDone(state, saved.id, '2026-10-04'), true);
+  }
+});
+
+check('a quest cannot pay twice in one day, but pays again the next day', () => {
+  const state = player();
+  const { quest: saved } = addQuest(state, quest({ priority: 3 }), noon);
+  completeQuest(state, saved, '2026-10-04');
+  assert.equal(completeQuest(state, saved, '2026-10-04'), null);
+  assert.equal(state.xp, 30);
+  assert.notEqual(completeQuest(state, saved, '2026-10-05'), null);
+  assert.equal(state.xp, 60);
+});
+
+check('the daily check-in gives 5 XP, once per day, less than any quest', () => {
+  const state = player();
+  assert.equal(canCheckIn(state, '2026-10-04'), true);
+  assert.deepEqual(checkIn(state, '2026-10-04'), { xp: 5, coins: 0, levelsGained: 0, level: 1 });
+  assert.equal(canCheckIn(state, '2026-10-04'), false);
+  assert.equal(checkIn(state, '2026-10-04'), null);
+  assert.equal(state.xp, 5);
+  assert.equal(state.coins, 0);
+  assert.equal(canCheckIn(state, '2026-10-05'), true);
+  assert.ok(CHECK_IN_XP < Math.min(...Object.values(XP_BY_PRIORITY)));
+});
+
+check('level 1 to 2 needs 50 XP, and every later level needs more than the last', () => {
+  assert.equal(xpToNext(1), 50);
+  for (let level = 1; level < 30; level++) assert.ok(xpToNext(level + 1) > xpToNext(level));
+  assert.ok(xpToNext(10) > 600 && xpToNext(10) < 700, `level 10 to 11 is about 650 (${xpToNext(10)})`);
+});
+
+check('the level is worked out from total XP', () => {
+  assert.deepEqual(levelInfo(0), { level: 1, into: 0, needed: 50 });
+  assert.deepEqual(levelInfo(49), { level: 1, into: 49, needed: 50 });
+  assert.deepEqual(levelInfo(50), { level: 2, into: 0, needed: xpToNext(2) });
+  assert.deepEqual(levelInfo(50 + xpToNext(2) + 3), { level: 3, into: 3, needed: xpToNext(3) });
+});
+
+check('crossing the threshold raises the level and reports it', () => {
+  const state = player({ xp: 40, level: 1 });
+  const { quest: saved } = addQuest(state, quest({ priority: 2 }), noon);
+  assert.deepEqual(completeQuest(state, saved, '2026-10-04'), { xp: 20, coins: 10, levelsGained: 1, level: 2 });
+  assert.equal(state.level, 2);
+});
+
+check('a full first day (three quests and a check-in) reaches level 2', () => {
+  const state = player();
+  for (const priority of [1, 2, 3]) completeQuest(state, addQuest(state, quest({ priority }), noon).quest, '2026-10-04');
+  checkIn(state, '2026-10-04');
+  assert.equal(state.xp, 65);
+  assert.equal(state.level, 2);
+});
+
+check('missing a quest never removes coins, XP or levels', () => {
+  const state = player({ coins: 40, xp: 70, level: 2 });
+  addQuest(state, quest(), noon);
+  assert.equal(findMissed(state, at(6, 9)).length, 1);
+  assert.deepEqual([state.coins, state.xp, state.level], [40, 70, 2]);
 });
 
 // ---------- Weeks left ----------

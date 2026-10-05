@@ -16,6 +16,19 @@ export const PENALTY_IDEAS = [
   'Stare at a wall for an hour',
 ];
 
+// Rewards for finishing a quest, by its priority (1 = Low, 3 = High).
+export const XP_BY_PRIORITY = { 1: 10, 2: 20, 3: 30 };
+export const COINS_BY_PRIORITY = { 1: 5, 2: 10, 3: 15 };
+export const CHECK_IN_XP = 5; // once a day, less than any quest
+
+// Levels get steeper. XP needed to go from level n to n+1:
+// 50 at level 1, about 650 at level 10 (roughly ten days of steady work).
+export const LEVEL_BASE_XP = 50;
+export const LEVEL_GROWTH = 1.33;
+export function xpToNext(level) {
+  return Math.round(LEVEL_BASE_XP * LEVEL_GROWTH ** (level - 1));
+}
+
 // Penalty Zone
 export const PENALTY_CHECK_MS = 15 * 1000; // how often an open app looks for missed deadlines
 export const FALLBACK_PHRASE = 'I did it';

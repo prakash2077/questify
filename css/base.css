@@ -6,6 +6,8 @@
   --danger: #ff3344;
   --text: #eaf2ff;
   --text-dim: #8493ad;
+  --gold: #ffc94d;
+  --ember: #ff8a2a;
 
   --line: color-mix(in srgb, var(--accent) 65%, transparent);
   --line-soft: color-mix(in srgb, var(--accent) 30%, transparent);
@@ -491,4 +493,103 @@ input {
 
 .btn--hold__label {
   position: relative;
+}
+
+/* ---------- Coins and the reward pop-up ---------- */
+
+.coin {
+  display: inline-block;
+  flex: none;
+  width: 0.9em;
+  height: 0.9em;
+  border: 0.14em solid var(--gold);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff3c4, var(--gold) 55%, #b8791a);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 60%, transparent);
+}
+
+/* Floats over whatever screen is showing. Taps pass straight through it. */
+.reward {
+  position: fixed;
+  top: 34%;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 16px 26px;
+  background: rgba(0, 0, 0, 0.9);
+  border-top: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 0 34px var(--glow);
+  text-align: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: reward-pop 0.32s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+
+.reward__title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px var(--glow);
+}
+
+.reward__gains {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.reward__xp {
+  text-shadow: 0 0 16px var(--accent);
+}
+
+.reward__coins {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold);
+  text-shadow: 0 0 16px color-mix(in srgb, var(--gold) 70%, transparent);
+}
+
+.reward__level {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--gold);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  animation: reward-level 0.5s 0.55s ease-out both;
+}
+
+@keyframes reward-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes reward-level {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }

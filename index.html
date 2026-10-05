@@ -88,6 +88,26 @@
         <p class="today-goal"><span class="today-goal__label">Goal</span><span id="today-goal"></span></p>
       </header>
 
+      <!-- Level, XP toward the next level, and coins. -->
+      <div class="hud">
+        <div class="hud__level">
+          <span class="hud__label">Level</span>
+          <span class="hud__level-num" id="hud-level">1</span>
+        </div>
+        <div class="hud__xp">
+          <div class="hud__xp-text"><span class="hud__label">XP</span><span id="hud-xp">0 / 50</span></div>
+          <div class="hud__bar" id="hud-bar" role="progressbar" aria-label="XP toward the next level" aria-valuemin="0">
+            <div class="hud__bar-fill" id="hud-bar-fill"></div>
+          </div>
+        </div>
+        <div class="hud__coins">
+          <span class="coin" aria-hidden="true"></span>
+          <span id="hud-coins">0</span>
+          <span class="visually-hidden">coins</span>
+        </div>
+      </div>
+      <button class="btn btn--small btn--checkin" id="today-checkin" type="button"></button>
+
       <div class="panel">
         <h1 class="panel__title">Daily quests</h1>
         <ul class="quest-list" id="today-quests"></ul>
@@ -101,6 +121,14 @@
       </div>
 
       <button class="btn btn--dashed" id="today-add-quest" type="button">+ Add quest</button>
+    </section>
+
+    <!-- Focus: true black, the quest name and the bonfire. Nothing else. -->
+    <section class="screen" data-screen="focus">
+      <button class="focus__back" id="focus-back" type="button" aria-label="Back to Today">&lsaquo;</button>
+      <h1 class="focus__quest" id="focus-quest"></h1>
+      <canvas class="focus__fire" id="focus-fire" aria-hidden="true"></canvas>
+      <button class="btn focus__done" id="focus-done" type="button">Quest complete</button>
     </section>
 
     <!-- Penalty Zone: takes over the whole app until the penalty is cleared. -->
@@ -177,6 +205,16 @@
     </section>
 
   </main>
+
+  <!-- Reward pop-up: floats over whatever screen is showing, then fades. -->
+  <div class="reward" id="reward" role="status" hidden>
+    <p class="reward__title" id="reward-title"></p>
+    <p class="reward__gains">
+      <span class="reward__xp" id="reward-xp"></span>
+      <span class="reward__coins" id="reward-coins"><span class="coin" aria-hidden="true"></span><span id="reward-coins-num"></span></span>
+    </p>
+    <p class="reward__level" id="reward-level" hidden></p>
+  </div>
 
   <!-- A penalty photo, opened large from the Proof Gallery. -->
   <dialog class="modal" id="photo-view">

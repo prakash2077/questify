@@ -381,3 +381,176 @@
   object-fit: contain;
   background: #000;
 }
+
+/* ---------- Today: level, XP and coins ---------- */
+
+.hud {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--fill);
+  border: 1px solid var(--line-soft);
+}
+
+.hud__label {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.hud__level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.hud__level-num {
+  font-size: 34px;
+  font-weight: 700;
+  text-shadow: 0 0 14px var(--accent);
+}
+
+.hud__xp {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.hud__xp-text {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.hud__bar {
+  height: 8px;
+  background: #000;
+  border: 1px solid var(--line-soft);
+}
+
+.hud__bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #fff));
+  box-shadow: 0 0 10px var(--accent);
+  transition: width 0.6s ease-out;
+}
+
+.hud__coins {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.btn--checkin {
+  align-self: flex-start;
+  margin-top: -8px;
+}
+
+/* ---------- Today: the right-hand side of a quest row ---------- */
+
+.quest__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  align-self: stretch;
+}
+
+.quest__side .icon-btn {
+  width: 34px;
+  height: 30px;
+  font-size: 20px;
+}
+
+.quest__focus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 56px;
+  margin: 0 6px 0 0;
+  padding: 7px 6px 5px;
+  background: #000;
+  border: 1px solid color-mix(in srgb, var(--ember) 55%, transparent);
+  border-radius: 2px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--ember) 30%, transparent);
+  cursor: pointer;
+}
+
+.quest__focus svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--ember);
+  filter: drop-shadow(0 0 5px var(--ember));
+}
+
+.quest__focus:active {
+  transform: scale(0.95);
+}
+
+/* ---------- Focus ---------- */
+
+.screen[data-screen='focus'].is-active {
+  position: relative;
+  gap: 0;
+  height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.focus__back {
+  position: absolute;
+  top: calc(8px + env(safe-area-inset-top));
+  left: 6px;
+  width: 48px;
+  height: 48px;
+  background: none;
+  border: 0;
+  color: #4a4a4a;
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.focus__quest {
+  flex: none;
+  margin: 0;
+  padding: calc(13dvh + env(safe-area-inset-top)) 28px 0;
+  font-size: clamp(28px, 8.6vw, 42px);
+  font-weight: 700;
+  line-height: 1.12;
+  text-align: center;
+  text-shadow: 0 0 26px color-mix(in srgb, var(--ember) 55%, transparent);
+  overflow-wrap: anywhere;
+}
+
+.focus__fire {
+  flex: 1;
+  display: block;
+  width: 100%;
+  min-height: 0;
+}
+
+.focus__done {
+  flex: none;
+  margin: 0 22px calc(26px + env(safe-area-inset-bottom));
+  border-color: #2a2a2a;
+  color: #b9b9b9;
+}

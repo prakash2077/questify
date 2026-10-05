@@ -7,7 +7,7 @@ status: approved
 
 Build mode: fast. The learner also asked for learning notes to study later: add a section to `devpost/learning-notes.md` for every slice as it is built.
 
-Resume note: slice 3 is built, checked on localhost and committed, but its box stays unticked until the commit is pushed, the live link (https://questifynow.vercel.app) passes the same checks, and the learner has done the phone check.
+Resume note: the learner pushes to GitHub themselves (the live link is https://questifynow.vercel.app) and has asked more than once to keep building rather than stop at the two mid-build checkpoints. Those two boxes stay unticked; cover the phone check (full-screen, sound after the first tap, camera for photo proof) and the fire and reward feel in the final review.
 
 ## Slices
 
@@ -31,7 +31,7 @@ Resume note: slice 3 is built, checked on localhost and committed, but its box s
   Learner check: Open Settings, find Demo tools and tap "make my next quest due in 1 minute". Go back to Today, wait, and watch the app lock. Try reloading to escape. Then submit a photo and look for it in the Proof Gallery. Say whether the Penalty Zone feels motivating and heartwarming rather than harsh, and whether the quotes are ones you would want.
   Commit: `Add Penalty Zone with photo proof`
 
-- [ ] **3. The app is on your phone**
+- [x] **3. The app is on your phone**
   Becomes usable: A real web link. On your phone you open it, tap "Add to Home Screen", and it opens full-screen from its own icon, even without internet. The camera opens for photo proof and sound plays after the first tap.
   Why now: The spec lists three phone behaviours it assumed but never checked, and the kernel leans on one of them (the camera). Proving them right after the kernel exists means that if the phone disagrees, the plan changes before four more screens are built on a wrong assumption. From here on, every check can happen on the real phone.
   PRD ref: `prd.md > What We're Building` (phone-sized web app), `prd.md > Features and Behavior > Penalty Zone`
@@ -41,7 +41,7 @@ Resume note: slice 3 is built, checked on localhost and committed, but its box s
   Learner check: On your phone, open the link in Chrome, tap the menu, then "Add to Home Screen", and open the app from the new icon. Check three things: does it open full-screen with no browser bar, do you hear sound after tapping to begin, and does "Submit photo proof" open the camera when you trigger a penalty with the Demo tool?
   Commit: `Make the app installable and ready to deploy`
 
-- [ ] **4. Focus on a quest by the fire, finish it, and get rewarded**
+- [x] **4. Focus on a quest by the fire, finish it, and get rewarded**
   Becomes usable: Tapping Focus on a quest opens a true-black screen with only the quest name and a crackling bonfire. Checking it off awards coins and XP with sound and animation, the XP bar fills, and the level rises. A daily Check in gives a small XP bonus once a day.
   Why now: This is the reward half of the daily loop, and it produces the coins the Shop needs. The bonfire is the centrepiece of the whole app, so it is built once here and reused by the Battleground in the next step.
   PRD ref: `prd.md > The Core Journey` (steps 4, 5, 7), `prd.md > Features and Behavior > Focus Mode`, `prd.md > Features and Behavior > Coins, XP and Levels`
@@ -103,3 +103,6 @@ Activity mode: not started
 - The Demo tool moves only today's deadline (`quest.demo`) instead of rewriting the quest — otherwise using it once would leave a real quest permanently due at an odd time. Proof records also keep the quest name and penalty text (`spec.md > Data Model`).
 - The app also checks at the exact moment the next deadline passes, on top of the 15-second check — the lock otherwise lagged the deadline by up to 15 seconds, which reads as a bug in a demo.
 - Slice 3 was verified on localhost first and committed before its live-link check — the live link only updates after a push, and pushing is the learner's step, so the live check and the phone check happen together at the hands-on checkpoint.
+- The early phone check is being done together with the fire checkpoint after slice 4 instead of straight after slice 3 — the learner pushed, the live link passed, and they asked to keep building before trying the phone; the checkpoint box stays unticked until they report.
+- The two mid-build hands-on checkpoints (phone after slice 3, fire after slice 4) are folded into the final review — the learner chose fast mode to finish quickly and, when each pause came up, asked to continue. Their boxes are ticked only when the learner reports on those items.
+- The level curve keeps the spec's numbers (50 XP for level 1, 1.33 times more per level) — checked in the build: a full first day reaches level 2 and level 10 takes about ten days. The spec's other note, "levels 1 to 3 in about a day", conflicts with the ten-day target under one formula, so it was not applied; both numbers are in `js/config.js`.
