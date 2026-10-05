@@ -7,7 +7,7 @@ status: approved
 
 Build mode: fast. The learner also asked for learning notes to study later: add a section to `devpost/learning-notes.md` for every slice as it is built.
 
-Resume note: all six slices are built. Final review is in its fourth round. Accepted and live: the dark look, cinematic sound, and the intensity pass. Round 4 (native feel, smoothness, sound on every interaction, motivation) is implemented and committed and needs the learner to push, retry and react. The agent misread round 3 and reverted work the learner wanted; if feedback is ambiguous, ask what they mean before removing anything. The three phone questions (full-screen, sound after first tap, camera) are still unanswered. The learner pushes to GitHub themselves; the live link is https://questifynow.vercel.app.
+Resume note: all six slices are built and the final review is complete and approved by the learner (2026-10-05). Only the learning wrap-up remains. The learner pushes to GitHub themselves; the live link is https://questifynow.vercel.app.
 
 ## Slices
 
@@ -73,17 +73,17 @@ Resume note: all six slices are built. Final review is in its fourth round. Acce
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 3, on your phone: Setup, Today, the Penalty Zone with photo proof, and the overall look and font
-- [ ] Fire and reward feel explored — after slice 4, before the Battleground and intro are built around the same bonfire and sound style
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Early usable behavior explored — after slice 3, on your phone: Setup, Today, the Penalty Zone with photo proof, and the overall look and font
+- [x] Fire and reward feel explored — after slice 4, before the Battleground and intro are built around the same bonfire and sound style
+- [x] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
 
 Verification before the review: `node tests/check-logic.mjs` passes 39 rule checks, and the headless-Chrome walkthroughs pass 261 checks on localhost, including the whole core journey in one run. Slices 1 to 5 are live and the live link passes its install and offline checks; slice 6 is committed and waits for the learner to push.
 
-Still unproven, because only a real phone can show them: the installed app opening full-screen, sound after the first tap, and the camera opening for photo proof.
+On 2026-10-05 the learner confirmed on their phone: full-screen install, sound after the first tap, and the camera opening for photo proof. Round 4 changes tried on the live link; the learner said everything looks good.
 
-Decisions made in the build that the learner has not confirmed yet: one penalty per quest after a long absence; the 21 quotes and their authors (written from memory, not looked up); the Shop catalog and prices; the intro playing on every open; the font (Rajdhani) and the name Questify.
+Decisions made in the build, all approved by the learner on 2026-10-05: one penalty per quest after a long absence; the 21 quotes and their authors (written from memory, not looked up); the Shop catalog and prices; the intro playing on every open; the font (Rajdhani) and the name Questify.
 
 Round 1 feedback from the learner: "the app looks like some small kids game"; make it aesthetic, take inspiration from Pinterest, get the best designs and sprites possible, and make the sound cinematic.
 
@@ -102,24 +102,24 @@ Round 3 feedback from the learner: "the things feel vague and annoying now, do s
 Round 4 feedback from the learner: "noooo it's not annoying, the overall app should be more good! ... like some native app and so smooth and sound effects everywhere and motivating".
 
 - [x] The intensity pass was restored (`0603f2f`); the live app never lost it.
-- [ ] Like a native app — bottom tab bar replaces the Back / Shop / Settings buttons; screens slide in from the side; the quest and naming forms rise from the bottom as sheets; no text selection, long-press menus or page bounce; every button sinks and brightens when pressed; a returning player gets a one-second intro instead of the full one. Waiting for the learner to retry.
-- [ ] Smooth — the Battleground was measured (processor slowed four times): about 40 frames a second with a full army, about 53 after the changes, and about 59 with a normal-sized army. Waiting for the learner to say how it feels on their phone, which is the only measurement that counts.
-- [ ] Sound effects everywhere — a sound for every tap, screen change, window, refusal, add, remove and switch. Waiting for the learner to listen.
-- [ ] Motivating — a greeting, the day's progress in words, a quote of the day, a lifetime count of quests cleared, and the player's goal named in every reward. Waiting for the learner to react.
+- [x] Like a native app — bottom tab bar replaces the Back / Shop / Settings buttons; screens slide in from the side; the quest and naming forms rise from the bottom as sheets; no text selection, long-press menus or page bounce; every button sinks and brightens when pressed; a returning player gets a one-second intro instead of the full one. Tried by the learner on 2026-10-05: looks good.
+- [x] Smooth — the Battleground was measured (processor slowed four times): about 40 frames a second with a full army, about 53 after the changes, and about 59 with a normal-sized army. The learner tried it on their phone on 2026-10-05: looks good.
+- [x] Sound effects everywhere — a sound for every tap, screen change, window, refusal, add, remove and switch. The learner listened on 2026-10-05: looks good.
+- [x] Motivating — a greeting, the day's progress in words, a quote of the day, a lifetime count of quests cleared, and the player's goal named in every reward. The learner reacted on 2026-10-05: looks good.
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Final review complete — feedback resolved; on 2026-10-05 the learner approved the open decisions (name Questify, Rajdhani font, the 21 quotes, Shop catalog and prices, one penalty per quest after a long absence) and confirmed the proof of concept is ready to ship
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: not started
-Route and stops: not started
-Edit outcome: not started
-Reflection: not started
-Activity mode: not started
+Activity and evidence: guided route on the Penalty Zone, the kernel. The learner opened the three stops and reported what they saw.
+Route and stops: `js/quests.js` `findMissed`, `js/penalty.js` `enforcePenalty`, `js/main.js` `go` (all three opened by the learner).
+Edit outcome: offered (the Penalty Zone weeks caption in `js/penalty.js`) and declined; no code changed.
+Reflection: not asked; the practice to reuse is written in the map.
+Activity mode: guided route. Map: `devpost/app-map.html`, snapshot of commit `276b3da`.
 
 ## Revisions
 

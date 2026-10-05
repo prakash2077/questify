@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Questify App Map</title>
+<style>
+  :root { --bg:#0b0d12; --panel:#141821; --text:#e6e9f0; --muted:#9aa3b5; --accent:#5b9bff; --line:#2a3142; --code:#1b2130; }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f5f6fa; --panel:#ffffff; --text:#1a1d26; --muted:#5a6275; --accent:#1f5fd6; --line:#d5d9e4; --code:#eef0f6; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 56px; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  h2 { font-size: 1.15rem; margin: 32px 0 10px; color: var(--accent); letter-spacing: .02em; }
+  p { margin: 8px 0; }
+  .sub { color: var(--muted); margin-top: 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+  code, pre { font-family: ui-monospace, Consolas, monospace; font-size: .9em; }
+  code { background: var(--code); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--code); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0 0; }
+  details { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; margin: 10px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  ul { padding-left: 20px; } li { margin: 6px 0; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { fill: var(--text); font: 13px system-ui, sans-serif; }
+  svg .muted { fill: var(--muted); font-size: 11.5px; }
+  svg rect.box { fill: var(--panel); stroke: var(--accent); stroke-width: 1.5; }
+  svg rect.plain { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+  svg path.arrow { stroke: var(--accent); stroke-width: 1.8; fill: none; }
+  svg polygon { fill: var(--accent); }
+  .foot { color: var(--muted); font-size: .9rem; margin-top: 32px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Questify: App Map</h1>
+  <p class="sub">A one-page guide to where things live, so you know where to start when you want to change something.</p>
+
+  <h2>What the app is</h2>
+  <div class="card">
+    <p>Questify is a phone-sized website (a Progressive Web App) with no server and no accounts. You set a goal and up to three daily quests, focus on them by a bonfire, earn coins, and spend them on a shadow army. Miss a deadline and the whole app locks into the Penalty Zone until you submit proof.</p>
+    <p>It has four main pieces:</p>
+    <ul>
+      <li><strong>Rules</strong> (<code>js/quests.js</code>, <code>js/rewards.js</code>, <code>js/config.js</code>): plain functions that decide things, such as what counts as missed and how much XP a quest pays.</li>
+      <li><strong>Memory</strong> (<code>js/store.js</code>): one saved object in the browser, plus photos in IndexedDB.</li>
+      <li><strong>Screens</strong> (<code>index.html</code>, <code>js/screens/</code>, <code>js/penalty.js</code>, <code>js/battleground.js</code>): what you see and tap.</li>
+      <li><strong>Router</strong> (<code>js/main.js</code>): shows exactly one screen at a time and enforces the lock.</li>
+    </ul>
+  </div>
+
+  <h2>One action, followed through: missing a quest</h2>
+  <div class="card">
+    <svg viewBox="0 0 700 150" role="img" aria-label="A deadline passes, findMissed decides it was missed, enforcePenalty saves it as state.penalty in localStorage, and go() in main.js shows the Penalty Zone.">
+      <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0,0 8,4 0,8"/></marker></defs>
+      <rect class="plain" x="6" y="30" width="120" height="70" rx="8"/>
+      <text x="66" y="60" text-anchor="middle">Deadline</text><text x="66" y="78" text-anchor="middle">passes</text>
+      <rect class="box" x="160" y="30" width="130" height="70" rx="8"/>
+      <text x="225" y="58" text-anchor="middle">findMissed</text><text class="muted" x="225" y="76" text-anchor="middle">quests.js</text><text class="muted" x="225" y="90" text-anchor="middle">"yes, missed"</text>
+      <rect class="box" x="324" y="30" width="140" height="70" rx="8"/>
+      <text x="394" y="58" text-anchor="middle">enforcePenalty</text><text class="muted" x="394" y="76" text-anchor="middle">penalty.js</text><text class="muted" x="394" y="90" text-anchor="middle">saves state.penalty</text>
+      <rect class="box" x="498" y="30" width="110" height="70" rx="8"/>
+      <text x="553" y="58" text-anchor="middle">go()</text><text class="muted" x="553" y="76" text-anchor="middle">main.js</text><text class="muted" x="553" y="90" text-anchor="middle">forces the screen</text>
+      <rect class="plain" x="636" y="30" width="58" height="70" rx="8"/>
+      <text x="665" y="62" text-anchor="middle">Penalty</text><text x="665" y="78" text-anchor="middle">Zone</text>
+      <path class="arrow" d="M126 65 H156" marker-end="url(#a)"/>
+      <path class="arrow" d="M290 65 H320" marker-end="url(#a)"/>
+      <path class="arrow" d="M464 65 H494" marker-end="url(#a)"/>
+      <path class="arrow" d="M608 65 H632" marker-end="url(#a)"/>
+      <rect class="plain" x="324" y="112" width="140" height="30" rx="6"/>
+      <text class="muted" x="394" y="132" text-anchor="middle">localStorage: lifeApp.v1</text>
+      <path class="arrow" d="M394 100 V112" marker-end="url(#a)"/>
+    </svg>
+    <p>Because the "missed" note is saved to storage, closing or reloading the app does not escape the lock.</p>
+  </div>
+
+  <h2>Reference route (three stops)</h2>
+  <details open>
+    <summary>1. Decide: <code>js/quests.js</code> → <code>findMissed</code></summary>
+    <p>For each quest it walks back from today and reports the most recent day whose deadline has passed with no tick. Search for <code>export function findMissed</code>. A week away still gives one penalty per quest, not seven.</p>
+  </details>
+  <details open>
+    <summary>2. Remember: <code>js/penalty.js</code> → <code>enforcePenalty</code></summary>
+    <p>If nothing is pending and <code>findMissed</code> returns a quest, it saves it with <code>update((s) =&gt; { s.penalty = missed; })</code>. <code>update</code> lives in <code>js/store.js</code> and writes to <code>localStorage</code> under the key <code>lifeApp.v1</code>.</p>
+  </details>
+  <details open>
+    <summary>3. Enforce: <code>js/main.js</code> → <code>go</code></summary>
+    <p>The first line of <code>go</code> is <code>if (enforcePenalty()) name = 'penalty';</code>. Whatever screen was asked for, a pending penalty wins.</p>
+  </details>
+
+  <h2>To change this, start here</h2>
+  <ul>
+    <li><strong>Words on the Penalty Zone screen:</strong> <code>render()</code> in <code>js/penalty.js</code> (the weeks caption, "Was due..." line).</li>
+    <li><strong>The 5-second hold for the no-camera fallback:</strong> <code>FALLBACK_HOLD_MS</code>, used by <code>startHold</code> in <code>js/penalty.js</code>.</li>
+    <li><strong>Quotes:</strong> <code>data/quotes.js</code>.</li>
+    <li><strong>Coins, XP and the level curve:</strong> <code>js/config.js</code>.</li>
+    <li><strong>Soldiers, weapons and prices:</strong> <code>data/catalog.js</code>.</li>
+    <li><strong>Accent colours:</strong> the colour list in <code>js/config.js</code>; the look itself is <code>css/base.css</code> and <code>css/screens.css</code>.</li>
+    <li><strong>How the dark soldiers and demons are drawn:</strong> <code>tools/make-sprites.cjs</code>, then run <code>node tools/make-sprites.cjs</code>.</li>
+    <li><strong>Any new file the app loads:</strong> also add it to the list in <code>sw.js</code>, or it will not work offline (a rule check in <code>tests/check-logic.mjs</code> catches this).</li>
+  </ul>
+
+  <h2>A practice to reuse</h2>
+  <div class="card">
+    <p><strong>Put each rule in a small function you can test without the screen.</strong> The "was this quest missed?" rule is <code>findMissed</code>, a plain function that takes the saved state and a time. Because it does, <code>tests/check-logic.mjs</code> can feed it a time of 20:59 (expects no penalty) and 21:00 (expects one), and also a miss on an earlier day while the app was closed, with no phone and no waiting.</p>
+    <p>Where it helps on another project: when you ask an agent to build a behaviour, ask it to state the exact observable result ("at 21:00 with no tick, this returns the quest"). That sentence becomes both the instruction and the check, and a wrong guess shows up as a failing line instead of a surprise on your phone.</p>
+  </div>
+
+  <h2>Run it again</h2>
+  <div class="card">
+    <pre>npx serve .
+# open http://localhost:3000 in a browser at phone size
+
+node tests/check-logic.mjs   # rule checks, no browser needed</pre>
+    <p>Live version: <a href="https://questifynow.vercel.app">questifynow.vercel.app</a>. In Settings, Demo tools can make a quest due in one minute so you can see the Penalty Zone.</p>
+  </div>
+
+  <p class="foot">Snapshot of the code at commit <code>276b3da</code>. File and function names may drift as the project changes; search for the function names above if a path has moved. This page works offline with no scripts.</p>
+</main>
+</body>
+</html>
