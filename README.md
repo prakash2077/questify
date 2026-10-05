@@ -67,6 +67,7 @@ This checks the app's rules (the three-quest limit, what counts as a missed dead
 | `js/screens/` | One file per screen |
 | `data/` | The Shop catalog and the quotes |
 | `assets/sprites/` | The soldier, weapon and demon drawings |
+| `tools/make-sprites.cjs` | Draws those sprites; run it after changing how they look |
 | `css/` | The black System look |
 | `sw.js`, `manifest.webmanifest` | Offline support and Add to Home Screen |
 | `devpost/` | The planning documents this was built from, and learning notes |

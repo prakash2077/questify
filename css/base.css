@@ -72,6 +72,16 @@ input {
   color: inherit;
 }
 
+/* A faint wash of the accent colour at the top of the screen. The rest stays true black. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(80% 34% at 50% -6%, color-mix(in srgb, var(--accent) 17%, transparent), transparent 72%);
+  pointer-events: none;
+}
+
 /* A phone-sized column, even on a wide desktop window. */
 #app {
   max-width: 460px;
@@ -89,74 +99,105 @@ input {
 }
 
 .system-line {
-  text-shadow: 0 0 10px var(--glow);
+  color: color-mix(in srgb, var(--text) 92%, var(--accent));
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .system-line--center {
   text-align: center;
 }
 
-/* ---------- System window ---------- */
+/* ---------- System window ----------
+   A pane of dark glass with its corners cut off, inside a thin glowing frame.
+   The frame is two shapes: ::before is the whole cut-corner shape in the line
+   colour, and ::after is the same shape a hair smaller in dark glass, laid on
+   top. What is left showing round the edge is the frame. */
 
 .panel {
+  --cut: 14px;
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 20px 16px 18px;
-  background: linear-gradient(180deg, var(--fill), #000 130%);
-  border: 1px solid var(--line-soft);
-  border-top: 2px solid var(--accent);
-  border-bottom: 2px solid var(--accent);
-  box-shadow: 0 0 22px var(--glow);
-  animation: panel-open 0.22s ease-out;
+  padding: 22px 16px 18px;
+  box-shadow: 0 0 36px -12px var(--glow);
+  animation: panel-open 0.26s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
-/* Bright corner ticks. */
 .panel::before,
 .panel::after {
   content: '';
   position: absolute;
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--text);
   pointer-events: none;
 }
 
 .panel::before {
-  top: -2px;
-  left: -1px;
-  border-right: 0;
-  border-bottom: 0;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(180deg, var(--accent), var(--line-soft) 18%, var(--line-soft) 82%, var(--accent));
+  clip-path: polygon(
+    var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut)
+  );
 }
 
 .panel::after {
-  right: -1px;
-  bottom: -2px;
-  border-top: 0;
-  border-left: 0;
+  --in: calc(var(--cut) - 0.6px);
+  inset: 1.5px;
+  z-index: -1;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 55% at 50% 0%, color-mix(in srgb, var(--accent) 17%, #000), transparent 72%),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 6%, #000), #010204);
+  clip-path: polygon(
+    var(--in) 0, calc(100% - var(--in)) 0, 100% var(--in), 100% calc(100% - var(--in)),
+    calc(100% - var(--in)) 100%, var(--in) 100%, 0 calc(100% - var(--in)), 0 var(--in)
+  );
 }
 
+/* The window's name, in a small plate with a line trailing off either side. */
 .panel__title {
+  position: relative;
   align-self: center;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 16px;
+  padding: 5px 18px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent);
   border: 1px solid var(--line);
-  font-size: 16px;
+  color: color-mix(in srgb, var(--accent) 30%, #fff);
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.3em;
   text-align: center;
   text-transform: uppercase;
   text-shadow: 0 0 12px var(--glow);
-  box-shadow: inset 0 0 12px var(--line-soft);
+}
+
+.panel__title::before,
+.panel__title::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 26px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line));
+}
+
+.panel__title::before {
+  right: calc(100% + 6px);
+}
+
+.panel__title::after {
+  left: calc(100% + 6px);
+  transform: scaleX(-1);
 }
 
 @keyframes panel-open {
   from {
     opacity: 0;
-    transform: scaleY(0.6);
+    transform: scaleY(0.7);
   }
   to {
     opacity: 1;
@@ -164,23 +205,49 @@ input {
   }
 }
 
-/* ---------- Buttons ---------- */
+/* ---------- Buttons ----------
+   Dark glass with a hairline border and two bright corner brackets. */
 
 .btn {
+  position: relative;
   flex: 1;
   min-height: var(--tap);
   padding: 10px 16px;
-  background: #000;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, #000), #000);
   border: 1px solid var(--line-soft);
-  border-radius: 2px;
+  border-radius: 0;
   color: var(--text);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
   transition: transform 0.08s, box-shadow 0.15s, background 0.15s;
+}
+
+.btn::before,
+.btn::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--accent);
+  pointer-events: none;
+}
+
+.btn::before {
+  top: -1px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.btn::after {
+  right: -1px;
+  bottom: -1px;
+  border-top: 0;
+  border-left: 0;
 }
 
 .btn:active {
@@ -188,18 +255,24 @@ input {
 }
 
 .btn--primary {
-  background: var(--fill-strong);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 34%, #000), color-mix(in srgb, var(--accent) 12%, #000));
   border-color: var(--accent);
-  box-shadow: 0 0 16px var(--glow);
+  box-shadow: 0 0 18px -2px var(--glow), inset 0 1px 0 color-mix(in srgb, var(--accent) 60%, transparent);
   text-shadow: 0 0 10px var(--glow);
 }
 
 .btn--dashed {
   flex: none;
   width: 100%;
+  background: none;
   border-style: dashed;
   border-color: var(--line);
   color: var(--text-dim);
+}
+
+.btn--dashed::before,
+.btn--dashed::after {
+  display: none;
 }
 
 .btn:disabled {
@@ -262,9 +335,9 @@ input {
   width: 100%;
   min-height: var(--tap);
   padding: 10px 12px;
-  background: #000;
+  background: rgba(0, 0, 0, 0.6);
   border: 1px solid var(--line-soft);
-  border-radius: 2px;
+  border-radius: 0;
   font-size: 19px;
   font-weight: 500;
 }
@@ -500,12 +573,12 @@ input {
 .coin {
   display: inline-block;
   flex: none;
-  width: 0.9em;
-  height: 0.9em;
-  border: 0.14em solid var(--gold);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fff3c4, var(--gold) 55%, #b8791a);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 60%, transparent);
+  width: 0.62em;
+  height: 0.62em;
+  margin: 0 0.14em;
+  background: linear-gradient(135deg, #fff6d0, var(--gold) 42%, #9a5f0e);
+  box-shadow: 0 0 9px color-mix(in srgb, var(--gold) 70%, transparent);
+  transform: rotate(45deg);
 }
 
 /* Floats over whatever screen is showing. Taps pass straight through it. */

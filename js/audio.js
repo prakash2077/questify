@@ -1,109 +1,108 @@
-// Sound effects made in code with the Web Audio API, so there are no audio files.
+// Every sound in the app, made in code with the Web Audio API. There are no audio files.
 // Phones only allow sound after a tap, so nothing plays until unlockAudio() has run.
+//
+// How it is put together:
+//   1. Raw material: tone() makes a pitched note, rush() makes a sweep of filtered noise.
+//   2. Instruments built from those: boom, bell, pad, braam, choir.
+//   3. The app's sounds (intro, done, penalty...) are short scores for those instruments.
+// Everything leaves through one output chain with a reverb, which is what makes a
+// handful of simple waves sound like they are in a huge dark hall.
 
 import { getState } from './store.js';
 
 let ctx = null;
+let out = null; // every sound ends up here
+let hall = null; // sounds send a share of themselves here to be given an echo
+
+// ---------- The output chain ----------
 
 // Call from a tap. Creates the sound engine, or wakes it if the phone paused it.
 export function unlockAudio() {
-  ctx ??= new AudioContext();
+  if (!ctx) {
+    ctx = new AudioContext();
+    buildOutput();
+  }
   if (ctx.state === 'suspended') ctx.resume();
 }
 
-// One note: a wave that can slide in pitch and fades out.
-function tone({ type = 'sine', from, to = from, at = 0, dur, vol = 0.2 }) {
+function buildOutput() {
+  // A compressor turns loud peaks down, so layered sounds do not crackle.
+  const squeeze = ctx.createDynamicsCompressor();
+  squeeze.threshold.value = -18;
+  squeeze.knee.value = 20;
+  squeeze.ratio.value = 5;
+  squeeze.attack.value = 0.004;
+  squeeze.release.value = 0.3;
+  out = ctx.createGain();
+  out.gain.value = 0.9;
+  out.connect(squeeze).connect(ctx.destination);
+
+  // Reverb. The echo of a big room is, roughly, a burst of noise fading away.
+  // So: make three seconds of fading noise, and let the browser smear every
+  // sound through it (that is what a "convolver" does).
+  const length = Math.floor(ctx.sampleRate * 3.2);
+  const echo = ctx.createBuffer(2, length, ctx.sampleRate);
+  for (let side = 0; side < 2; side++) {
+    const samples = echo.getChannelData(side);
+    for (let i = 0; i < length; i++) samples[i] = (Math.random() * 2 - 1) * (1 - i / length) ** 2.6;
+  }
+  const room = ctx.createConvolver();
+  room.buffer = echo;
+  const soften = ctx.createBiquadFilter();
+  soften.type = 'lowpass';
+  soften.frequency.value = 3800;
+  hall = ctx.createGain();
+  hall.connect(room).connect(soften).connect(out);
+}
+
+// Connects a finished sound to the output, with `wet` of it sent to the hall.
+function send(node, wet) {
+  node.connect(out);
+  if (wet > 0) {
+    const share = ctx.createGain();
+    share.gain.value = wet;
+    node.connect(share).connect(hall);
+  }
+}
+
+// ---------- Raw material ----------
+
+// One note: a wave that can slide in pitch, swell in, and fade out.
+// `spread` adds a second, slightly out-of-tune copy, which thickens the sound.
+// `cutoff` muffles it by removing everything above that frequency.
+function tone({ type = 'sine', from, to = from, at = 0, dur, vol = 0.2, attack = 0.012, wet = 0, spread = 0, cutoff = null }) {
   const start = ctx.currentTime + at;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = type;
-  osc.frequency.setValueAtTime(from, start);
-  osc.frequency.exponentialRampToValueAtTime(to, start + dur);
-  gain.gain.setValueAtTime(0.0001, start);
-  gain.gain.exponentialRampToValueAtTime(vol, start + 0.015);
-  gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
-  osc.connect(gain).connect(ctx.destination);
-  osc.start(start);
-  osc.stop(start + dur + 0.02);
+  const level = ctx.createGain();
+  level.gain.setValueAtTime(0.0001, start);
+  level.gain.exponentialRampToValueAtTime(vol, start + attack);
+  level.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+
+  let last = level;
+  if (cutoff) {
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(cutoff[0], start);
+    filter.frequency.exponentialRampToValueAtTime(cutoff[1] ?? cutoff[0], start + dur);
+    level.connect(filter);
+    last = filter;
+  }
+  send(last, wet);
+
+  for (const cents of spread ? [-spread, spread] : [0]) {
+    const osc = ctx.createOscillator();
+    osc.type = type;
+    osc.detune.value = cents;
+    osc.frequency.setValueAtTime(from, start);
+    osc.frequency.exponentialRampToValueAtTime(to, start + dur);
+    osc.connect(level);
+    osc.start(start);
+    osc.stop(start + dur + 0.05);
+  }
 }
-
-const sounds = {
-  // The intro: a rush out of the dark, an impact, then a bright chord left ringing.
-  intro() {
-    tone({ type: 'sawtooth', from: 48, to: 190, dur: 0.75, vol: 0.12 });
-    tone({ type: 'sine', from: 180, to: 720, dur: 0.75, vol: 0.07 });
-    tone({ type: 'sine', from: 120, to: 38, dur: 0.7, at: 0.72, vol: 0.4 });
-    for (const from of [523, 784, 1047, 1568]) tone({ type: 'triangle', from, dur: 1.5, at: 0.74, vol: 0.09 });
-    [2093, 2637, 3136].forEach((from, i) => {
-      tone({ type: 'sine', from, dur: 0.5, at: 1.25 + i * 0.09, vol: 0.05 });
-    });
-  },
-  // The System waking up: two quick rising notes.
-  begin() {
-    tone({ type: 'triangle', from: 440, to: 660, dur: 0.14, vol: 0.18 });
-    tone({ type: 'sine', from: 880, dur: 0.4, at: 0.1, vol: 0.14 });
-  },
-  // Penalty Zone: two heavy falling hits with an uneasy hum on top.
-  penalty() {
-    for (const at of [0, 0.5]) {
-      tone({ type: 'sawtooth', from: 130, to: 58, dur: 0.45, at, vol: 0.22 });
-      tone({ type: 'sine', from: 65, to: 40, dur: 0.6, at, vol: 0.3 });
-    }
-    tone({ type: 'sine', from: 233, dur: 1.2, at: 0.05, vol: 0.05 });
-    tone({ type: 'sine', from: 220, dur: 1.2, at: 0.05, vol: 0.05 });
-  },
-  // Penalty cleared: a small bright chord climbing home.
-  cleared() {
-    [523, 659, 784, 1047].forEach((from, i) => {
-      tone({ type: 'triangle', from, dur: 0.5, at: i * 0.09, vol: 0.14 });
-    });
-  },
-  // Quest ticked off: a bright "ding" with a shimmer above it.
-  done() {
-    tone({ type: 'triangle', from: 784, dur: 0.18, vol: 0.2 });
-    tone({ type: 'sine', from: 1175, dur: 0.5, at: 0.09, vol: 0.18 });
-    tone({ type: 'sine', from: 2350, dur: 0.35, at: 0.09, vol: 0.05 });
-  },
-  // Coins landing: three quick high pings, just after the ding.
-  coins() {
-    [1568, 1976, 2637].forEach((from, i) => {
-      tone({ type: 'square', from, dur: 0.09, at: 0.3 + i * 0.07, vol: 0.05 });
-    });
-  },
-  // Level up: a deep thump, a rising run, then a held chord.
-  levelUp() {
-    tone({ type: 'sine', from: 98, to: 49, dur: 0.5, at: 0.6, vol: 0.3 });
-    [523, 659, 784, 1047].forEach((from, i) => {
-      tone({ type: 'triangle', from, dur: 0.22, at: 0.6 + i * 0.1, vol: 0.18 });
-    });
-    for (const from of [1047, 1319, 1568]) tone({ type: 'sine', from, dur: 1.2, at: 1, vol: 0.09 });
-  },
-  // Buying in the Shop: coins paid out, then a shadow rising.
-  purchase() {
-    [2093, 1568, 1319].forEach((from, i) => {
-      tone({ type: 'square', from, dur: 0.08, at: i * 0.06, vol: 0.05 });
-    });
-    tone({ type: 'sawtooth', from: 82, to: 330, dur: 0.6, at: 0.22, vol: 0.1 });
-    tone({ type: 'triangle', from: 220, to: 880, dur: 0.6, at: 0.22, vol: 0.14 });
-    tone({ type: 'sine', from: 1319, dur: 0.7, at: 0.75, vol: 0.12 });
-  },
-  // Daily check-in: one soft rising note.
-  checkIn() {
-    tone({ type: 'sine', from: 660, to: 880, dur: 0.18, vol: 0.14 });
-  },
-};
-
-export function play(name) {
-  if (!ctx || getState().settings.muted) return;
-  sounds[name]();
-}
-
-// ---------- The crackling fire ----------
-// A fire is mostly noise: a low steady roar, with short sharp pops on top.
 
 let noiseData = null;
 
-// Two seconds of random static, the raw material for both the roar and the pops.
+// Two seconds of random static: the raw material for wind, whooshes, crackles and thuds.
 function noise() {
   if (!noiseData) {
     noiseData = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
@@ -116,57 +115,227 @@ function noise() {
   return source;
 }
 
+// A sweep of filtered noise. Sliding the filter upward is a rising whoosh;
+// downward is something falling away. `swell` is the share of the time spent building up.
+function rush({ from, to = from, at = 0, dur, vol = 0.1, swell = 0.5, wet = 0.3, type = 'bandpass', q = 1.2 }) {
+  const start = ctx.currentTime + at;
+  const source = noise();
+  const filter = ctx.createBiquadFilter();
+  filter.type = type;
+  filter.Q.value = q;
+  filter.frequency.setValueAtTime(from, start);
+  filter.frequency.exponentialRampToValueAtTime(to, start + dur);
+  const level = ctx.createGain();
+  level.gain.setValueAtTime(0.0001, start);
+  level.gain.exponentialRampToValueAtTime(vol, start + Math.max(0.01, dur * swell));
+  level.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  source.connect(filter).connect(level);
+  send(level, wet);
+  source.start(start, Math.random() * 1.5);
+  source.stop(start + dur + 0.05);
+}
+
+// ---------- Instruments ----------
+
+// A deep impact: a low note dropping fast, with a dull thud of noise on top.
+function boom(at = 0, vol = 0.5) {
+  tone({ from: 120, to: 30, at, dur: 1.3, vol, attack: 0.006, wet: 0.35 });
+  rush({ from: 900, to: 60, at, dur: 0.5, vol: vol * 0.5, swell: 0.02, type: 'lowpass', wet: 0.5 });
+}
+
+// A bell: one note plus quieter, higher partials that are deliberately not in tune
+// with it. That slight clash is what makes metal sound like metal.
+function bell(freq, at = 0, vol = 0.1, dur = 2) {
+  [[1, 1], [2.01, 0.5], [2.76, 0.32], [4.07, 0.18], [5.4, 0.1]].forEach(([ratio, share], i) => {
+    tone({ from: freq * ratio, at, dur: dur / (1 + i * 0.45), vol: vol * share, attack: 0.004, wet: 0.7 });
+  });
+}
+
+// A pad: soft, slow, thick chords, like strings holding a note.
+function pad(freqs, at, dur, vol = 0.05) {
+  for (const from of freqs) {
+    tone({ type: 'sawtooth', from, at, dur, vol, attack: dur * 0.35, spread: 9, cutoff: [700, 2000], wet: 0.8 });
+  }
+}
+
+// A braam: the huge, growling low brass hit of a film trailer.
+function braam(freq, at, dur, vol = 0.2) {
+  tone({ type: 'sawtooth', from: freq, at, dur, vol, attack: 0.05, spread: 14, cutoff: [1500, 220], wet: 0.6 });
+  tone({ type: 'sawtooth', from: freq / 2, at, dur, vol: vol * 0.8, attack: 0.05, spread: 6, cutoff: [600, 140], wet: 0.4 });
+  tone({ type: 'square', from: freq * 2, at, dur: dur * 0.6, vol: vol * 0.18, attack: 0.08, spread: 10, cutoff: [2400, 500], wet: 0.7 });
+}
+
+// A choir: the same buzzing notes pushed through three narrow filters set to the
+// resonances of a mouth singing "aah".
+function choir(freqs, at, dur, vol = 0.08) {
+  const start = ctx.currentTime + at;
+  const level = ctx.createGain();
+  level.gain.setValueAtTime(0.0001, start);
+  level.gain.exponentialRampToValueAtTime(vol, start + dur * 0.4);
+  level.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  send(level, 0.9);
+
+  const mouth = [700, 1150, 2700].map((formant) => {
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = formant;
+    filter.Q.value = 7;
+    filter.connect(level);
+    return filter;
+  });
+  for (const from of freqs) {
+    for (const cents of [-11, 11]) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.value = from;
+      osc.detune.value = cents;
+      for (const filter of mouth) osc.connect(filter);
+      osc.start(start);
+      osc.stop(start + dur + 0.05);
+    }
+  }
+}
+
+// ---------- The app's sounds ----------
+
+const sounds = {
+  // The intro: a rush out of the dark, an impact with a low brass roar, then
+  // bells and a held chord ringing out into the hall.
+  intro() {
+    rush({ from: 180, to: 7000, dur: 0.78, vol: 0.14, swell: 0.95, wet: 0.5 });
+    tone({ type: 'sawtooth', from: 38, to: 150, dur: 0.78, vol: 0.14, attack: 0.5, cutoff: [300, 1400], wet: 0.3 });
+    boom(0.76, 0.6);
+    braam(55, 0.76, 2.6, 0.2);
+    braam(82.4, 0.78, 2.2, 0.1);
+    pad([220, 329.6, 440], 0.9, 2.8, 0.04);
+    [880, 1318.5, 1760].forEach((freq, i) => bell(freq, 1.15 + i * 0.16, 0.06, 2.4));
+  },
+  // The System waking up, for people who skip the intro: one bell over a soft low note.
+  begin() {
+    bell(880, 0, 0.15, 1.8);
+    tone({ from: 110, to: 55, dur: 0.6, vol: 0.26, wet: 0.3 });
+  },
+  // Quest complete: a warm bell, a second one answering above it, a soft thump below.
+  done() {
+    bell(659.3, 0, 0.21, 1.9);
+    bell(987.8, 0.08, 0.13, 1.7);
+    tone({ from: 196, to: 82, dur: 0.4, vol: 0.26, attack: 0.005, wet: 0.2 });
+    rush({ from: 5000, to: 9000, dur: 0.5, vol: 0.02, swell: 0.1, wet: 0.6 });
+  },
+  // Coins landing: three small bright chimes, just after the bell.
+  coins() {
+    [2093, 2637, 3136].forEach((freq, i) => {
+      tone({ from: freq, at: 0.3 + i * 0.075, dur: 0.5, vol: 0.085, attack: 0.003, wet: 0.6 });
+      tone({ from: freq * 2.4, at: 0.3 + i * 0.075, dur: 0.25, vol: 0.028, attack: 0.003, wet: 0.6 });
+    });
+  },
+  // Level up: a rush upward, an impact, then a rising run of bells over a wide chord.
+  levelUp() {
+    rush({ from: 300, to: 6000, at: 0.1, dur: 0.5, vol: 0.09, swell: 0.95, wet: 0.5 });
+    boom(0.58, 0.5);
+    braam(65.4, 0.58, 2, 0.13);
+    pad([261.6, 329.6, 392, 523.3], 0.58, 3, 0.05);
+    [523.3, 659.3, 784, 1046.5, 1318.5].forEach((freq, i) => bell(freq, 0.62 + i * 0.1, 0.09, 2.4));
+  },
+  // Daily check-in: a single soft bell.
+  checkIn() {
+    bell(784, 0, 0.17, 1.4);
+  },
+  // Penalty Zone: everything falls away, then two low notes a semitone apart
+  // (the most uneasy interval there is) roar together over a heavy impact.
+  penalty() {
+    rush({ from: 5000, to: 90, dur: 1, vol: 0.14, swell: 0.05, type: 'lowpass', wet: 0.6 });
+    boom(0, 0.6);
+    braam(46.25, 0.02, 3, 0.26);
+    braam(49, 0.02, 3, 0.15);
+    boom(1.05, 0.38);
+    bell(1244.5, 0.2, 0.025, 3);
+    bell(1318.5, 0.2, 0.025, 3);
+  },
+  // Penalty cleared: the tension lets go into a major chord and rising bells.
+  cleared() {
+    pad([293.7, 370, 440], 0, 2.6, 0.05);
+    tone({ from: 147, to: 73, dur: 0.6, vol: 0.2, wet: 0.3 });
+    [587.3, 740, 880, 1174.7].forEach((freq, i) => bell(freq, 0.08 + i * 0.11, 0.09, 2.2));
+  },
+  // A soldier rises: a whoosh from below, an impact, and a choir out of the dark.
+  purchase() {
+    rush({ from: 250, to: 3200, dur: 0.5, vol: 0.11, swell: 0.9, wet: 0.5 });
+    tone({ from: 46, to: 110, dur: 0.55, vol: 0.26, attack: 0.3, wet: 0.3 });
+    boom(0.42, 0.4);
+    choir([220, 261.6, 329.6], 0.4, 2.4, 0.07);
+    bell(1318.5, 0.55, 0.05, 2.2);
+  },
+};
+
+export function play(name) {
+  if (!ctx || getState().settings.muted) return;
+  sounds[name]();
+}
+
+// ---------- The crackling fire ----------
+// A fire is mostly noise: a low steady roar that wavers, with sharp little pops on top.
+
 function crackle() {
   const now = ctx.currentTime;
   const source = noise();
   const band = ctx.createBiquadFilter();
   band.type = 'bandpass';
-  band.frequency.value = 1500 + Math.random() * 3000;
-  const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.02 + Math.random() * 0.1, now);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03 + Math.random() * 0.05);
-  source.connect(band).connect(gain).connect(ctx.destination);
+  band.frequency.value = 1400 + Math.random() * 3600;
+  band.Q.value = 1.5;
+  const level = ctx.createGain();
+  // Mostly small ticks, now and then a louder pop.
+  const loud = Math.random() < 0.12 ? 0.16 : 0.02 + Math.random() * 0.06;
+  level.gain.setValueAtTime(loud, now);
+  level.gain.exponentialRampToValueAtTime(0.0001, now + 0.025 + Math.random() * 0.06);
+  source.connect(band).connect(level);
+  send(level, 0.15);
   source.start(now, Math.random() * 1.5);
-  source.stop(now + 0.1);
+  source.stop(now + 0.12);
 }
 
 let fireSound = null;
 
 export function startFireSound() {
   if (!ctx || fireSound || getState().settings.muted) return;
+  const now = ctx.currentTime;
   const roar = noise();
   const low = ctx.createBiquadFilter();
   low.type = 'lowpass';
-  low.frequency.value = 420;
-  const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.1, ctx.currentTime + 1.2);
-  roar.connect(low).connect(gain).connect(ctx.destination);
+  low.frequency.value = 380;
+  const level = ctx.createGain();
+  level.gain.setValueAtTime(0.0001, now);
+  level.gain.exponentialRampToValueAtTime(0.11, now + 1.4);
+  // The roar wavers, the way flames do.
+  const waver = ctx.createOscillator();
+  waver.frequency.value = 0.37;
+  const depth = ctx.createGain();
+  depth.gain.value = 0.035;
+  waver.connect(depth).connect(level.gain);
+  roar.connect(low).connect(level);
+  send(level, 0.1);
   roar.start();
+  waver.start();
   const pops = setInterval(() => {
     if (Math.random() < 0.55) crackle();
-  }, 130);
-  fireSound = { roar, gain, pops };
+  }, 120);
+  fireSound = { roar, waver, level, pops };
 }
 
 export function stopFireSound() {
   if (!fireSound) return;
-  const { roar, gain, pops } = fireSound;
+  const { roar, waver, level, pops } = fireSound;
   fireSound = null;
   clearInterval(pops);
-  gain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.1);
-  roar.stop(ctx.currentTime + 0.5);
+  level.gain.cancelScheduledValues(ctx.currentTime);
+  level.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.12);
+  roar.stop(ctx.currentTime + 0.7);
+  waver.stop(ctx.currentTime + 0.7);
 }
 
 // ---------- The army's presence on the Battleground ----------
 // One layer of sound per few soldiers, so a bigger army sounds bigger:
-// a low hum, then a note above it, then a high shimmer, then war drums.
-
-const ARMY_LAYERS = [
-  { type: 'sine', freq: 55, vol: 0.16, wobble: 0.13 },
-  { type: 'triangle', freq: 82.4, vol: 0.07, wobble: 0.21 },
-  { type: 'sine', freq: 220, vol: 0.03, wobble: 0.34 },
-];
+// a deep drone, then a note above it, then wind and a distant choir, then war drums.
 
 let armySound = null;
 
@@ -175,46 +344,78 @@ export function startArmySound(layers) {
   const now = ctx.currentTime;
   const master = ctx.createGain();
   master.gain.setValueAtTime(0.0001, now);
-  master.gain.exponentialRampToValueAtTime(1, now + 2);
-  master.connect(ctx.destination);
+  master.gain.exponentialRampToValueAtTime(1, now + 2.5);
+  send(master, 0.5);
 
-  const voices = [];
-  for (const layer of ARMY_LAYERS.slice(0, layers)) {
-    const voice = ctx.createOscillator();
-    voice.type = layer.type;
-    voice.frequency.value = layer.freq;
+  const running = [];
+  // A held note: two slightly out-of-tune waves, muffled, slowly swelling and fading.
+  const drone = (type, freq, vol, cutoff, wobble) => {
     const level = ctx.createGain();
-    level.gain.value = layer.vol;
-    // A slow wobble in loudness keeps the hum alive instead of flat.
-    const wobble = ctx.createOscillator();
-    wobble.frequency.value = layer.wobble;
+    level.gain.value = vol;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = cutoff;
+    filter.connect(level).connect(master);
+    const swell = ctx.createOscillator();
+    swell.frequency.value = wobble;
     const depth = ctx.createGain();
-    depth.gain.value = layer.vol * 0.5;
-    wobble.connect(depth).connect(level.gain);
-    voice.connect(level).connect(master);
-    voice.start();
-    wobble.start();
-    voices.push(voice, wobble);
+    depth.gain.value = vol * 0.5;
+    swell.connect(depth).connect(level.gain);
+    swell.start();
+    running.push(swell);
+    for (const cents of [-8, 8]) {
+      const osc = ctx.createOscillator();
+      osc.type = type;
+      osc.frequency.value = freq;
+      osc.detune.value = cents;
+      osc.connect(filter);
+      osc.start();
+      running.push(osc);
+    }
+  };
+
+  drone('sawtooth', 55, 0.065, 170, 0.11);
+  if (layers >= 2) drone('sawtooth', 82.4, 0.036, 320, 0.17);
+  if (layers >= 3) {
+    drone('sawtooth', 220, 0.012, 900, 0.07);
+    // Wind: a narrow band of noise whose pitch drifts.
+    const wind = noise();
+    const band = ctx.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.value = 520;
+    band.Q.value = 3;
+    const gust = ctx.createOscillator();
+    gust.frequency.value = 0.09;
+    const reach = ctx.createGain();
+    reach.gain.value = 260;
+    gust.connect(reach).connect(band.frequency);
+    const level = ctx.createGain();
+    level.gain.value = 0.05;
+    wind.connect(band).connect(level).connect(master);
+    wind.start();
+    gust.start();
+    running.push(wind, gust);
   }
 
-  // The fourth layer: a slow double drum beat.
+  // The fourth layer: slow war drums, far away.
   let drums = null;
-  if (layers > ARMY_LAYERS.length) {
+  if (layers >= 4) {
     const beat = () => {
-      tone({ type: 'sine', from: 90, to: 42, dur: 0.35, vol: 0.28 });
-      tone({ type: 'sine', from: 90, to: 42, dur: 0.35, at: 0.28, vol: 0.2 });
+      boom(0, 0.3);
+      boom(0.32, 0.2);
     };
     beat();
-    drums = setInterval(beat, 2400);
+    drums = setInterval(beat, 2600);
   }
-  armySound = { master, voices, drums };
+  armySound = { master, running, drums };
 }
 
 export function stopArmySound() {
   if (!armySound) return;
-  const { master, voices, drums } = armySound;
+  const { master, running, drums } = armySound;
   armySound = null;
   clearInterval(drums);
-  master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.15);
-  for (const voice of voices) voice.stop(ctx.currentTime + 0.8);
+  master.gain.cancelScheduledValues(ctx.currentTime);
+  master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.2);
+  for (const node of running) node.stop(ctx.currentTime + 1.2);
 }

@@ -1,5 +1,5 @@
 // The bonfire: a canvas fire made of a few hundred soft glowing particles, with
-// logs, a ring of stones, sparks and a flickering glow on the ground.
+// charred logs, a ring of dark stones, sparks and a flickering glow on the ground.
 // Focus uses it now; the Battleground will draw the same fire.
 //
 // Sizes are in "fire units": 1 unit is the width of the fire. x runs left to
@@ -12,7 +12,7 @@ const rand = (min, max) => min + Math.random() * (max - min);
 // A soft round blob of colour, drawn once and then stamped for every particle.
 // Stamps add their light together, so where many overlap the fire turns white-hot.
 
-function makeStamp(core, edge) {
+export function makeStamp(core, edge) {
   const size = 64;
   const stamp = document.createElement('canvas');
   stamp.width = stamp.height = size;
@@ -178,40 +178,43 @@ function drawGroundGlow(ctx, cx, groundY, size, flicker) {
   ctx.restore();
 }
 
-// Two crossed logs, drawn thick and simple.
+// Two crossed logs, charred black, with fire glowing through the cracks.
 function drawLogs(ctx, cx, groundY, size) {
   for (const tilt of [-0.3, 0.3]) {
     ctx.save();
     ctx.translate(cx, groundY - size * 0.07);
     ctx.rotate(tilt);
-    const length = size * 0.78;
-    const thick = size * 0.13;
-    ctx.lineWidth = size * 0.022;
-    ctx.strokeStyle = '#1d0d05';
-    ctx.fillStyle = '#5a2e14';
+    const length = size * 0.8;
+    const thick = size * 0.11;
+
+    const wood = ctx.createLinearGradient(0, -thick / 2, 0, thick / 2);
+    wood.addColorStop(0, '#3b2315');
+    wood.addColorStop(0.45, '#1a0d07');
+    wood.addColorStop(1, '#070302');
+    ctx.fillStyle = wood;
     ctx.beginPath();
-    ctx.roundRect(-length / 2, -thick / 2, length, thick, thick / 2);
+    ctx.roundRect(-length / 2, -thick / 2, length, thick, thick * 0.35);
     ctx.fill();
-    ctx.stroke();
-    // Bark highlight, and the pale cut end of the log.
-    ctx.strokeStyle = '#8b4c22';
+
+    // Embers showing through the bark, brightest near the middle of the fire.
     ctx.lineCap = 'round';
+    ctx.lineWidth = Math.max(1, size * 0.008);
+    ctx.shadowColor = '#ff6a1a';
+    ctx.shadowBlur = size * 0.04;
+    ctx.strokeStyle = 'rgba(255, 150, 60, 0.9)';
     ctx.beginPath();
-    ctx.moveTo(-length * 0.34, -thick * 0.18);
-    ctx.lineTo(length * 0.2, -thick * 0.18);
-    ctx.stroke();
-    ctx.fillStyle = '#c98a4b';
-    ctx.strokeStyle = '#1d0d05';
-    ctx.beginPath();
-    ctx.ellipse((tilt < 0 ? -1 : 1) * (length / 2 - thick * 0.42), 0, thick * 0.3, thick * 0.4, 0, 0, TAU);
-    ctx.fill();
+    for (const [x, w] of [[-0.2, 0.1], [-0.04, 0.12], [0.12, 0.08]]) {
+      ctx.moveTo(length * x, thick * 0.05);
+      ctx.lineTo(length * (x + w * 0.4), -thick * 0.12);
+      ctx.lineTo(length * (x + w), thick * 0.1);
+    }
     ctx.stroke();
     ctx.restore();
   }
 }
 
-// A ring of stones. The back half is drawn before the fire and the front half
-// after it, so the fire sits inside the ring.
+// A ring of dark stones. The back half is drawn before the fire and the front
+// half after it, so the fire sits inside the ring.
 const STONES = [
   { angle: 200, r: 0.07 }, { angle: 232, r: 0.085 }, { angle: 270, r: 0.075 }, { angle: 308, r: 0.085 }, { angle: 340, r: 0.07 },
   { angle: 20, r: 0.075 }, { angle: 55, r: 0.09 }, { angle: 90, r: 0.08 }, { angle: 125, r: 0.09 }, { angle: 160, r: 0.075 },
@@ -226,17 +229,16 @@ function drawStones(ctx, px, py, size, front) {
     const x = px(Math.cos(angle) * 0.5);
     const y = py(0.02 - Math.sin(angle) * 0.11);
     const r = stone.r * size;
-    ctx.lineWidth = size * 0.02;
-    ctx.strokeStyle = '#0d0f14';
-    ctx.fillStyle = front ? '#3b4252' : '#2a2f3b';
+
+    // Lit from the fire's side, falling away into black on the other.
+    const towardFire = -Math.cos(angle);
+    const rock = ctx.createLinearGradient(x + towardFire * r, y - r * 0.6, x - towardFire * r, y + r * 0.6);
+    rock.addColorStop(0, front ? '#5a3a26' : '#6b3d1f');
+    rock.addColorStop(0.35, '#1d1c22');
+    rock.addColorStop(1, '#050507');
+    ctx.fillStyle = rock;
     ctx.beginPath();
-    ctx.ellipse(x, y, r, r * 0.72, 0, 0, TAU);
-    ctx.fill();
-    ctx.stroke();
-    // The side facing the fire catches its light.
-    ctx.fillStyle = 'rgba(255, 150, 60, 0.28)';
-    ctx.beginPath();
-    ctx.ellipse(x - Math.cos(angle) * r * 0.3, y - r * 0.22, r * 0.5, r * 0.26, 0, 0, TAU);
+    ctx.ellipse(x, y, r, r * 0.7, 0, 0, TAU);
     ctx.fill();
   }
 }

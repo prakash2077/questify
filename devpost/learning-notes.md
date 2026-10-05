@@ -401,3 +401,54 @@ Six steps, and each one could be tried the moment it was finished. A few practic
 4. **Keep rules apart from screens.** It is why the rules can be checked in a second, and why the look could change without touching them.
 5. **Put numbers and lists in one place.** Rewards, the level curve, the Shop, the quotes and the accent colours are all data you can edit without reading screen code.
 6. **Write down what changed and why.** The plan was wrong in small ways about ten times. Each time it was corrected in the checklist under Revisions, which is why the documents still describe the app you have.
+
+---
+
+## Final review, round 1: from cute to cinematic
+
+### What happened
+
+You tried the finished app and said it looked like a small kids' game. That was a fair hit on the plan, not only on the build: your PRD had asked for "thick, clean, Duolingo-style" characters that were "friendly and cute", and that is what got built. Seeing it was what told you it was wrong. This is normal, and it is the reason every plan in this process ends with a hands-on review.
+
+So the look and the sound were redone, and the PRD and spec were changed to say what you now want.
+
+### What changed
+
+- **Characters.** Chunky cartoon soldiers became tall shadow knights: almost black, lit along one edge, with glowing eyes and a cold aura. Demons became huge horned shapes with burning eyes.
+- **The Battleground.** A blood moon rises behind the demons, fog drifts along the horizon, dust catches the firelight, and shadow rises off every soldier.
+- **The bonfire.** Charred logs with fire glowing through the cracks, and dark stones lit on the side facing the flames. No outlines.
+- **Windows and buttons.** Dark glass with cut corners in a thin glowing frame. Coins are small gold gems.
+- **Sound.** Every sound was rebuilt. Beeps became impacts, bells, low brass and a choir, in a big echoing space.
+
+None of the rules changed. All 39 rule checks passed untouched, which is the payoff of keeping rules apart from screens.
+
+### Ideas worth learning
+
+**A silhouette needs less drawing and reads as more serious.** The cute soldiers had faces, bellies and feet, all outlined. The new ones are one dark shape, a thin line of light down one side (`stroke="url(#rim)"`), and two eyes. Your eye fills in the rest. Dark-on-dark only works with something bright behind or beside it, which is why the demons have a moon and the soldiers have an aura.
+
+**Parts, not copies.** `tools/make-sprites.cjs` builds all four soldiers from shared pieces: `body()`, `eyes()`, `helmet()`, `arm()`. Change the eye colour in one place and run `node tools/make-sprites.cjs`, and every soldier changes. The app never runs this script; it only loads the SVG files it writes.
+
+**The aura is the fire, recoloured.** `js/battleground.js` reuses the fire's trick (soft glowing dots that rise and fade, their light adding up) with blue and violet dots instead of orange. `makeStamp` was already written for the fire; it only had to be shared.
+
+**Reverb is most of what "cinematic" means.** The old sounds went straight to the speaker. Now everything can pass through `hall` in `js/audio.js`, a reverb. The echo of a big room is roughly a burst of noise fading away, so `buildOutput` makes three seconds of fading noise and the browser smears each sound through it. A plain note becomes a note in a cathedral.
+
+**Instruments are recipes made of two ingredients.** Everything is built from `tone()` (a pitched wave) and `rush()` (a sweep of filtered noise):
+
+- a **boom** is a low note dropping fast plus a thud of noise;
+- a **bell** is a note plus higher notes deliberately not in tune with it, which is what makes metal sound like metal;
+- a **braam**, the trailer-brass roar, is buzzing low waves, slightly out of tune with each other, with the brightness filtered away as they fade;
+- a **choir** is the same buzz pushed through three narrow filters set to the resonances of a mouth singing "aah".
+
+Then each app sound is a short score: the intro is a rush, a boom, two braams, a pad and three bells.
+
+**You can measure sound without hearing it.** The agent cannot listen. So each sound was rendered to memory with an `OfflineAudioContext` and measured: how loud is its peak (is it below 1.0, where it would distort?), and how long does it ring? That caught a real problem: the army's drone was several times louder than the quest bell. It cannot tell you whether the sound is *good*. Only your ears can.
+
+**Checks should test what the user gets, not how it is built.** Four checks broke during the restyle though nothing was wrong: they asked "is the panel's border red?", and the new panels have no border, they have a frame drawn a different way. A check that says "the Penalty Zone is red" survives a redesign; one that names a CSS property does not.
+
+**Inspiration is a direction, not a download.** Pinterest wanted a sign-in, which the agent cannot do, so only the pins visible behind the wall were seen. They were enough to take a direction from (dark glass, glowing frames). Nothing was copied, and every drawing here was made from scratch. That matters for a public repo: you can show it to anyone.
+
+### Try it yourself
+
+1. In `tools/make-sprites.cjs`, find `const eyes = (y, colour = '#cfe2ff', halo = '#5b8cff')` and change the halo to `'#ff5b5b'`. Run `node tools/make-sprites.cjs`, reload, and open the Shop.
+2. In `js/audio.js`, find `soften.frequency.value = 3800;` in `buildOutput` and change it to `900`. The hall becomes dark and muffled. Then find `** 2.6` a few lines above and change it to `** 1.2` for a much longer echo.
+3. In `js/battleground.js`, find `drawMoon` and change the three reds in `disc.addColorStop` to blues. A different night entirely.

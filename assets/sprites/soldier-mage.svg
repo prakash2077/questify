@@ -1,21 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="120" height="140">
-  <defs><filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3"/></filter></defs>
-  <g fill="#4f6dff" opacity="0.6"><path d="M27 62 q-11 -13 -3 -27 q3 13 11 17 z"/><path d="M93 62 q11 -13 3 -27 q-3 13 -11 17 z"/></g>
-  <!-- staff with a glowing orb -->
-  <g stroke="#080b16" stroke-width="5" stroke-linecap="round">
-    <path d="M100 34 L100 132" stroke-width="11"/>
-    <path d="M100 34 L100 132" stroke="#7a4a22"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 220" width="140" height="220">
+
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b2347"/>
+      <stop offset="0.45" stop-color="#0b0f22"/>
+      <stop offset="1" stop-color="#04050b"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8fbcff"/>
+      <stop offset="0.42" stop-color="#5b7cff" stop-opacity="0.35"/>
+      <stop offset="0.7" stop-color="#5b7cff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c9dcff"/>
+      <stop offset="0.5" stop-color="#4a5a8c"/>
+      <stop offset="1" stop-color="#141a33"/>
+    </linearGradient>
+    <linearGradient id="aura" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#3b4fe0" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#7c4dff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="2.4"/></filter>
+  </defs>
+
+  <g filter="url(#soft)" fill="url(#aura)">
+    <path d="M30 212 C22 170 30 120 44 86 C40 60 52 30 70 8 C88 30 100 60 96 86 C110 120 118 170 110 212 Z"/>
+    <path d="M22 150 C12 120 18 96 28 78 C26 100 34 112 40 124 Z" opacity="0.8"/>
+    <path d="M118 150 C128 120 122 96 112 78 C114 100 106 112 100 124 Z" opacity="0.8"/>
   </g>
-  <circle cx="100" cy="24" r="17" fill="#b26bff" filter="url(#glow)" opacity="0.9"/>
-  <circle cx="100" cy="24" r="12" fill="#c99bff" stroke="#080b16" stroke-width="5"/>
-  <circle cx="96" cy="20" r="3.5" fill="#fff"/>
-  <g fill="#161d38" stroke="#080b16" stroke-width="5"><rect x="35" y="122" width="21" height="14" rx="7"/><rect x="64" y="122" width="21" height="14" rx="7"/></g>
-  <ellipse cx="60" cy="90" rx="36" ry="39" fill="#25315c" stroke="#080b16" stroke-width="6"/><ellipse cx="60" cy="106" rx="20" ry="17" fill="#33447d"/>
-  <!-- wizard hat -->
-  <path d="M30 62 C40 40 46 22 44 6 C58 12 74 34 86 62 Z" fill="#5a3fa8" stroke="#080b16" stroke-width="6" stroke-linejoin="round"/>
-  <ellipse cx="60" cy="62" rx="44" ry="11" fill="#6b4fc4" stroke="#080b16" stroke-width="6"/>
-  <path d="M47 46 l4 -8 l4 8 l-8 -5 h8 z" fill="#ffc94d"/>
-  <g transform="translate(0 6)"><rect x="35" y="59" width="50" height="25" rx="12.5" fill="#080b16"/><g fill="#7fe3ff"><ellipse cx="49" cy="71.5" rx="7" ry="9" filter="url(#glow)"/><ellipse cx="71" cy="71.5" rx="7" ry="9" filter="url(#glow)"/><ellipse cx="49" cy="71.5" rx="4.6" ry="6.8"/><ellipse cx="71" cy="71.5" rx="4.6" ry="6.8"/></g><g fill="#fff"><circle cx="50.5" cy="69" r="1.6"/><circle cx="72.5" cy="69" r="1.6"/></g></g>
-  <circle cx="23" cy="98" r="9.5" fill="#25315c" stroke="#080b16" stroke-width="5"/>
-  <circle cx="97" cy="98" r="9.5" fill="#25315c" stroke="#080b16" stroke-width="5"/>
+
+  
+  <path d="M48 82 L92 82 L96 122 L103 170 L110 212 L101 203 L95 212 L87 201 L79 212 L70 202 L61 212 L53 201 L45 212 L39 203 L30 212 L37 170 L44 122 Z" fill="url(#body)"/>
+  <g fill="none" stroke="#1d2a5c" stroke-width="1.4" stroke-linecap="round" opacity="0.9">
+    <path d="M58 86 L70 104 L82 86"/>
+    <path d="M47 124 H93"/>
+    <path d="M58 128 L50 200 M70 128 V198 M82 128 L90 200"/>
+    <path d="M64 140 l6 -8 l6 8 l-6 8 z"/>
+  </g>
+  <path d="M34 92 L24 78 L38 80 C42 70 54 66 64 70 L76 70 C86 66 98 70 102 80 L116 78 L106 92 L98 98 L86 84 L54 84 L42 98 Z" fill="url(#body)"/>
+  <path d="M48 82 L92 82 L96 122 L103 170 L110 212 L101 203 L95 212 L87 201 L79 212 L70 202 L61 212 L53 201 L45 212 L39 203 L30 212 L37 170 L44 122 Z" fill="none" stroke="url(#rim)" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M34 92 L24 78 L38 80 C42 70 54 66 64 70 L76 70 C86 66 98 70 102 80 L116 78 L106 92 L98 98 L86 84 L54 84 L42 98 Z" fill="none" stroke="url(#rim)" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M42 90 L32 104 L34 132 L42 136 L44 110 Z" fill="url(#body)" stroke="url(#rim)" stroke-width="1.2"/>
+  <!-- cowl -->
+  <path d="M66 0 C80 16 94 40 92 66 L84 80 L70 84 L56 80 L48 66 C46 42 56 22 66 0 Z" fill="url(#body)"/>
+  <path d="M66 0 C80 16 94 40 92 66 L84 80 L70 84 L56 80 L48 66 C46 42 56 22 66 0 Z" fill="none" stroke="url(#rim)" stroke-width="1.8"/>
+  <path d="M70 32 C80 36 84 48 82 62 L76 72 L70 74 L64 72 L58 62 C56 48 60 36 70 32 Z" fill="#03040a"/>
+  
+  <g>
+    <g fill="#a06bff" filter="url(#glow)">
+      <path d="M58 50 L67 53 L66 56.5 L58 54.5 Z"/><path d="M82 50 L73 53 L74 56.5 L82 54.5 Z"/>
+    </g>
+    <g fill="#ecdcff">
+      <path d="M59 51 L66.5 53.4 L66 55.6 L59 53.8 Z"/><path d="M81 51 L73.5 53.4 L74 55.6 L81 53.8 Z"/>
+    </g>
+  </g>
+  <!-- staff -->
+  <path d="M112 36 L110 212" stroke="#04050b" stroke-width="7" stroke-linecap="round"/>
+  <path d="M112 36 L110 212" stroke="url(#steel)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M102 40 C100 26 106 18 112 14 C118 18 124 26 122 40" fill="none" stroke="url(#steel)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M112 10 L119 24 L112 38 L105 24 Z" fill="#a06bff" filter="url(#glow)"/>
+  <path d="M112 12 L118 24 L112 36 L106 24 Z" fill="#e3d2ff"/>
+  <path d="M112 12 L112 36 M106 24 H118" stroke="#a06bff" stroke-width="0.8"/>
+  <path d="M100 96 L110 108 L116 124 L108 132 L98 114 Z" fill="url(#body)" stroke="url(#rim)" stroke-width="1.2"/>
+
 </svg>

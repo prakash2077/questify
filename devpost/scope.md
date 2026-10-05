@@ -22,7 +22,7 @@ Open the app each morning and see today's quests, with deadlines and priority. S
 - *Solo Leveling* (the System, the Penalty Zone, the shadow army), *Demon Slayer*.
 - Clash of Clans-style building: easy to understand, and watching it grow feels good.
 - Dark, AMOLED-friendly, true-black look with a motivating fire symbol; cute, game-like and unique, not generic.
-- Cinematic and cute at once: just using the app should give a dopamine hit and a feeling of progress.
+- Cinematic first: just using the app should give a dopamine hit and a feeling of progress. (The build's first, cute cartoon look was rejected in review as too childish; the look is now dark and sleek.)
 - Sound effects are important. Key moments (check-off, coins, a new soldier, the Penalty Zone) should sound good, so it feels like a game.
 - Fonts and styling close to the *Solo Leveling* System UI in the anime, but with a "fire plus cool" Pinterest-style vibe.
 - Real, influential quotes. Heartwarming, not harsh.

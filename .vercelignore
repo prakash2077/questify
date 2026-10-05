@@ -1,6 +1,7 @@
 # Kept in the repo, but not part of the app, so not served on the live site.
 devpost
 tests
+tools
 .claude
 .agents
 agent

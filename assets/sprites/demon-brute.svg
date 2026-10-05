@@ -1,26 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
-  <defs><filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="4"/></filter></defs>
-  <!-- big curved horns -->
-  <g fill="#f3e2c0" stroke="#2a0306" stroke-width="6" stroke-linejoin="round">
-    <path d="M44 62 C14 56 4 30 12 8 C22 28 40 36 60 40 Z"/>
-    <path d="M116 62 C146 56 156 30 148 8 C138 28 120 36 100 40 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 240" width="260" height="240">
+  <defs>
+    <linearGradient id="hide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a0a10"/>
+      <stop offset="0.5" stop-color="#16040a"/>
+      <stop offset="1" stop-color="#050102"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff5a4a"/>
+      <stop offset="0.5" stop-color="#b3121f" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#b3121f" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.55" stop-color="#fff"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="rise"><rect width="260" height="240" fill="url(#fade)"/></mask>
+    <filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+  <g mask="url(#rise)">
+
+    <path d="M96 78 C60 74 36 50 34 10 C48 38 72 52 104 58 Z" fill="url(#hide)" stroke="url(#rim)" stroke-width="2"/>
+    <path d="M164 78 C200 74 224 50 226 10 C212 38 188 52 156 58 Z" fill="url(#hide)" stroke="url(#rim)" stroke-width="2"/>
+    <path d="M16 150 L4 118 L34 134 L44 104 L62 124 Z" fill="url(#hide)" stroke="url(#rim)" stroke-width="2"/>
+    <path d="M244 150 L256 118 L226 134 L216 104 L198 124 Z" fill="url(#hide)" stroke="url(#rim)" stroke-width="2"/>
+    <path d="M130 52 C152 52 168 66 172 88 L176 112 C196 112 226 122 244 150 L260 240 L0 240 L16 150 C34 122 64 112 84 112 L88 88 C92 66 108 52 130 52 Z" fill="url(#hide)"/>
+    <path d="M130 52 C152 52 168 66 172 88 L176 112 C196 112 226 122 244 150 L260 240 L0 240 L16 150 C34 122 64 112 84 112 L88 88 C92 66 108 52 130 52 Z" fill="none" stroke="url(#rim)" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M100 86 L130 96 L160 86" fill="none" stroke="#050102" stroke-width="6" stroke-linecap="round"/>
+    
+    <g fill="#ff2a2a" filter="url(#glow)">
+      <path d="M92 88 L118 97 L114 103 L94 95 Z"/>
+      <path d="M168 88 L142 97 L146 103 L166 95 Z"/>
+    </g>
+    <g fill="#ffd9c2">
+      <path d="M96 91 L115 97.5 L113 100.5 L97 94.5 Z"/>
+      <path d="M164 91 L145 97.5 L147 100.5 L163 94.5 Z"/>
+    </g>
+    <!-- embers glowing behind clenched teeth -->
+    <path d="M108 124 l7 6 l7 -6 l8 6 l8 -6 l7 6 l7 -6" fill="none" stroke="#ff6a3c" stroke-width="2.2" stroke-linejoin="round" filter="url(#glow)"/>
+    <path d="M108 124 l7 6 l7 -6 l8 6 l8 -6 l7 6 l7 -6" fill="none" stroke="#ffb38a" stroke-width="1" stroke-linejoin="round" opacity="0.8"/>
+
   </g>
-  <!-- fists -->
-  <g fill="#8e0f1a" stroke="#2a0306" stroke-width="6"><rect x="2" y="96" width="30" height="30" rx="12"/><rect x="128" y="96" width="30" height="30" rx="12"/></g>
-  <!-- feet -->
-  <g fill="#6f0b14" stroke="#2a0306" stroke-width="6"><rect x="40" y="138" width="30" height="16" rx="8"/><rect x="90" y="138" width="30" height="16" rx="8"/></g>
-  <!-- wide body -->
-  <path d="M18 104 C18 62 44 40 80 40 C116 40 142 62 142 104 C142 132 118 148 80 148 C42 148 18 132 18 104 Z" fill="#a8141f" stroke="#2a0306" stroke-width="7" stroke-linejoin="round"/>
-  <ellipse cx="80" cy="124" rx="34" ry="18" fill="#c93038"/>
-  <path d="M36 82 C42 64 56 54 72 51" fill="none" stroke="#d94a50" stroke-width="6" stroke-linecap="round"/>
-  <!-- narrow glowing eyes under one heavy brow -->
-  <g fill="#ffd84a">
-    <ellipse cx="58" cy="86" rx="13" ry="9" filter="url(#glow)"/><ellipse cx="102" cy="86" rx="13" ry="9" filter="url(#glow)"/>
-    <ellipse cx="58" cy="86" rx="10" ry="7"/><ellipse cx="102" cy="86" rx="10" ry="7"/>
-  </g>
-  <g fill="#2a0306"><ellipse cx="60" cy="87" rx="3.5" ry="4.5"/><ellipse cx="100" cy="87" rx="3.5" ry="4.5"/></g>
-  <path d="M38 70 L80 80 L122 70" fill="none" stroke="#2a0306" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- underbite with tusks -->
-  <path d="M52 114 H108" stroke="#2a0306" stroke-width="7" stroke-linecap="round"/>
-  <g fill="#fff" stroke="#2a0306" stroke-width="3.5" stroke-linejoin="round"><path d="M56 116 l6 -16 l6 16 z"/><path d="M92 116 l6 -16 l6 16 z"/></g>
 </svg>

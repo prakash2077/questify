@@ -32,12 +32,12 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`, `scope.md > 
 Navigation: Today is home. Shop and Battleground are reachable from Today. Focus opens from a quest and returns to Today. The Penalty Zone takes over everything until cleared.
 
 ## Look and Feel
-- Black (AMOLED) background, close to the *Solo Leveling* System UI in typography and styling, with a "fire plus cool" feel; cute, cinematic, and not generic.
+- Black (AMOLED) background, close to the *Solo Leveling* System UI in typography and styling, with a "fire plus cool" feel; dark, cinematic, and not generic. Windows are panes of dark glass with cut corners in thin glowing frames.
 - Default accent is blue; the Penalty Zone is red to signal danger and importance. The user can switch the accent colour in Settings.
 - The intro is short, sleek, and 3D-looking, popping out of the black with a satisfying sound.
 - The fire is a real bonfire: a crackling, burning flame, like one you'd keep going while building or cooking something. That is the theme of the whole app. It is shown on Focus and on the Battleground, and the animation should look great.
-- Characters are 2D sprites drawn from scratch: thick, clean, Duolingo-style. Soldiers are friendly and cute; demons are red-themed.
-- Sound effects are important at key moments: intro, check-off, coins, buying a soldier, the Battleground, the Penalty Zone. The Battleground gets richer in sound as the army grows.
+- Characters are 2D sprites drawn from scratch as dark silhouettes: tall shadow soldiers with glowing eyes and a cold aura, and demons as huge horned shapes with burning red eyes against a blood moon. Sleek and cinematic, not cartoon. (Changed in the final review: the first version was thick, cute and Duolingo-style, and read as a small children's game.)
+- Sound is cinematic: deep impacts, bells, low brass and a choir in a large reverberant space, not beeps. Sound effects are important at key moments: intro, check-off, coins, buying a soldier, the Battleground, the Penalty Zone. The Battleground gets richer in sound as the army grows.
 - Tone: motivating and heartwarming, not harsh.
 
 ## Features and Behavior
@@ -107,7 +107,7 @@ Navigation: Today is home. Shop and Battleground are reachable from Today. Focus
 - Weeks left comes from date of birth plus an expected lifespan the user enters — an honest, visual reminder that time is limited.
 - Goals contain recurring sub-quests entered once — typing tasks daily would be a pain; this replaces the AI planner for now.
 - Levels get steeper over time — early wins feel fast, later levels feel earned.
-- Soldiers and demons are 2D, from-scratch, Duolingo-style sprites — clean, thick, cute.
+- Soldiers and demons are 2D, from-scratch sprites drawn as dark silhouettes with glowing eyes — the cute Duolingo-style first version was replaced in the final review because it looked like a children's game.
 - Missed means the deadline passes without a check-off.
 - Without a camera, the penalty can still be cleared — a rare fallback that exists so the user is never stuck.
 - XP mainly comes from finishing quests, plus a small amount from other things like a daily check-in.
