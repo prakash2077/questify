@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="120" height="140">
+  <defs><filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3"/></filter></defs>
+  <g fill="#4f6dff" opacity="0.6"><path d="M27 62 q-11 -13 -3 -27 q3 13 11 17 z"/><path d="M93 62 q11 -13 3 -27 q-3 13 -11 17 z"/></g>
+  <!-- sword -->
+  <g stroke="#080b16" stroke-width="5" stroke-linejoin="round">
+    <path d="M97 12 l8 13 v52 h-16 v-52 z" fill="#d7e6ff"/>
+    <path d="M97 22 v52" stroke="#9db6e0" stroke-width="3"/>
+    <rect x="83" y="75" width="28" height="9" rx="4.5" fill="#ffc94d"/>
+  </g>
+  <g fill="#161d38" stroke="#080b16" stroke-width="5"><rect x="35" y="122" width="21" height="14" rx="7"/><rect x="64" y="122" width="21" height="14" rx="7"/></g>
+  <ellipse cx="60" cy="90" rx="36" ry="39" fill="#25315c" stroke="#080b16" stroke-width="6"/><ellipse cx="60" cy="106" rx="20" ry="17" fill="#33447d"/>
+  <!-- helmet with a crest -->
+  <rect x="54" y="14" width="12" height="22" rx="6" fill="#5b7bff" stroke="#080b16" stroke-width="5"/>
+  <path d="M25 76 C25 41 43 29 60 29 C77 29 95 41 95 76 Z" fill="#3d4f8f" stroke="#080b16" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M36 50 C40 41 48 37 56 36" fill="none" stroke="#6f86d6" stroke-width="5" stroke-linecap="round"/>
+  <rect x="35" y="59" width="50" height="25" rx="12.5" fill="#080b16"/><g fill="#7fe3ff"><ellipse cx="49" cy="71.5" rx="7" ry="9" filter="url(#glow)"/><ellipse cx="71" cy="71.5" rx="7" ry="9" filter="url(#glow)"/><ellipse cx="49" cy="71.5" rx="4.6" ry="6.8"/><ellipse cx="71" cy="71.5" rx="4.6" ry="6.8"/></g><g fill="#fff"><circle cx="50.5" cy="69" r="1.6"/><circle cx="72.5" cy="69" r="1.6"/></g>
+  <circle cx="23" cy="98" r="9.5" fill="#25315c" stroke="#080b16" stroke-width="5"/>
+  <circle cx="97" cy="98" r="9.5" fill="#25315c" stroke="#080b16" stroke-width="5"/>
+</svg>

@@ -262,3 +262,71 @@ Nothing in what you get. One open question from the spec was settled: with the s
 2. In `js/fire.js`, change `FLAMES_PER_SECOND` to `40`, then `400`, and open Focus each time.
 3. In `js/fire.js`, find `ctx.globalCompositeOperation = 'lighter';` inside `draw` and comment that line out. The white-hot core disappears.
 4. In `js/audio.js`, find the `done()` sound and change `784` to `392`. Finish a quest and listen.
+
+---
+
+## Step 5: the Shop, your army and the Battleground
+
+### What you can do now
+
+Spend coins in the Shop on soldiers and weapons. You name each soldier as you buy it (the first one is offered the name Sung Jinwoo). On the Battleground your fire burns at the bottom, your named soldiers gather round it, weapons stand planted in the ground, and red demons loom behind. A new player sees only the fire. One demon arrives per level, and once there are six they keep getting bigger. The sound gets fuller as the army grows.
+
+For a demo there is a shortcut: Settings, Demo tools, "Add 100 test coins".
+
+### How it works
+
+- **`data/catalog.js`** is the price list: every soldier and weapon, its price and its drawing.
+- **`buyItem`** in `js/rewards.js` is the rule for spending coins.
+- **`js/screens/shop.js`** is the Shop screen and the naming window.
+- **`assets/sprites/`** holds the drawings, one SVG file each.
+- **`js/sprites.js`** loads the drawings. **`js/battleground.js`** arranges and animates the scene.
+- **`demonsForLevel`** in `js/config.js` decides how many demons there are and how big.
+
+Follow buying a soldier through the code:
+
+1. You tap a price in the Shop. `startPurchase` in `js/screens/shop.js` checks your coins first and, if you are short, says exactly how many you are missing.
+2. For a soldier it opens the naming window. Submitting it calls `finishPurchase`.
+3. `buyItem` takes the coins and adds `{ id, catalogId, name }` to `state.army`. That is all a soldier is in storage: which kind, and what you called it.
+4. On the Battleground, `arrange` in `js/battleground.js` reads `state.army` and gives each soldier a place around the fire.
+
+### Ideas worth learning
+
+**Data in one file, behaviour in another.** The Shop screen has no soldier names or prices in it. It loops over `CATALOG`. To add a new soldier you draw one SVG and add one line to `data/catalog.js`; no screen code changes. When a list of things might grow, keep the list as data.
+
+**A drawing can be code.** Each sprite is an SVG: a text file of shapes ("an ellipse here, a path there"). Open `assets/sprites/soldier-swordsman.svg` in a text editor and in a browser side by side. Every soldier shares the same body, visor and glowing eyes, and differs only in hat and gear, which is why they look like one family.
+
+**Faking depth on a flat screen.** The Battleground uses three old tricks, all in `js/battleground.js`:
+
+1. **An oval instead of a circle.** A ring of soldiers seen from the side looks like a flat oval, so `onOval` squashes the circle (`rx` wide, `ry` tall).
+2. **Draw the far things first.** Everything is sorted by how low it is on screen, and drawn top to bottom, so nearer soldiers overlap further ones. The fire is drawn in the middle of that order: soldiers behind it, then the fire, then soldiers in front.
+3. **Distance is darkness.** The demons are drawn normally, then a veil of darkness is painted over all of them, thickest near the ground. They read as far away and large.
+
+**Work out the layout once, then only animate.** `arrange` runs once when you open the screen and decides where everything stands. The loop that runs 60 times a second (`drawScene`) does only the cheap part: a little bob, a little sway, and the fire.
+
+**Turn each drawing into a picture once.** An SVG is a recipe, and following it for 25 characters, 60 times a second, is slow. `stampFor` in `js/sprites.js` follows the recipe once per size, keeps the result as a plain bitmap, and reuses it every frame. Doing expensive work once and keeping the result is called caching.
+
+**Loading takes time, and the user does not wait.** The drawings load in the background. If you tapped Back before they arrived, the old code would have started an animation on a screen you had already left. `enter` in `js/battleground.js` takes a ticket number (`visit`) before waiting, and checks it afterwards; if the number has moved on, it stops.
+
+**Layers of sound.** `startArmySound` in `js/audio.js` adds one layer for every two soldiers: a low hum, a note above it, a high shimmer, and at seven soldiers a slow drum.
+
+### How it was checked
+
+- Nine new rule checks: a blocked purchase changes nothing, a soldier needs a name and a weapon does not, level 1 has no demons, and demons never get fewer or smaller as the level rises.
+- The browser script tried to buy with no coins, added test coins, bought and named two soldiers and a sword, and confirmed the Battleground's description of itself matched: "Level 1 · 2 soldiers · 1 weapon · 0 demons".
+- Screenshots at level 2, 6 and 12 were inspected by eye. They showed three problems, all fixed: soldiers in front were hiding the names of soldiers behind (names are now drawn last, on top of everything), overlapping demons were see-through (they are now drawn solid and dimmed together), and soldiers in the second ring stood directly behind those in the first (the second ring is now turned so they stand in the gaps).
+
+The practice to reuse: a check that passes tells you the logic is right, not that it looks right. For anything visual, look at it.
+
+### What changed from the plan
+
+Nothing in what you get, but three choices were made that the plan had left open. All are yours to change:
+
+- **The catalog.** Four soldiers (Swordsman 20, Archer 35, Mage 50, Knight 80) and three weapons (Sword 10, Spear 15, Axe 25). A full day of quests earns 30 coins, so the first soldier is within reach on day one.
+- **"The first soldier is Sung Jinwoo"** was read as: the first soldier you buy is offered that name, and you can change it.
+- **No demons at level 1**, so that a new player really does see only the fire.
+
+### Try it yourself
+
+1. Add a soldier to the Shop without touching any screen: copy `assets/sprites/soldier-swordsman.svg` to `soldier-guard.svg`, change a colour in it, and add `{ id: 'guard', kind: 'soldier', label: 'Shadow Guard', price: 5, sprite: 'soldier-guard' }` to `data/catalog.js`. Then run `node tests/check-logic.mjs` and read why one check fails.
+2. In `js/config.js`, change `demonsForLevel` so level 1 already has two demons. Which check objects, and why does the plan care?
+3. In `js/battleground.js`, change the first ring's `ry` from `0.07` to `0.2`. The camp is now seen from above instead of from the side.

@@ -68,6 +68,15 @@ const sounds = {
     });
     for (const from of [1047, 1319, 1568]) tone({ type: 'sine', from, dur: 1.2, at: 1, vol: 0.09 });
   },
+  // Buying in the Shop: coins paid out, then a shadow rising.
+  purchase() {
+    [2093, 1568, 1319].forEach((from, i) => {
+      tone({ type: 'square', from, dur: 0.08, at: i * 0.06, vol: 0.05 });
+    });
+    tone({ type: 'sawtooth', from: 82, to: 330, dur: 0.6, at: 0.22, vol: 0.1 });
+    tone({ type: 'triangle', from: 220, to: 880, dur: 0.6, at: 0.22, vol: 0.14 });
+    tone({ type: 'sine', from: 1319, dur: 0.7, at: 0.75, vol: 0.12 });
+  },
   // Daily check-in: one soft rising note.
   checkIn() {
     tone({ type: 'sine', from: 660, to: 880, dur: 0.18, vol: 0.14 });
@@ -137,4 +146,65 @@ export function stopFireSound() {
   clearInterval(pops);
   gain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.1);
   roar.stop(ctx.currentTime + 0.5);
+}
+
+// ---------- The army's presence on the Battleground ----------
+// One layer of sound per few soldiers, so a bigger army sounds bigger:
+// a low hum, then a note above it, then a high shimmer, then war drums.
+
+const ARMY_LAYERS = [
+  { type: 'sine', freq: 55, vol: 0.16, wobble: 0.13 },
+  { type: 'triangle', freq: 82.4, vol: 0.07, wobble: 0.21 },
+  { type: 'sine', freq: 220, vol: 0.03, wobble: 0.34 },
+];
+
+let armySound = null;
+
+export function startArmySound(layers) {
+  if (!ctx || armySound || layers < 1 || getState().settings.muted) return;
+  const now = ctx.currentTime;
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.0001, now);
+  master.gain.exponentialRampToValueAtTime(1, now + 2);
+  master.connect(ctx.destination);
+
+  const voices = [];
+  for (const layer of ARMY_LAYERS.slice(0, layers)) {
+    const voice = ctx.createOscillator();
+    voice.type = layer.type;
+    voice.frequency.value = layer.freq;
+    const level = ctx.createGain();
+    level.gain.value = layer.vol;
+    // A slow wobble in loudness keeps the hum alive instead of flat.
+    const wobble = ctx.createOscillator();
+    wobble.frequency.value = layer.wobble;
+    const depth = ctx.createGain();
+    depth.gain.value = layer.vol * 0.5;
+    wobble.connect(depth).connect(level.gain);
+    voice.connect(level).connect(master);
+    voice.start();
+    wobble.start();
+    voices.push(voice, wobble);
+  }
+
+  // The fourth layer: a slow double drum beat.
+  let drums = null;
+  if (layers > ARMY_LAYERS.length) {
+    const beat = () => {
+      tone({ type: 'sine', from: 90, to: 42, dur: 0.35, vol: 0.28 });
+      tone({ type: 'sine', from: 90, to: 42, dur: 0.35, at: 0.28, vol: 0.2 });
+    };
+    beat();
+    drums = setInterval(beat, 2400);
+  }
+  armySound = { master, voices, drums };
+}
+
+export function stopArmySound() {
+  if (!armySound) return;
+  const { master, voices, drums } = armySound;
+  armySound = null;
+  clearInterval(drums);
+  master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.15);
+  for (const voice of voices) voice.stop(ctx.currentTime + 0.8);
 }

@@ -51,7 +51,7 @@ Resume note: the learner pushes to GitHub themselves (the live link is https://q
   Learner check: Tap Focus on a quest and watch the fire for a few seconds. Check the quest off and listen for the reward. Tap Check in once, then again. Say whether the fire feels like a real bonfire, and what you would change about how it looks, moves or sounds.
   Commit: `Add Focus mode, bonfire and rewards`
 
-- [ ] **5. Spend coins on soldiers and watch your army gather on the Battleground**
+- [x] **5. Spend coins on soldiers and watch your army gather on the Battleground**
   Becomes usable: The Shop lists soldiers and weapons with coin prices and blocks a purchase you cannot afford. You buy a soldier, name it, and it stands by your fire on the Battleground with its name. Weapons stick in the ground around the fire, demons loom behind and grow with your level, and the sound gets richer as the army grows.
   Why now: It needs the coins and the bonfire from the step before. It completes the core loop, so after this the whole day (quest, focus, reward, army, penalty) can be run end to end.
   PRD ref: `prd.md > The Core Journey` (steps 6-7), `prd.md > Features and Behavior > Shop and Army`, `prd.md > Features and Behavior > Battleground`
@@ -106,3 +106,7 @@ Activity mode: not started
 - The early phone check is being done together with the fire checkpoint after slice 4 instead of straight after slice 3 — the learner pushed, the live link passed, and they asked to keep building before trying the phone; the checkpoint box stays unticked until they report.
 - The two mid-build hands-on checkpoints (phone after slice 3, fire after slice 4) are folded into the final review — the learner chose fast mode to finish quickly and, when each pause came up, asked to continue. Their boxes are ticked only when the learner reports on those items.
 - The level curve keeps the spec's numbers (50 XP for level 1, 1.33 times more per level) — checked in the build: a full first day reaches level 2 and level 10 takes about ten days. The spec's other note, "levels 1 to 3 in about a day", conflicts with the ten-day target under one formula, so it was not applied; both numbers are in `js/config.js`.
+- The Shop catalog was proposed in the build, as the spec left it open: four soldiers (20, 35, 50, 80 coins) and three weapons (10, 15, 25) — priced against the 30 coins a full day of quests earns, so the first soldier is reachable on day one. The learner can change any of it in `data/catalog.js`.
+- "The first soldier is Sung Jinwoo" is implemented as the suggested name for the first soldier bought, which the learner can overtype — the spec did not say whether it was a soldier type or a name, and naming every soldier is a PRD requirement.
+- Level 1 has no demons; one arrives per level up to six, then they keep growing — needed so the PRD criterion "at the start, only the fire is shown" and "demons are larger or more numerous at a higher level" both hold.
+- Check in, Shop and Battleground sit in one row of buttons under the coins and XP on Today — three separate buttons pushed the quest list below the fold on a phone.

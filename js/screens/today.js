@@ -12,7 +12,7 @@ import {
   upcomingQuests,
 } from '../quests.js';
 import { CHECK_IN_XP } from '../config.js';
-import { canCheckIn, checkIn, completeQuest, levelInfo } from '../rewards.js';
+import { armyOf, canCheckIn, checkIn, completeQuest, levelInfo } from '../rewards.js';
 import { enforcePenalty } from '../penalty.js';
 import { openQuestSheet, questSummary } from './setup.js';
 
@@ -128,7 +128,10 @@ function renderHud(state, today) {
 
   const available = canCheckIn(state, today);
   $('today-checkin').disabled = !available;
-  $('today-checkin').textContent = available ? `Check in · +${CHECK_IN_XP} XP` : 'Checked in today';
+  $('today-checkin-note').textContent = available ? `+${CHECK_IN_XP} XP` : 'Done today';
+
+  const soldiers = armyOf(state).soldiers.length;
+  $('today-army-note').textContent = soldiers === 0 ? 'Your fire' : soldiers === 1 ? '1 soldier' : `${soldiers} soldiers`;
 }
 
 function render() {
@@ -165,6 +168,8 @@ export function initToday(theApp) {
 
   $('today-add-quest').addEventListener('click', () => openQuestSheet(render));
   $('today-settings').addEventListener('click', () => app.go('settings'));
+  $('today-shop').addEventListener('click', () => app.go('shop'));
+  $('today-battleground').addEventListener('click', () => app.go('battleground'));
   $('today-checkin').addEventListener('click', () => {
     let reward;
     update((state) => {

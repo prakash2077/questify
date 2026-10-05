@@ -1,9 +1,10 @@
 // Checks the app's rules without a browser. Run with: node tests/check-logic.mjs
 
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
-import { CHECK_IN_XP, MAX_QUESTS, XP_BY_PRIORITY, xpToNext } from '../js/config.js';
-import { canCheckIn, checkIn, completeQuest, levelInfo } from '../js/rewards.js';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { CHECK_IN_XP, MAX_QUESTS, XP_BY_PRIORITY, demonsForLevel, soundLayersFor, xpToNext } from '../js/config.js';
+import { armyOf, buyItem, canCheckIn, checkIn, completeQuest, levelInfo } from '../js/rewards.js';
+import { CATALOG, FIRST_SOLDIER_NAME } from '../data/catalog.js';
 import {
   addDays,
   addQuest,
@@ -272,6 +273,82 @@ check('missing a quest never removes coins, XP or levels', () => {
   addQuest(state, quest(), noon);
   assert.equal(findMissed(state, at(6, 9)).length, 1);
   assert.deepEqual([state.coins, state.xp, state.level], [40, 70, 2]);
+});
+
+// ---------- Shop and army ----------
+
+const price = (id) => CATALOG.find((item) => item.id === id).price;
+
+check('the Shop sells soldiers and weapons, each with a price and a drawing', () => {
+  assert.ok(CATALOG.some((item) => item.kind === 'soldier'));
+  assert.ok(CATALOG.some((item) => item.kind === 'weapon'));
+  for (const item of CATALOG) {
+    assert.ok(item.price > 0 && item.label && item.sprite, item.id);
+    assert.ok(existsSync(new URL(`../assets/sprites/${item.sprite}.svg`, import.meta.url)), `drawing for ${item.id}`);
+  }
+  assert.equal(new Set(CATALOG.map((item) => item.id)).size, CATALOG.length, 'ids are unique');
+  assert.equal(FIRST_SOLDIER_NAME, 'Sung Jinwoo');
+});
+
+check('a purchase is blocked when coins are short, and nothing changes', () => {
+  const state = player({ coins: price('swordsman') - 1, army: [] });
+  assert.deepEqual(buyItem(state, 'swordsman', 'Igris'), { ok: false, reason: 'coins', short: 1 });
+  assert.equal(state.coins, price('swordsman') - 1);
+  assert.deepEqual(state.army, []);
+});
+
+check('buying a soldier spends the coins and saves it with its name', () => {
+  const state = player({ coins: 100, army: [] });
+  const result = buyItem(state, 'swordsman', '  Igris  ');
+  assert.equal(result.ok, true);
+  assert.equal(state.coins, 100 - price('swordsman'));
+  assert.equal(state.army.length, 1);
+  assert.deepEqual([state.army[0].catalogId, state.army[0].name], ['swordsman', 'Igris']);
+});
+
+check('a soldier needs a name; a weapon does not', () => {
+  const state = player({ coins: 100, army: [] });
+  assert.deepEqual(buyItem(state, 'swordsman', '   '), { ok: false, reason: 'name' });
+  assert.equal(state.coins, 100);
+  assert.equal(buyItem(state, 'sword').ok, true);
+  assert.equal(state.army[0].name, null);
+  assert.equal(buyItem(state, 'no-such-thing', 'x').reason, 'unknown');
+});
+
+check('the army is split into soldiers and weapons, in the order bought', () => {
+  const state = player({ coins: 500, army: [] });
+  buyItem(state, 'swordsman', 'Igris');
+  buyItem(state, 'sword');
+  buyItem(state, 'mage', 'Beru');
+  const { soldiers, weapons } = armyOf(state);
+  assert.deepEqual(soldiers.map((s) => s.name), ['Igris', 'Beru']);
+  assert.deepEqual(weapons.map((w) => w.item.label), ['Iron Sword']);
+});
+
+check('the first soldier is affordable after one full day of quests', () => {
+  const cheapest = Math.min(...CATALOG.filter((item) => item.kind === 'soldier').map((item) => item.price));
+  assert.ok(cheapest <= 5 + 10 + 15, `cheapest soldier costs ${cheapest}`);
+});
+
+// ---------- Battleground ----------
+
+check('at level 1 there are no demons: only the fire', () => {
+  assert.equal(demonsForLevel(1).count, 0);
+});
+
+check('higher levels bring more demons, then bigger ones, and never fewer or smaller', () => {
+  for (let level = 1; level < 40; level++) {
+    const now = demonsForLevel(level);
+    const next = demonsForLevel(level + 1);
+    assert.ok(next.count >= now.count && next.scale >= now.scale, `level ${level + 1}`);
+    assert.ok(next.count > now.count || next.scale > now.scale || level >= 18, `level ${level + 1} changes something`);
+  }
+  assert.ok(demonsForLevel(2).count === 1 && demonsForLevel(5).count === 4);
+  assert.ok(demonsForLevel(12).scale > demonsForLevel(7).scale, 'once the horde is full, the demons keep growing');
+});
+
+check('the Battleground gains a sound layer for every few soldiers', () => {
+  assert.deepEqual([0, 1, 2, 3, 4, 5, 6, 7, 20].map(soundLayersFor), [0, 1, 1, 2, 2, 3, 3, 4, 4]);
 });
 
 // ---------- Weeks left ----------

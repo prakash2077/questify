@@ -6,6 +6,8 @@ import { enforcePenalty, initPenalty, startWatching } from './penalty.js';
 import { initSetup } from './screens/setup.js';
 import { initToday } from './screens/today.js';
 import { initFocus } from './screens/focus.js';
+import { initShop } from './screens/shop.js';
+import { initBattleground } from './battleground.js';
 import { initSettings } from './screens/settings.js';
 
 const screens = {}; // name -> { enter, leave }
@@ -101,12 +103,14 @@ const app = {
   register,
   celebrate,
   notify: (text, title) => showNotice({ text, title }),
-  confirm: (text, title) => showNotice({ text, title, yes: 'Yes', no: 'No' }),
+  confirm: (text, title, { yes = 'Yes', no = 'No' } = {}) => showNotice({ text, title, yes, no }),
 };
 
 initSetup(app);
 initToday(app);
 initFocus(app);
+initShop(app);
+initBattleground(app);
 initSettings(app);
 initPenalty(app);
 

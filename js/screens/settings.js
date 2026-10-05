@@ -1,6 +1,7 @@
 // Settings: the Proof Gallery and the Demo tools.
 
 import { getState, resetAll, update } from '../store.js';
+import { DEMO_COINS } from '../config.js';
 import { dateStr, deadlineAt, isDone, questsFor, upcomingQuests } from '../quests.js';
 import { initGallery, releaseGallery, renderGallery } from './gallery.js';
 
@@ -51,5 +52,11 @@ export function initSettings(theApp) {
 
   $('settings-back').addEventListener('click', () => app.go('today'));
   $('demo-due-soon').addEventListener('click', dueInOneMinute);
+  $('demo-coins').addEventListener('click', () => {
+    update((state) => {
+      state.coins += DEMO_COINS;
+    });
+    app.notify(`${DEMO_COINS} test coins added. You now have ${getState().coins}.`, 'Demo tools');
+  });
   $('demo-reset').addEventListener('click', resetEverything);
 }

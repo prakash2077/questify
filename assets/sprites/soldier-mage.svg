@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="120" height="140">
+  <defs><filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3"/></filter></defs>
+  <g fill="#4f6dff" opacity="0.6"><path d="M27 62 q-11 -13 -3 -27 q3 13 11 17 z"/><path d="M93 62 q11 -13 3 -27 q-3 13 -11 17 z"/></g>
+  <!-- staff with a glowing orb -->
+  <g stroke="#080b16" stroke-width="5" stroke-linecap="round">
+    <path d="M100 34 L100 132" stroke-width="11"/>
+    <path d="M100 34 L100 132" stroke="#7a4a22"/>
+  </g>
+  <circle cx="100" cy="24" r="17" fill="#b26bff" filter="url(#glow)" opacity="0.9"/>
+  <circle cx="100" cy="24" r="12" fill="#c99bff" stroke="#080b16" stroke-width="5"/>
+  <circle cx="96" cy="20" r="3.5" fill="#fff"/>
+  <g fill="#161d38" stroke="#080b16" stroke-width="5"><rect x="35" y="122" width="21" height="14" rx="7"/><rect x="64" y="122" width="21" height="14" rx="7"/></g>
+  <ellipse cx="60" cy="90" rx="36" ry="39" fill="#25315c" stroke="#080b16" stroke-width="6"/><ellipse cx="60" cy="106" rx="20" ry="17" fill="#33447d"/>
+  <!-- wizard hat -->
+  <path d="M30 62 C40 40 46 22 44 6 C58 12 74 34 86 62 Z" fill="#5a3fa8" stroke="#080b16" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="60" cy="62" rx="44" ry="11" fill="#6b4fc4" stroke="#080b16" stroke-width="6"/>
+  <path d="M47 46 l4 -8 l4 8 l-8 -5 h8 z" fill="#ffc94d"/>
+  <g transform="translate(0 6)"><rect x="35" y="59" width="50" height="25" rx="12.5" fill="#080b16"/><g fill="#7fe3ff"><ellipse cx="49" cy="71.5" rx="7" ry="9" filter="url(#glow)"/><ellipse cx="71" cy="71.5" rx="7" ry="9" filter="url(#glow)"/><ellipse cx="49" cy="71.5" rx="4.6" ry="6.8"/><ellipse cx="71" cy="71.5" rx="4.6" ry="6.8"/></g><g fill="#fff"><circle cx="50.5" cy="69" r="1.6"/><circle cx="72.5" cy="69" r="1.6"/></g></g>
+  <circle cx="23" cy="98" r="9.5" fill="#25315c" stroke="#080b16" stroke-width="5"/>
+  <circle cx="97" cy="98" r="9.5" fill="#25315c" stroke="#080b16" stroke-width="5"/>
+</svg>

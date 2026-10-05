@@ -3,7 +3,8 @@
 // Nothing here ever takes coins or XP away; missing a quest costs a penalty, not progress.
 
 import { CHECK_IN_XP, COINS_BY_PRIORITY, XP_BY_PRIORITY, xpToNext } from './config.js';
-import { isDone, markDone } from './quests.js';
+import { isDone, markDone, newId } from './quests.js';
+import { CATALOG, MAX_SOLDIER_NAME } from '../data/catalog.js';
 
 // The level a total amount of XP adds up to, and how far into that level it is.
 export function levelInfo(xp) {
@@ -34,6 +35,41 @@ export function completeQuest(state, quest, date) {
   const levelsGained = addXp(state, xp);
   return { xp, coins, levelsGained, level: state.level };
 }
+
+// ---------- Spending coins ----------
+
+// Buys one Shop item. Soldiers need a name; weapons do not.
+// Returns { ok: true, owned, item }, or { ok: false, reason } with nothing changed:
+// 'coins' (with how many are missing in `short`), 'name', or 'unknown'.
+export function buyItem(state, catalogId, name) {
+  const item = CATALOG.find((entry) => entry.id === catalogId);
+  if (!item) return { ok: false, reason: 'unknown' };
+  if (state.coins < item.price) return { ok: false, reason: 'coins', short: item.price - state.coins };
+
+  let soldierName = null;
+  if (item.kind === 'soldier') {
+    soldierName = String(name ?? '').trim().slice(0, MAX_SOLDIER_NAME);
+    if (!soldierName) return { ok: false, reason: 'name' };
+  }
+
+  state.coins -= item.price;
+  const owned = { id: newId(), catalogId, name: soldierName };
+  state.army.push(owned);
+  return { ok: true, owned, item };
+}
+
+// The army split into what the Battleground draws: soldiers and weapons, in the order bought.
+export function armyOf(state) {
+  const withItem = state.army
+    .map((owned) => ({ ...owned, item: CATALOG.find((entry) => entry.id === owned.catalogId) }))
+    .filter((owned) => owned.item);
+  return {
+    soldiers: withItem.filter((owned) => owned.item.kind === 'soldier'),
+    weapons: withItem.filter((owned) => owned.item.kind === 'weapon'),
+  };
+}
+
+// ---------- Daily check-in ----------
 
 export function canCheckIn(state, date) {
   return !state.days[date]?.checkedIn;

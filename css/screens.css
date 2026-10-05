@@ -452,11 +452,6 @@
   font-weight: 700;
 }
 
-.btn--checkin {
-  align-self: flex-start;
-  margin-top: -8px;
-}
-
 /* ---------- Today: the right-hand side of a quest row ---------- */
 
 .quest__side {
@@ -553,4 +548,186 @@
   margin: 0 22px calc(26px + env(safe-area-inset-bottom));
   border-color: #2a2a2a;
   color: #b9b9b9;
+}
+
+/* ---------- Today: Check in, Shop, Battleground ---------- */
+
+.today-nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: -8px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 6px 4px;
+  background: #000;
+  border: 1px solid var(--line-soft);
+  border-radius: 2px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tile:active {
+  transform: scale(0.97);
+}
+
+.tile:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+.tile__name {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tile__note {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+/* ---------- Shop ---------- */
+
+.shop-coins {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: var(--gold);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.shop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shop-item {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  background: var(--fill);
+  border: 1px solid var(--line-soft);
+}
+
+.shop-item__art {
+  width: 60px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.shop-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.shop-item__name {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.shop-item__owned {
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.shop-item__buy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 78px;
+  justify-content: center;
+  border-color: color-mix(in srgb, var(--gold) 60%, transparent);
+  color: var(--gold);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+}
+
+/* Not enough coins yet: still tappable, so the Shop can say what is missing. */
+.shop-item__buy.is-short {
+  opacity: 0.45;
+}
+
+.name-sheet__art {
+  align-self: center;
+  width: 96px;
+  height: 112px;
+  object-fit: contain;
+}
+
+/* ---------- Battleground ---------- */
+
+.screen[data-screen='battleground'].is-active {
+  position: relative;
+  justify-content: space-between;
+  height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.battle__scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.battle__top,
+.battle__bottom {
+  position: relative; /* above the canvas */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: calc(12px + env(safe-area-inset-top)) 14px 12px;
+}
+
+.battle__top {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.85), transparent);
+}
+
+.battle__top .eyebrow {
+  flex: 1;
+  color: var(--text);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-align: right;
+}
+
+.battle__bottom {
+  justify-content: flex-end;
+  padding: 12px 14px calc(16px + env(safe-area-inset-bottom));
+}
+
+.battle__bottom .system-line {
+  flex: 1;
+  color: var(--text-dim);
+  font-size: 16px;
+  text-shadow: none;
+}
+
+.battle__bottom .system-line:empty {
+  visibility: hidden;
 }

@@ -106,7 +106,12 @@
           <span class="visually-hidden">coins</span>
         </div>
       </div>
-      <button class="btn btn--small btn--checkin" id="today-checkin" type="button"></button>
+      <!-- Check in, and the ways to the Shop and the Battleground. -->
+      <nav class="today-nav">
+        <button class="tile" id="today-checkin" type="button"><span class="tile__name">Check in</span><span class="tile__note" id="today-checkin-note"></span></button>
+        <button class="tile" id="today-shop" type="button"><span class="tile__name">Shop</span><span class="tile__note">Spend coins</span></button>
+        <button class="tile" id="today-battleground" type="button"><span class="tile__name">Battleground</span><span class="tile__note" id="today-army-note"></span></button>
+      </nav>
 
       <div class="panel">
         <h1 class="panel__title">Daily quests</h1>
@@ -129,6 +134,37 @@
       <h1 class="focus__quest" id="focus-quest"></h1>
       <canvas class="focus__fire" id="focus-fire" aria-hidden="true"></canvas>
       <button class="btn focus__done" id="focus-done" type="button">Quest complete</button>
+    </section>
+
+    <!-- Shop: spend coins on soldiers and weapons. -->
+    <section class="screen" data-screen="shop">
+      <header class="head-row">
+        <h1 class="eyebrow">Shop</h1>
+        <p class="shop-coins"><span class="coin" aria-hidden="true"></span><span id="shop-coins">0</span><span class="visually-hidden">coins</span></p>
+        <button class="btn btn--small" id="shop-back" type="button">Back</button>
+      </header>
+      <div class="panel">
+        <h2 class="panel__title">Soldiers</h2>
+        <ul class="shop-list" id="shop-soldiers"></ul>
+      </div>
+      <div class="panel">
+        <h2 class="panel__title">Weapons</h2>
+        <ul class="shop-list" id="shop-weapons"></ul>
+      </div>
+      <button class="btn btn--wrap" id="shop-battleground" type="button">See the Battleground</button>
+    </section>
+
+    <!-- Battleground: the fire, your army around it, demons behind. One full-screen canvas. -->
+    <section class="screen" data-screen="battleground">
+      <canvas class="battle__scene" id="battle-scene" role="img"></canvas>
+      <header class="battle__top">
+        <button class="btn btn--small" id="battle-back" type="button">Back</button>
+        <p class="eyebrow" id="battle-caption"></p>
+      </header>
+      <footer class="battle__bottom">
+        <p class="system-line system-line--center" id="battle-hint"></p>
+        <button class="btn btn--small" id="battle-shop" type="button">Shop</button>
+      </footer>
     </section>
 
     <!-- Penalty Zone: takes over the whole app until the penalty is cleared. -->
@@ -200,6 +236,7 @@
         <h2 class="panel__title">Demo tools</h2>
         <p class="system-line">Shortcuts for showing the app in a demo. They are not part of normal use.</p>
         <button class="btn btn--wrap" id="demo-due-soon" type="button">Make my next quest due in 1 minute</button>
+        <button class="btn btn--wrap" id="demo-coins" type="button">Add 100 test coins</button>
         <button class="btn btn--wrap" id="demo-reset" type="button">Reset all data</button>
       </div>
     </section>
@@ -252,6 +289,21 @@
       <div class="actions">
         <button class="btn" id="quest-cancel" type="button">Cancel</button>
         <button class="btn btn--primary" type="submit">Add quest</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Naming a new soldier. -->
+  <dialog class="modal" id="name-sheet">
+    <form class="panel" id="name-form" novalidate>
+      <h2 class="panel__title">Arise</h2>
+      <img class="name-sheet__art" id="name-art" alt="">
+      <p class="system-line system-line--center" id="name-prompt"></p>
+      <input class="input" id="name-input" type="text" maxlength="16" autocomplete="off" aria-label="Soldier name">
+      <p class="field-error" id="name-error" role="alert" hidden>Give your soldier a name.</p>
+      <div class="actions">
+        <button class="btn" id="name-cancel" type="button">Cancel</button>
+        <button class="btn btn--primary" type="submit">Arise</button>
       </div>
     </form>
   </dialog>

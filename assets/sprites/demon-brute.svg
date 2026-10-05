@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <defs><filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="4"/></filter></defs>
+  <!-- big curved horns -->
+  <g fill="#f3e2c0" stroke="#2a0306" stroke-width="6" stroke-linejoin="round">
+    <path d="M44 62 C14 56 4 30 12 8 C22 28 40 36 60 40 Z"/>
+    <path d="M116 62 C146 56 156 30 148 8 C138 28 120 36 100 40 Z"/>
+  </g>
+  <!-- fists -->
+  <g fill="#8e0f1a" stroke="#2a0306" stroke-width="6"><rect x="2" y="96" width="30" height="30" rx="12"/><rect x="128" y="96" width="30" height="30" rx="12"/></g>
+  <!-- feet -->
+  <g fill="#6f0b14" stroke="#2a0306" stroke-width="6"><rect x="40" y="138" width="30" height="16" rx="8"/><rect x="90" y="138" width="30" height="16" rx="8"/></g>
+  <!-- wide body -->
+  <path d="M18 104 C18 62 44 40 80 40 C116 40 142 62 142 104 C142 132 118 148 80 148 C42 148 18 132 18 104 Z" fill="#a8141f" stroke="#2a0306" stroke-width="7" stroke-linejoin="round"/>
+  <ellipse cx="80" cy="124" rx="34" ry="18" fill="#c93038"/>
+  <path d="M36 82 C42 64 56 54 72 51" fill="none" stroke="#d94a50" stroke-width="6" stroke-linecap="round"/>
+  <!-- narrow glowing eyes under one heavy brow -->
+  <g fill="#ffd84a">
+    <ellipse cx="58" cy="86" rx="13" ry="9" filter="url(#glow)"/><ellipse cx="102" cy="86" rx="13" ry="9" filter="url(#glow)"/>
+    <ellipse cx="58" cy="86" rx="10" ry="7"/><ellipse cx="102" cy="86" rx="10" ry="7"/>
+  </g>
+  <g fill="#2a0306"><ellipse cx="60" cy="87" rx="3.5" ry="4.5"/><ellipse cx="100" cy="87" rx="3.5" ry="4.5"/></g>
+  <path d="M38 70 L80 80 L122 70" fill="none" stroke="#2a0306" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- underbite with tusks -->
+  <path d="M52 114 H108" stroke="#2a0306" stroke-width="7" stroke-linecap="round"/>
+  <g fill="#fff" stroke="#2a0306" stroke-width="3.5" stroke-linejoin="round"><path d="M56 116 l6 -16 l6 16 z"/><path d="M92 116 l6 -16 l6 16 z"/></g>
+</svg>

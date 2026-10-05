@@ -116,11 +116,11 @@ Check-off awards coins and XP, with a sound and a small animation.
 PRD ref: `prd.md > Features and Behavior > Coins, XP and Levels`.
 
 ### Shop and Army
-A list from `catalog.js` of soldiers and weapons with coin prices. The first soldier is **Sung Jinwoo**. Buying checks coins (blocks with a message if short), asks for a name for soldiers, saves the item, and plays a sound. **Weapons** are stuck into the ground around the fire on the Battleground.
+A list from `catalog.js` of soldiers and weapons with coin prices: Shadow Swordsman 20, Archer 35, Mage 50, Knight 80; Iron Sword 10, War Spear 15, Battle Axe 25. The first soldier you buy is offered the name **Sung Jinwoo**, which you can change. Buying checks coins (blocks with a message if short), asks for a name for soldiers, saves the item, and plays a sound. **Weapons** are stuck into the ground around the fire on the Battleground.
 PRD ref: `prd.md > Features and Behavior > Shop and Army`.
 
 ### Battleground
-Full-screen canvas: fire at the bottom, owned soldiers placed in a ring around it with their names, demons in the background. The demon count and size grow with level (`demonsForLevel(level)` in `config.js`). Everything is an ambient loop (bobbing, swaying); there is no combat. At the start only the fire shows. `audio.js` adds a sound layer for every few soldiers.
+Full-screen canvas: fire at the bottom, owned soldiers placed in a ring around it with their names, demons in the background. The demon count and size grow with level (`demonsForLevel(level)` in `config.js`). Everything is an ambient loop (bobbing, swaying); there is no combat. At the start only the fire shows: level 1 has no demons, one arrives per level up to six, and after that they keep growing. `audio.js` adds a sound layer for every few soldiers.
 PRD ref: `prd.md > Features and Behavior > Battleground`.
 
 ### Penalty Zone

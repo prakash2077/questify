@@ -29,6 +29,26 @@ export function xpToNext(level) {
   return Math.round(LEVEL_BASE_XP * LEVEL_GROWTH ** (level - 1));
 }
 
+// Battleground: how many demons loom in the background, and how big they are.
+// Level 1 has none, so a new player sees only their fire. One more arrives per
+// level up to MAX_DEMONS, and they keep growing after that.
+export const MAX_DEMONS = 6;
+export function demonsForLevel(level) {
+  return {
+    count: Math.min(Math.max(level - 1, 0), MAX_DEMONS),
+    scale: Math.min(0.8 + 0.07 * Math.max(level - 2, 0), 1.9),
+  };
+}
+// One extra layer of Battleground sound for every this-many soldiers.
+export const SOLDIERS_PER_SOUND_LAYER = 2;
+export const MAX_SOUND_LAYERS = 4;
+export function soundLayersFor(soldierCount) {
+  return Math.min(Math.ceil(soldierCount / SOLDIERS_PER_SOUND_LAYER), MAX_SOUND_LAYERS);
+}
+
+// Demo tools
+export const DEMO_COINS = 100;
+
 // Penalty Zone
 export const PENALTY_CHECK_MS = 15 * 1000; // how often an open app looks for missed deadlines
 export const FALLBACK_PHRASE = 'I did it';
