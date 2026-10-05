@@ -455,40 +455,48 @@ Then each app sound is a short score: the intro is a rush, a boom, two braams, a
 
 ---
 
-## Final review, rounds 2 and 3: a guess that missed
+## Final review, round 2: intensity
 
 ### What happened
 
-1. You said: make it "even more gamified and intense".
-2. The agent did not ask what you pictured. It guessed that "intense" meant *more effects*, and built a lot of them in one go: a full-screen flash, sparks, a screen shake and a vibration on every reward; red glowing screen edges and a ticking clock as a deadline approached; a two-and-a-half-second "Arise" sequence; lightning.
-3. Every check passed. 298 of them.
-4. You tried it and said it felt "vague and annoying".
-5. The whole round was taken back out. The app is now exactly the version you called great.
+You liked the new look and asked for the app to be "even more gamified and intense". Those are two different requests, and they were handled differently on purpose.
 
-This is the most useful thing that happened in the whole build, so it is worth being plain about it.
+- **Intense** is about feel. The same rules, staged harder. That was built straight away.
+- **Gamified** means new rules: ranks, streaks, bosses. Each one changes the PRD and is one more thing to build, test and show in a short demo. That is a scope decision, so it went back to you as a question instead of being guessed at.
 
-### Why it went wrong
+The practice to reuse: when a request is vague, split it into the part that is safe to act on and the part that needs a decision, do the first, and ask about the second.
 
-**A vague request can only get a guess.** "Intense" could have meant harder penalties, higher stakes, faster pacing, a boss, a streak, or louder effects. The agent picked one and built it confidently. It was the agent's job to ask before building, and it did not. The planning steps at the start of this project worked precisely because they would not accept a vague answer: the scope step kept asking until "a level-up app" became "an app that locks itself until you do a penalty you chose in advance".
+### What changed
 
-**Passing checks is not the same as being good.** All 298 checks were green. They proved the shake shook and the ticking ticked. No check can tell you whether a thing is pleasant. That only comes from a person using it, which is why this process ends with you trying the app, not with a test run.
+- **Finishing a quest** now plays a sequence: a flash of light, a shockwave ring, sparks, a jolt of the screen, a vibration, and the bell. A level-up, or the last quest of the day, gets a bigger gold version.
+- **Deadlines are felt before they hit.** In the last hour a quest's row turns amber. In the last ten minutes it turns red, counts down in seconds, and the edges of every screen glow red. In the last minute a clock ticks, faster for the final ten seconds.
+- **The bonfire in Focus burns harder** as the deadline closes in: taller flames and five times the sparks.
+- **A soldier joining** rises out of a pool of shadow under the word ARISE.
+- **The Penalty Zone arrives** with a red flash and a hard jolt.
+- **Lightning** cracks over the demons, with thunder.
 
-**Effects that fire often, and that you did not ask for, turn into noise.** A sound or a shake is exciting the first time and irritating the twentieth. The effects were added everywhere at once, including on small things like the daily check-in, with nothing explaining why the screen had started glowing red.
+### Ideas worth learning
 
-### What made it cheap to undo
+**"Juice" is the word game makers use for this.** None of it changes what the app does. All of it changes how doing it feels. A reward that is a number going up is information; the same number with a flash, a sound and a jolt is a reward. Each effect on its own is small (`shake` in `js/main.js` is ten lines); the feeling comes from several firing in the same instant.
 
-Every step of this build was committed separately. So undoing a bad round was one command, `git revert`, which adds a new commit that reverses an old one. Nothing was deleted: the intensity work is still in the history as commit `6c85fc9`, and any single piece of it can be brought back.
+**One mood, set in one place, read by everything.** `feelTension` in `js/penalty.js` runs once a second and writes a single word onto the page: `<body data-tension="near">`. It does not know about any screen. The CSS then says "when the body has that word, glow the edges" (`body[data-tension='near']::after` in `css/base.css`). That is why the tension shows on every screen, including ones written before it existed, without touching any of them.
 
-If all of that work had been mixed into one big commit with other changes, there would have been no clean way back.
+**Change the text, not the list.** Today's countdown ticks every second. Rebuilding the whole quest list each second would restart every animation and could swallow a tap. So `render` builds the rows once and remembers the pieces that change (`live` in `js/screens/today.js`), and `tickCountdowns` only rewrites those.
 
-### The practice to reuse
+**Pass a question, not an answer.** `lightFire(canvas, heat)` takes `heat` as a function. The fire asks it "how hot now?" on every frame, and Focus answers from the clock. If it took a number, the fire would be stuck at whatever the heat was when the screen opened.
 
-When you ask an agent (or a person) for something, the request that works has three parts:
+**Sparks are the fire, thrown outward.** `sparks` in `js/main.js` is the same particle idea as the bonfire: many dots, each with a speed, gravity pulling them down, air slowing them, fading out. Three places in this app now use that one idea.
 
-- **What you do.** "When I finish my last quest of the day..."
-- **What you see or hear.** "...the fire flares up and my soldiers cheer..."
-- **Why it matters.** "...because that is the moment I want to feel proud."
+**Respecting "reduce motion" was already paid for.** `shake`, `sparks` and `arise` each begin by asking `calm()`. People who get dizzy from motion get the reward without the jolt.
 
-"Make it cool" has none of the three. "When I finish every quest for seven days in a row, I want a new kind of soldier to appear, because consistency is the whole point" has all of them, and an agent can build exactly that.
+### How it was checked
 
-And when an agent hands you a question instead of a result, that is usually the agent doing its job.
+- A new walkthrough runs with animation switched on. It moves the clock to five minutes, then 45 seconds, before a deadline and checks the mood words, the seconds countdown and the ticking; finishes quests and checks the jolt, the sparks and the vibration; buys a soldier and checks the Arise sequence; lets a deadline pass and checks the flash; and waits for lightning.
+- The four new sounds were rendered and measured like the others. That caught one: the ticking clock measured about a third as loud as it needed to be, because a very short low note fades before it has finished one wave. It was made longer.
+- Two of the new checks failed for the same reason as before: they looked for a half-second effect a moment too late. Checks on short-lived effects have to look immediately.
+
+### Try it yourself
+
+1. In `js/config.js`, change `TENSION_NEAR_MS` to `60 * 60 * 1000`. Now the last *hour* glows red and counts in seconds. Notice you changed one number and three places reacted.
+2. In `js/main.js`, find `count: grand ? 110 : 46` and try `400`.
+3. In `css/base.css`, find `@keyframes quake` and double every number.

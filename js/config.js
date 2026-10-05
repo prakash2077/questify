@@ -49,6 +49,11 @@ export function soundLayersFor(soldierCount) {
 // Demo tools
 export const DEMO_COINS = 100;
 
+// Tension: how the app behaves as a deadline closes in.
+export const TENSION_SOON_MS = 60 * 60 * 1000; // the last hour: the quest's row warms up
+export const TENSION_NEAR_MS = 10 * 60 * 1000; // the last ten minutes: seconds count down, screen edges glow
+export const TENSION_CRITICAL_MS = 60 * 1000; // the last minute: a clock ticks, wherever you are
+
 // Penalty Zone
 export const PENALTY_CHECK_MS = 15 * 1000; // how often an open app looks for missed deadlines
 export const FALLBACK_PHRASE = 'I did it';

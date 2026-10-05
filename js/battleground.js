@@ -7,7 +7,7 @@ import { demonsForLevel, soundLayersFor } from './config.js';
 import { armyOf } from './rewards.js';
 import { createFire, makeStamp } from './fire.js';
 import { drawSprite, loadSprites } from './sprites.js';
-import { startArmySound, startFireSound, stopArmySound, stopFireSound } from './audio.js';
+import { play, startArmySound, startFireSound, stopArmySound, stopFireSound } from './audio.js';
 import { CATALOG, DEMON_SPRITES } from '../data/catalog.js';
 
 const $ = (id) => document.getElementById(id);
@@ -111,6 +111,8 @@ function makeAir(width, height) {
   return {
     wisps: [], // shadow rising off the soldiers
     debt: 0,
+    flash: 0, // how bright the sky is from lightning right now, 1 to 0
+    nextStrike: rand(3, 7), // seconds until the next lightning
     motes: Array.from({ length: MOTES }, () => ({
       x: rand(0, width),
       y: rand(height * HORIZON, height),
@@ -169,6 +171,20 @@ function stepAir(air, scene, width, height, dt) {
       m.x = rand(0, width);
     }
   }
+  // Lightning: only once the demons have come. A strike, then a weaker second flicker.
+  air.flash = Math.max(0, air.flash - dt * 3.2);
+  if (scene.demons.length) {
+    air.nextStrike -= dt;
+    if (air.nextStrike <= 0) {
+      air.flash = 1;
+      air.nextStrike = rand(6, 13);
+      play('thunder');
+      setTimeout(() => {
+        air.flash = Math.max(air.flash, 0.7);
+      }, 140);
+    }
+  }
+
   for (const f of air.fog) {
     f.x += f.speed * dt;
     if (f.x - f.r > width) f.x = -f.r;
@@ -215,6 +231,15 @@ function drawScene(ctx, width, height, scene, sprites, fire, air, time) {
       const breathe = Math.sin(time * 0.7 + demon.phase);
       drawSprite(ctx, demon.sprite, sprites[demon.sprite], demon.x + breathe * 2, demon.y + Math.cos(time * 0.5 + demon.phase) * 3, demon.height);
     }
+  }
+
+  // Lightning lights the whole sky for an instant, behind the ground.
+  if (air.flash > 0) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = `rgba(255, 150, 140, ${air.flash * 0.34})`;
+    ctx.fillRect(0, 0, width, horizonY + height * 0.04);
+    ctx.restore();
   }
 
   // The ground: black, with the sky fading into it at the horizon.

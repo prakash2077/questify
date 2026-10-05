@@ -2,10 +2,10 @@
 // unlocks it again once the penalty is cleared with a photo (or the fallback).
 
 import { getState, savePhoto, update } from './store.js';
-import { FALLBACK_HOLD_MS, FALLBACK_PHRASE, PENALTY_CHECK_MS } from './config.js';
+import { FALLBACK_HOLD_MS, FALLBACK_PHRASE, PENALTY_CHECK_MS, TENSION_CRITICAL_MS, TENSION_NEAR_MS } from './config.js';
 import { dateStr, deadlineAt, findMissed, newId, nextDeadline } from './quests.js';
 import { drawWeeksGrid, weeksLeft, weeksLived } from './weeks-grid.js';
-import { play } from './audio.js';
+import { buzz, play } from './audio.js';
 import { QUOTES } from '../data/quotes.js';
 
 const $ = (id) => document.getElementById(id);
@@ -52,8 +52,27 @@ function wakeAtNextDeadline() {
   if (next) exactTimer = setTimeout(lockIfMissed, next - new Date() + 50);
 }
 
+// Once a second: how close is the next deadline? In the last ten minutes the
+// edges of the screen glow red on every screen, and in the last minute a clock
+// ticks, faster for the final ten seconds.
+function feelTension() {
+  const msLeft = showTension();
+  if (msLeft <= TENSION_CRITICAL_MS) play(msLeft <= 10 * 1000 ? 'tickFast' : 'tick');
+}
+
+// Sets the mood the whole app can see (body[data-tension]) and returns the time left.
+function showTension() {
+  const state = getState();
+  const next = state.profile.setupDone && !state.penalty ? nextDeadline(state) : null;
+  const msLeft = next ? next - new Date() : Infinity;
+  const tension = msLeft <= TENSION_CRITICAL_MS ? 'critical' : msLeft <= TENSION_NEAR_MS ? 'near' : 'none';
+  if (document.body.dataset.tension !== tension) document.body.dataset.tension = tension;
+  return msLeft;
+}
+
 export function startWatching() {
   setInterval(lockIfMissed, PENALTY_CHECK_MS);
+  setInterval(feelTension, 1000);
   // Phones pause timers while the app is in the background, so check on return.
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) lockIfMissed();
@@ -165,7 +184,10 @@ export function initPenalty(theApp) {
   app.register('penalty', {
     enter() {
       render();
+      showTension(); // the waiting is over: stop the red pulse and the ticking at once
       play('penalty');
+      app.shake(true);
+      buzz([200, 90, 200, 90, 320]);
     },
   });
 
