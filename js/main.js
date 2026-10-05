@@ -1,7 +1,7 @@
 // Starts the app and decides which screen is showing.
 
 import { getState } from './store.js';
-import { buzz, play, unlockAudio } from './audio.js';
+import { play, unlockAudio } from './audio.js';
 import { enforcePenalty, initPenalty, startWatching } from './penalty.js';
 import { initSetup } from './screens/setup.js';
 import { initToday } from './screens/today.js';
@@ -69,129 +69,32 @@ function showNotice({ text, title = 'Notification', yes = 'OK', no = null }) {
   });
 }
 
-// ---------- Big moments: shake, sparks, the reward sequence ----------
-
-const calm = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const appEl = document.getElementById('app');
-
-// Jolts the whole screen. `hard` is for the moments that should really land.
-function shake(hard = false) {
-  if (calm()) return;
-  const name = hard ? 'is-quaking' : 'is-shaking';
-  appEl.classList.remove('is-shaking', 'is-quaking');
-  void appEl.offsetWidth; // lets the same shake start again from the beginning
-  appEl.classList.add(name);
-  appEl.addEventListener('animationend', () => appEl.classList.remove(name), { once: true });
-}
-
-// A burst of sparks flying out from a point and falling away.
-function sparks(canvas, { x, y, count, colours }) {
-  const scale = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = canvas.clientWidth * scale;
-  canvas.height = canvas.clientHeight * scale;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(scale, scale);
-  if (calm()) return;
-
-  const bits = Array.from({ length: count }, () => {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 120 + Math.random() * 420;
-    return {
-      x,
-      y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - 120,
-      size: 1 + Math.random() * 2.4,
-      life: 0.6 + Math.random() * 0.8,
-      colour: colours[Math.floor(Math.random() * colours.length)],
-    };
-  });
-  let last = null;
-  let age = 0;
-  function frame(now) {
-    const dt = Math.min((now - (last ?? now)) / 1000, 0.05);
-    last = now;
-    age += dt;
-    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-    ctx.globalCompositeOperation = 'lighter';
-    let alive = false;
-    for (const bit of bits) {
-      if (age > bit.life) continue;
-      alive = true;
-      bit.vy += 620 * dt; // gravity
-      bit.vx *= 1 - 1.6 * dt; // air slowing it down
-      bit.x += bit.vx * dt;
-      bit.y += bit.vy * dt;
-      ctx.globalAlpha = 1 - age / bit.life;
-      ctx.fillStyle = bit.colour;
-      ctx.beginPath();
-      ctx.arc(bit.x, bit.y, bit.size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    if (alive) requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
+// ---------- Reward pop-up ----------
 
 const rewardEl = document.getElementById('reward');
 let rewardTimer = null;
 
-// Shows what was just earned over whatever screen is showing: a flash, a
-// shockwave, sparks, a jolt and a sound. `big` is for a level-up or a finished day.
-function celebrate({ title, sound, xp, coins, levelsGained, level, big = false }) {
-  const grand = big || levelsGained > 0;
+// Shows what was just earned, with sound, over whatever screen is showing.
+function celebrate({ title, sound, xp, coins, levelsGained, level }) {
   document.getElementById('reward-title').textContent = title;
   document.getElementById('reward-xp').textContent = `+${xp} XP`;
   document.getElementById('reward-coins').hidden = !coins;
   document.getElementById('reward-coins-num').textContent = `+${coins}`;
   document.getElementById('reward-level').hidden = !levelsGained;
   document.getElementById('reward-level').textContent = `Level up! You are now level ${level}`;
-  rewardEl.classList.toggle('is-big', grand);
 
-  // Hiding and re-showing restarts the animations if a reward is already on screen.
+  // Hiding and re-showing restarts the pop-in animation if one is already on screen.
   rewardEl.hidden = true;
   void rewardEl.offsetWidth;
   rewardEl.hidden = false;
   clearTimeout(rewardTimer);
   rewardTimer = setTimeout(() => {
     rewardEl.hidden = true;
-  }, grand ? 3800 : 2000);
-
-  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-  sparks(document.getElementById('reward-sparks'), {
-    x: window.innerWidth / 2,
-    y: window.innerHeight * 0.36,
-    count: grand ? 110 : 46,
-    colours: grand ? ['#ffc94d', '#fff3c4', accent, '#ffffff'] : [accent, '#ffffff', '#ffc94d'],
-  });
-  shake(grand);
-  buzz(grand ? [40, 60, 40, 60, 140] : [18, 30, 36]);
+  }, levelsGained ? 3400 : 1900);
 
   play(sound);
   if (coins) play('coins');
   if (levelsGained) play('levelUp');
-  else if (big) play('allClear');
-}
-
-// ---------- A soldier rises ----------
-
-const ariseEl = document.getElementById('arise');
-
-// Plays the summoning: the soldier climbs out of a pool of shadow under the
-// word ARISE. Resolves when it is over.
-function arise({ sprite, name }) {
-  if (calm()) return Promise.resolve();
-  document.getElementById('arise-art').src = sprite;
-  document.getElementById('arise-name').textContent = name;
-  ariseEl.hidden = false;
-  shake();
-  buzz([30, 50, 30, 50, 120]);
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      ariseEl.hidden = true;
-      resolve();
-    }, 2600);
-  });
 }
 
 // What each screen is handed so it can move around and talk to the user.
@@ -200,8 +103,6 @@ const app = {
   lock,
   register,
   celebrate,
-  arise,
-  shake,
   notify: (text, title) => showNotice({ text, title }),
   confirm: (text, title, { yes = 'Yes', no = 'No' } = {}) => showNotice({ text, title, yes, no }),
 };
@@ -229,9 +130,10 @@ document.getElementById('gate').addEventListener('click', () => {
 
   // A brand-new player gets the Level 0 demo; everyone else goes home to Today.
   const next = getState().profile.setupDone ? 'today' : 'demo';
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (enforcePenalty()) {
     go('penalty');
-  } else if (calm()) {
+  } else if (calm) {
     // Someone who has asked their device for less motion skips the intro.
     go(next);
     play('begin');

@@ -237,30 +237,6 @@ const sounds = {
     pad([261.6, 329.6, 392, 523.3], 0.58, 3, 0.05);
     [523.3, 659.3, 784, 1046.5, 1318.5].forEach((freq, i) => bell(freq, 0.62 + i * 0.1, 0.09, 2.4));
   },
-  // The last minute before a deadline: a clock's tick over a heartbeat.
-  tick() {
-    tone({ type: 'square', from: 1700, dur: 0.06, vol: 0.1, attack: 0.002, wet: 0.5 });
-    tone({ from: 96, to: 52, dur: 0.34, vol: 0.5, attack: 0.008, wet: 0.2 });
-  },
-  // The last ten seconds: the same, higher and with a second beat.
-  tickFast() {
-    tone({ type: 'square', from: 2300, dur: 0.06, vol: 0.12, attack: 0.002, wet: 0.5 });
-    tone({ from: 112, to: 58, dur: 0.3, vol: 0.55, attack: 0.008, wet: 0.2 });
-    tone({ from: 104, to: 54, dur: 0.3, at: 0.26, vol: 0.42, attack: 0.008, wet: 0.2 });
-  },
-  // Lightning over the Battleground: a crack, then a long roll.
-  thunder() {
-    rush({ from: 3200, to: 300, dur: 0.25, vol: 0.12, swell: 0.02, type: 'lowpass', wet: 0.7 });
-    rush({ from: 500, to: 50, at: 0.12, dur: 2.4, vol: 0.16, swell: 0.08, type: 'lowpass', wet: 0.9 });
-    tone({ from: 70, to: 30, at: 0.12, dur: 1.8, vol: 0.3, wet: 0.5 });
-  },
-  // Every quest of the day cleared: brass, a wide major chord, bells climbing.
-  allClear() {
-    boom(0.5, 0.45);
-    braam(73.4, 0.5, 2.2, 0.12);
-    pad([293.7, 370, 440, 587.3], 0.5, 3, 0.05);
-    [587.3, 740, 880, 1174.7, 1480].forEach((freq, i) => bell(freq, 0.56 + i * 0.1, 0.09, 2.4));
-  },
   // Daily check-in: a single soft bell.
   checkIn() {
     bell(784, 0, 0.17, 1.4);
@@ -295,12 +271,6 @@ const sounds = {
 export function play(name) {
   if (!ctx || getState().settings.muted) return;
   sounds[name]();
-}
-
-// Vibrates the phone, where the phone allows it. The sound switch silences this too.
-export function buzz(pattern) {
-  if (getState().settings.muted) return;
-  navigator.vibrate?.(pattern);
 }
 
 // ---------- The crackling fire ----------

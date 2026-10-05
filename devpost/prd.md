@@ -38,9 +38,7 @@ Navigation: Today is home. Shop and Battleground are reachable from Today. Focus
 - The fire is a real bonfire: a crackling, burning flame, like one you'd keep going while building or cooking something. That is the theme of the whole app. It is shown on Focus and on the Battleground, and the animation should look great.
 - Characters are 2D sprites drawn from scratch as dark silhouettes: tall shadow soldiers with glowing eyes and a cold aura, and demons as huge horned shapes with burning red eyes against a blood moon. Sleek and cinematic, not cartoon. (Changed in the final review: the first version was thick, cute and Duolingo-style, and read as a small children's game.)
 - Sound is cinematic: deep impacts, bells, low brass and a choir in a large reverberant space, not beeps. Sound effects are important at key moments: intro, check-off, coins, buying a soldier, the Battleground, the Penalty Zone. The Battleground gets richer in sound as the army grows.
-- Intensity: the key moments are staged, not just shown. Finishing a quest plays a flash, a shockwave, sparks, a jolt of the screen and a vibration; a level-up or the last quest of the day plays a bigger gold version. A soldier joining rises out of a pool of shadow under the word ARISE. The Penalty Zone arrives with a red flash and a hard jolt. Lightning cracks over the demons.
-- Tension: a deadline is felt before it hits. In its last hour a quest's row turns amber; in the last ten minutes it turns red, counts down in seconds, and the edges of every screen glow red; in the last minute a clock ticks. The bonfire in Focus burns harder as the deadline nears.
-- Tone: motivating and heartwarming, not harsh. The drama is in the staging; the words stay kind.
+- Tone: motivating and heartwarming, not harsh.
 
 ## Features and Behavior
 

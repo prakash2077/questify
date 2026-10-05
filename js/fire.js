@@ -56,12 +56,12 @@ export function createFire() {
   let flameDebt = 0;
   let sparkDebt = 0;
 
-  function addFlame(heat = 0) {
+  function addFlame() {
     const tongue = TONGUES[Math.floor(Math.random() * TONGUES.length)];
     flames.push({
       x: tongue.x + rand(-0.07, 0.07) + Math.sin(time * 2.3 + tongue.x * 20) * 0.03,
       y: rand(0.03, 0.1),
-      rise: rand(0.95, 1.75) * tongue.power * (1 + heat * 0.3),
+      rise: rand(0.95, 1.75) * tongue.power,
       sway: rand(2, 5),
       phase: rand(0, TAU),
       size: rand(0.26, 0.42),
@@ -82,15 +82,14 @@ export function createFire() {
     });
   }
 
-  // Move the fire forward by dt seconds. `heat` runs from 0 (a steady fire) to 1
-  // (roaring): more flame, taller, and many more sparks.
-  function step(dt, heat = 0) {
+  // Move the fire forward by dt seconds.
+  function step(dt) {
     time += dt;
 
     // The fire breathes: it burns a little harder and softer over time.
     const breath = 0.82 + 0.18 * Math.sin(time * 2.6) * Math.sin(time * 1.1 + 1);
-    for (flameDebt += dt * FLAMES_PER_SECOND * breath * (1 + heat * 0.7); flameDebt >= 1; flameDebt -= 1) addFlame(heat);
-    for (sparkDebt += dt * SPARKS_PER_SECOND * (1 + heat * 5); sparkDebt >= 1; sparkDebt -= 1) addSpark();
+    for (flameDebt += dt * FLAMES_PER_SECOND * breath; flameDebt >= 1; flameDebt -= 1) addFlame();
+    for (sparkDebt += dt * SPARKS_PER_SECOND; sparkDebt >= 1; sparkDebt -= 1) addSpark();
 
     for (const f of flames) {
       f.age += dt;
@@ -247,8 +246,7 @@ function drawStones(ctx, px, py, size, front) {
 // ---------- Running a fire on its own canvas ----------
 
 // Fills the canvas with a burning fire. Returns a function that puts it out.
-// `heat`, if given, is asked every frame how hard the fire should burn (0 to 1).
-export function lightFire(canvas, heat = () => 0) {
+export function lightFire(canvas) {
   const fire = createFire();
   const ctx = canvas.getContext('2d');
   let width = 0;
@@ -269,7 +267,7 @@ export function lightFire(canvas, heat = () => 0) {
     // Cap the step so a paused tab does not make the fire jump when it returns.
     const dt = Math.min((now - (last ?? now)) / 1000, 0.05);
     last = now;
-    fire.step(dt, heat());
+    fire.step(dt);
     ctx.clearRect(0, 0, width, height);
     fire.draw(ctx, width / 2, height * 0.86, Math.min(width * 0.8, height * 0.5));
     frame = requestAnimationFrame(tick);

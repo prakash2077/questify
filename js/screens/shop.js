@@ -87,7 +87,6 @@ async function finishPurchase(item, name) {
 
   play('purchase');
   render();
-  if (result.owned.name) await app.arise({ sprite: spritePath(item), name: result.owned.name });
   const joined = result.owned.name ? `${result.owned.name} has joined your army.` : `${item.label} added to your camp.`;
   const look = await app.confirm(joined, 'Arise', { yes: 'See it', no: 'Keep shopping' });
   if (look) app.go('battleground');

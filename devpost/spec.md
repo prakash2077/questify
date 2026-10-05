@@ -104,15 +104,6 @@ PRD ref: `prd.md > Features and Behavior > Goals and Quests`.
 Lists today's quests ordered by priority with deadline, a Focus button, and a done tick. The header shows coins, XP bar and level. It has buttons to the Shop, Battleground and Settings, and a **Check in** button (see Rewards). If there are no quests, it shows a prompt to add one.
 PRD ref: `prd.md > Screens and Layout > Today`, `prd.md > States and Boundaries > No quests yet today`.
 
-### Tension and Big Moments
-Added in the final review. None of it changes a rule; it changes how the rules feel.
-- **Tension** comes from one place: `feelTension` in `penalty.js` runs once a second, finds the next deadline, and sets `body[data-tension]` to `none`, `near` (last ten minutes) or `critical` (last minute). CSS turns that into a red glow at the screen edges on every screen; in the last minute it also plays a ticking sound. The thresholds are `TENSION_*` in `config.js`.
-- **Today** updates each open quest's countdown, time bar and mood (`data-urgency`) in place once a second, without rebuilding the list.
-- **The reward sequence** is `celebrate` in `main.js`: flash, ring, sparks on a canvas, a shake of `#app`, a vibration, and the sounds. `big` selects the gold version.
-- **Arise** is `arise` in `main.js`, shown for about two and a half seconds before the "joined your army" message.
-- **Reduced motion:** anyone whose device asks for less motion gets none of the shaking, sparks or Arise sequence.
-PRD ref: `prd.md > Look and Feel`.
-
 ### Focus Mode
 Full-screen true black with only the quest name, the canvas bonfire, and a check-off control. It reuses `fire.js`.
 PRD ref: `prd.md > Features and Behavior > Focus Mode`.
